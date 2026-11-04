@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certify — Certificate Automation</title>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--ink:#1d2433;--muted:#667085;--line:#e4e7ec;--accent:#1f3a5f;--accent2:#2f5d92;
+--ok:#127a3e;--okbg:#e7f6ec;--bad:#b42318;--badbg:#fdecea;--warn:#93600a;--warnbg:#fff4e0;--info:#1d4ed8;--infobg:#e8efff}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit}
+header{background:var(--accent);color:#fff;padding:12px 20px;display:flex;align-items:center;gap:14px}
+header h1{font-size:17px;margin:0;font-weight:650;letter-spacing:.2px}
+header .sp{flex:1}
+.badge{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+header .badge{background:rgba(255,255,255,.15)}
+.layout{display:grid;grid-template-columns:250px 1fr;min-height:calc(100vh - 50px)}
+aside{border-right:1px solid var(--line);background:#fff;padding:14px}
+aside h2{font-size:12px;text-transform:uppercase;color:var(--muted);letter-spacing:.6px;margin:6px 0 10px}
+.batch{padding:9px 10px;border-radius:8px;cursor:pointer;margin-bottom:4px}
+.batch:hover{background:var(--bg)} .batch.sel{background:var(--infobg)}
+.batch b{display:block;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.batch small{color:var(--muted)}
+main{padding:20px;max-width:1200px;width:100%}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card h3{margin:0 0 4px;font-size:16px}
+.card .sub{color:var(--muted);margin:0 0 14px}
+.step{display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;
+align-items:center;justify-content:center;margin-right:8px;font-weight:700;vertical-align:1px}
+.btn{text-decoration:none;color:inherit;display:inline-block;border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;cursor:pointer;font-weight:550}
+.btn:hover{border-color:#c5cad3}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+a.btn{color:var(--ink)}
+.btn.primary:hover{background:var(--accent2)}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.sm{padding:4px 9px;font-size:12px}
+input[type=text],input[type=password],select,textarea{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff;width:100%}
+textarea{font-family:ui-monospace,Menlo,monospace;font-size:12.5px}
+label.f{display:block;font-weight:600;font-size:12.5px;margin:0 0 4px;color:#344054}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.drop{border:2px dashed #c5cad3;border-radius:12px;padding:30px;text-align:center;color:var(--muted);cursor:pointer}
+.drop.over{border-color:var(--accent);background:var(--infobg)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--muted);font-weight:600;background:#fafbfc;position:sticky;top:0}
+.tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.map-row{display:grid;grid-template-columns:150px 170px 1fr;gap:10px;align-items:center;margin-bottom:8px}
+.ph{font-family:ui-monospace,Menlo,monospace;font-weight:700;color:var(--accent)}
+.chip{display:inline-block;font-family:ui-monospace,monospace;font-size:12px;background:var(--infobg);color:var(--info);
+padding:2px 7px;border-radius:6px;margin:2px;cursor:pointer}
+.tiles{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:14px}
+.tile{border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer;background:#fff}
+.tile.sel{outline:2px solid var(--accent)}
+.tile .n{font-size:22px;font-weight:700}
+.tile .l{font-size:12px;color:var(--muted)}
+.s-Sent{background:var(--okbg);color:var(--ok)} .s-Failed,.s-Invalid{background:var(--badbg);color:var(--bad)}
+.s-Pending{background:#eef0f3;color:#475467} .s-Generated{background:var(--infobg);color:var(--info)}
+.s-Sending{background:var(--warnbg);color:var(--warn)} .s-Skipped{background:var(--warnbg);color:var(--warn)}
+.err{color:var(--bad);font-size:12.5px} .wrn{color:var(--warn);font-size:12.5px} .muted{color:var(--muted)}
+.notice{padding:10px 12px;border-radius:8px;margin:10px 0}
+.notice.warn{background:var(--warnbg);color:var(--warn)} .notice.ok{background:var(--okbg);color:var(--ok)}
+.notice.bad{background:var(--badbg);color:var(--bad)} .notice.info{background:var(--infobg);color:var(--info)}
+.preview{display:grid;grid-template-columns:1.4fr 1fr;gap:16px}
+iframe{width:100%;height:440px;border:1px solid var(--line);border-radius:8px;background:#fff}
+.email{border:1px solid var(--line);border-radius:8px;padding:14px;font-size:13.5px}
+.email .h{color:var(--muted);font-size:12.5px;margin-bottom:2px}
+.email pre{white-space:pre-wrap;font-family:inherit;margin:12px 0 0;border-top:1px solid var(--line);padding-top:12px}
+.attach{display:inline-block;margin-top:10px;border:1px solid var(--line);border-radius:6px;padding:5px 9px;font-size:12.5px;background:#fafbfc}
+.progress{height:8px;background:#eef0f3;border-radius:99px;overflow:hidden;margin:6px 0 12px}
+.progress div{height:100%;background:var(--ok);transition:width .4s}
+#login{max-width:360px;margin:12vh auto}
+.hidden{display:none!important}
+details summary{cursor:pointer;color:var(--accent);font-weight:600;margin:6px 0}
+#toast{position:fixed;bottom:20px;right:20px;background:#1d2433;color:#fff;padding:10px 16px;border-radius:8px;opacity:0;transition:.3s;pointer-events:none;max-width:420px}
+#toast.show{opacity:1}
+@media (max-width:900px){.layout{grid-template-columns:1fr}aside{border-right:0;border-bottom:1px solid var(--line)}
+.grid2,.grid3,.preview{grid-template-columns:1fr}.tiles{grid-template-columns:repeat(4,1fr)}.map-row{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+
+<div id="login" class="card hidden">
+  <h3>Certify — sign in</h3>
+  <p class="sub">Only authorized organizers can generate or send certificates.</p>
+  <form id="loginForm">
+    <label class="f">Username</label><input type="text" id="lu" value="admin" autocomplete="username"><br><br>
+    <label class="f">Password</label><input type="password" id="lp" autocomplete="current-password"><br><br>
+    <button class="btn primary" style="width:100%">Sign in</button>
+    <p id="loginErr" class="err"></p>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+<header>
+  <h1>🎓 Certify</h1><span class="muted" style="color:#c9d4e3">Upload once, generate automatically, send to everyone</span>
+  <span class="sp"></span>
+  <span id="mailMode" class="badge"></span>
+  <button class="btn sm" id="logout">Sign out</button>
+</header>
+<div class="layout">
+  <aside>
+    <button class="btn primary" style="width:100%;margin-bottom:14px" onclick="newBatch()">+ New batch</button>
+    <h2>Batches</h2>
+    <div id="batches"><p class="muted">No batches yet.</p></div>
+  </aside>
+  <main>
+    <!-- Step 1 -->
+    <section id="uploadCard" class="card">
+      <h3><span class="step">1</span>Upload student data</h3>
+      <p class="sub">Excel (.xlsx) or CSV with one row per student, e.g. Student Name, Student ID, Student Email, Personal Email, Event, Certificate Type, Achievement, Date.</p>
+      <div class="grid2" style="margin-bottom:12px">
+        <div><label class="f">Batch / event name</label><input type="text" id="batchName" placeholder="e.g. AI Hackathon 2026"></div>
+      </div>
+      <div class="drop" id="drop">Drop your Excel/CSV here or <b>click to browse</b><input type="file" id="file" accept=".csv,.xlsx,.xls,.xlsm" hidden></div>
+      <p class="muted" style="margin-top:10px">No file handy? <a href="#" onclick="useSample();return false">Use the sample sheet</a> (includes a few deliberately broken rows to show validation).</p>
+    </section>
+
+    <div id="batchView" class="hidden">
+      <div class="card" style="padding:12px 20px">
+        <div class="row"><b id="bTitle" style="font-size:16px"></b><span class="muted" id="bMeta"></span><span class="sp" style="flex:1"></span>
+        <button class="btn sm danger" onclick="deleteBatch()">Delete batch</button></div>
+      </div>
+
+      <!-- Step 2 -->
+      <section class="card">
+        <h3><span class="step">2</span>Map columns &amp; choose email</h3>
+        <p class="sub">Connect each placeholder to a spreadsheet column, or type a fixed value used for everyone (e.g. the event name).</p>
+        <div class="grid2">
+          <div><label class="f">Send to (preferred email column)</label><select id="emailCol"></select></div>
+          <div><label class="f">Fallback email column (used if preferred is missing/invalid)</label><select id="fallbackCol"></select></div>
+        </div>
+        <h4 style="margin:18px 0 8px">Placeholders</h4>
+        <div id="mapping"></div>
+        <div class="row" style="margin-top:12px"><button class="btn primary" onclick="saveConfig()">Save &amp; validate</button><span id="valSummary"></span></div>
+      </section>
+
+      <!-- Step 3 -->
+      <section class="card">
+        <h3><span class="step">3</span>Certificate template &amp; email</h3>
+        <p class="sub">Use the built-in design, or upload your own certificate artwork (PNG/JPG) and place the text fields on it. Click a placeholder to insert it.</p>
+        <div id="chips" style="margin-bottom:10px"></div>
+        <div class="grid2">
+          <div>
+            <label class="f">Certificate background (optional)</label>
+            <div class="row"><input type="file" id="bgFile" accept=".png,.jpg,.jpeg" style="flex:1"><button class="btn sm" onclick="clearBg()">Use built-in design</button></div>
+            <p class="muted" id="bgInfo" style="margin:6px 0 12px"></p>
+            <label class="f">File naming pattern</label>
+            <input type="text" id="fnPattern" data-ins>
+            <p class="muted" style="margin:4px 0 12px">Example: <code id="fnExample"></code></p>
+            <details><summary>Edit text fields on the certificate (advanced)</summary>
+              <p class="muted">Positions are fractions of the page (x: 0 left → 1 right, y: 0 bottom → 1 top). Long text auto-shrinks to <code>max_width</code>.</p>
+              <textarea id="tplJson" rows="16"></textarea>
+              <div class="row" style="margin-top:6px"><button class="btn sm" onclick="resetTemplate()">Reset to default</button>
+              <label class="row" style="gap:6px"><input type="checkbox" id="qrToggle"> Add verification QR code</label></div>
+            </details>
+          </div>
+          <div>
+            <label class="f">Email subject</label><input type="text" id="subj" data-ins><br><br>
+            <label class="f">Email body</label><textarea id="body" rows="13" data-ins style="font-family:inherit;font-size:13.5px"></textarea>
+          </div>
+        </div>
+        <div class="row" style="margin-top:12px"><button class="btn primary" onclick="saveConfig(true)">Save &amp; preview</button></div>
+      </section>
+
+      <!-- Step 4 -->
+      <section class="card" id="previewCard">
+        <h3><span class="step">4</span>Preview</h3>
+        <p class="sub">Check representative certificates and emails before sending anything.</p>
+        <div class="row" style="margin-bottom:10px">
+          <button class="btn sm" onclick="stepPreview(-1)">◀ Prev</button>
+          <button class="btn sm" onclick="stepPreview(1)">Next ▶</button>
+          <span class="muted" id="pvInfo"></span>
+        </div>
+        <div class="preview">
+          <div><img id="pvImg" alt="Certificate preview" style="width:100%;border:1px solid var(--line);border-radius:8px;display:block">
+          <iframe id="pvCert" title="Certificate preview" class="hidden"></iframe>
+          <a class="muted" id="pvPdf" target="_blank" style="font-size:12.5px">Open as PDF ↗</a></div>
+          <div class="email" id="pvEmail"></div>
+        </div>
+      </section>
+
+      <!-- Step 5 -->
+      <section class="card">
+        <h3><span class="step">5</span>Generate, send &amp; track</h3>
+        <p class="sub">Every record is processed on its own: a failure never stops the batch. Already-delivered certificates are skipped unless you resend them.</p>
+        <div id="modeNotice"></div>
+        <div class="tiles" id="tiles"></div>
+        <div id="jobBar" class="hidden"><b id="jobLabel"></b><div class="progress"><div id="jobProg" style="width:0"></div></div></div>
+        <div class="row" style="margin-bottom:14px">
+          <button class="btn" id="genBtn" onclick="generate()">⚙ Generate certificates</button>
+          <button class="btn primary" id="sendBtn" onclick="sendAll()">✉ Send emails</button>
+          <button class="btn" id="retryBtn" onclick="retry()">↻ Retry failed</button>
+          <span style="flex:1"></span>
+          <a class="btn" id="zipBtn">⬇ Certificates (.zip)</a>
+          <a class="btn" id="csvBtn">⬇ Status report (.csv)</a>
+        </div>
+        <div class="row" style="margin-bottom:8px"><input type="text" id="search" placeholder="Search name, email or ID…" style="max-width:300px"><span class="muted" id="recCount"></span></div>
+        <div class="tablewrap"><table>
+          <thead><tr><th>Row</th><th>Student</th><th>Email</th><th>Status</th><th>Details</th><th></th></tr></thead>
+          <tbody id="recs"></tbody>
+        </table></div>
+      </section>
+    </div>
+  </main>
+</div>
+</div>
+<div id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let me = null, batch = null, cfg = null, filter = '', pvIndex = 0, pvList = [], pollTimer = null, lastFocus = null;
+const STATUSES = ['Total','Invalid','Pending','Generated','Sent','Failed','Skipped'];
+
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3500); }
+
+async function api(path, opts={}){
+  const r = await fetch(path, {credentials:'same-origin', ...opts,
+    headers: opts.body && !(opts.body instanceof FormData) ? {'Content-Type':'application/json'} : {}});
+  if (r.status === 401 && path !== '/api/login'){ showLogin(); throw new Error('Login required'); }
+  const ct = r.headers.get('content-type') || '';
+  const data = ct.includes('json') ? await r.json() : await r.text();
+  if (!r.ok) throw new Error(data.detail || data || r.statusText);
+  return data;
+}
+
+function showLogin(){ $('#app').classList.add('hidden'); $('#login').classList.remove('hidden'); $('#lp').focus(); }
+$('#loginForm').onsubmit = async e => {
+  e.preventDefault(); $('#loginErr').textContent='';
+  try { await api('/api/login',{method:'POST',body:JSON.stringify({username:$('#lu').value,password:$('#lp').value})}); boot(); }
+  catch(err){ $('#loginErr').textContent = err.message; }
+};
+$('#logout').onclick = async () => { await api('/api/logout',{method:'POST'}); showLogin(); };
+
+async function boot(){
+  try { me = await api('/api/me'); } catch { return; }
+  $('#login').classList.add('hidden'); $('#app').classList.remove('hidden');
+  $('#mailMode').textContent = me.mail_mode === 'smtp' ? `SMTP · ${me.mail_from}` : 'Outbox mode (no SMTP configured)';
+  await loadBatches();
+}
+
+async function loadBatches(){
+  const list = await api('/api/batches');
+  $('#batches').innerHTML = list.length ? list.map(b => `<div class="batch ${batch&&batch.id===b.id?'sel':''}" onclick="openBatch(${b.id})">
+    <b>${esc(b.name)}</b><small>${b.counts.Total||0} students · ${b.counts.Sent||0} sent${b.counts.Failed?` · ${b.counts.Failed} failed`:''}</small></div>`).join('')
+    : '<p class="muted">No batches yet.</p>';
+}
+
+function newBatch(){ batch=null; cfg=null; $('#batchView').classList.add('hidden'); $('#uploadCard').classList.remove('hidden'); stopPoll(); loadBatches(); }
+
+// ---------- upload
+const drop = $('#drop');
+drop.onclick = () => $('#file').click();
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); };
+$('#file').onchange = e => e.target.files[0] && upload(e.target.files[0]);
+
+async function upload(file){
+  const fd = new FormData(); fd.append('file', file); fd.append('name', $('#batchName').value);
+  drop.textContent = 'Uploading and validating…';
+  try { const b = await api('/api/batches',{method:'POST',body:fd}); $('#batchName').value=''; await openBatch(b.id); toast('Uploaded. Check the mapping and validation results.'); }
+  catch(err){ toast(err.message); }
+  finally { drop.innerHTML = 'Drop your Excel/CSV here or <b>click to browse</b><input type="file" id="file" accept=".csv,.xlsx,.xls,.xlsm" hidden>';
+    $('#file').onchange = e => e.target.files[0] && upload(e.target.files[0]); }
+}
+async function useSample(){
+  const r = await fetch('/sample/students.csv'); const blob = await r.blob();
+  if (!$('#batchName').value) $('#batchName').value = 'AI Hackathon 2026';
+  upload(new File([blob], 'students.csv', {type:'text/csv'}));
+}
+
+// ---------- batch view
+async function openBatch(id){
+  batch = await api(`/api/batches/${id}`); cfg = batch.config;
+  $('#uploadCard').classList.add('hidden'); $('#batchView').classList.remove('hidden');
+  $('#bTitle').textContent = batch.name; $('#bMeta').textContent = `· ${batch.filename} · ${batch.columns.length} columns`;
+  $('#zipBtn').href = `/api/batches/${id}/certificates.zip`; $('#csvBtn').href = `/api/batches/${id}/report.csv`;
+  $('#modeNotice').innerHTML = me.mail_mode === 'smtp'
+    ? `<div class="notice info">Emails will be delivered through your SMTP server as <b>${esc(me.mail_from)}</b>.</div>`
+    : `<div class="notice warn"><b>Outbox mode:</b> no SMTP server is configured, so emails are written as .eml files to <code>data/outbox/</code> instead of being delivered. Set SMTP_* in <code>.env</code> to send for real.</div>`;
+  renderMapping(); renderTemplateEditor(); filter=''; await refresh(); loadPreview(); loadBatches();
+}
+
+function colOptions(sel, allowNone){
+  return (allowNone?'<option value="">— none —</option>':'') + batch.columns.map(c=>`<option ${c===sel?'selected':''}>${esc(c)}</option>`).join('');
+}
+
+function renderMapping(){
+  $('#emailCol').innerHTML = colOptions(cfg.email_column, true);
+  $('#fallbackCol').innerHTML = colOptions(cfg.fallback_column, true);
+  const phs = batch.placeholders.all.filter(p => !['CERT_ID','VERIFY_URL','ISSUE_DATE'].includes(p));
+  const sample = batch.sample_rows[0] || {};
+  $('#mapping').innerHTML = phs.map(p => {
+    const m = cfg.mapping[p] || {type:'column', value:''};
+    const used = batch.placeholders.certificate.includes(p) ? 'certificate' : (batch.placeholders.email.includes(p)?'email':'file name');
+    return `<div class="map-row" data-ph="${p}">
+      <div><span class="ph">{{${p}}}</span><br><small class="muted">used in ${used}${p==='NAME'?' · required':''}</small></div>
+      <select class="mtype" onchange="this.parentElement.querySelector('.mcol').classList.toggle('hidden',this.value!=='column');this.parentElement.querySelector('.mtext').classList.toggle('hidden',this.value!=='text')">
+        <option value="column" ${m.type==='column'?'selected':''}>From column</option>
+        <option value="text" ${m.type==='text'?'selected':''}>Fixed text</option>
+        <option value="none" ${!m.value?'selected':''}>Not used</option></select>
+      <div><select class="mcol ${m.type!=='column'?'hidden':''}">${colOptions(m.type==='column'?m.value:'', true)}</select>
+      <input type="text" class="mtext ${m.type!=='text'?'hidden':''}" value="${m.type==='text'?esc(m.value):''}" placeholder="Same value for every student"></div>
+    </div>`;}).join('') + `<p class="muted">First row example: ${esc(Object.entries(sample).slice(0,4).map(([k,v])=>`${k} = ${v}`).join(' · '))}</p>`;
+  $('#mapping').querySelectorAll('.map-row').forEach(row => { if (row.querySelector('.mtype').value==='none') row.querySelector('.mtype').dispatchEvent(new Event('change')); });
+}
+
+function renderTemplateEditor(){
+  $('#subj').value = cfg.email_subject; $('#body').value = cfg.email_body; $('#fnPattern').value = cfg.filename_pattern;
+  $('#tplJson').value = JSON.stringify(cfg.template.fields, null, 1);
+  $('#qrToggle').checked = cfg.template.qr !== false;
+  $('#bgInfo').textContent = cfg.template.background ? 'Using your uploaded background.' : 'Using the built-in design.';
+  const all = [...new Set([...batch.placeholders.all, 'NAME','ID','EVENT','CERT_TYPE','ACHIEVEMENT','DATE','CERT_ID','VERIFY_URL','ISSUE_DATE'])];
+  $('#chips').innerHTML = 'Placeholders: ' + all.map(p=>`<span class="chip" onclick="insertPh('${p}')">{{${p}}}</span>`).join('');
+}
+document.addEventListener('focusin', e => { if (e.target.matches('[data-ins],#tplJson')) lastFocus = e.target; });
+function insertPh(p){
+  const el = lastFocus || $('#body'); const s = el.selectionStart ?? el.value.length, t = `{{${p}}}`;
+  el.value = el.value.slice(0,s) + t + el.value.slice(el.selectionEnd ?? s); el.focus(); el.selectionStart = el.selectionEnd = s + t.length;
+}
+
+function collectConfig(){
+  const mapping = {};
+  $('#mapping').querySelectorAll('.map-row').forEach(row => {
+    const t = row.querySelector('.mtype').value, ph = row.dataset.ph;
+    if (t==='column' && row.querySelector('.mcol').value) mapping[ph] = {type:'column', value:row.querySelector('.mcol').value};
+    if (t==='text' && row.querySelector('.mtext').value.trim()) mapping[ph] = {type:'text', value:row.querySelector('.mtext').value.trim()};
+  });
+  let fields;
+  try { fields = JSON.parse($('#tplJson').value); if (!Array.isArray(fields)) throw 0; }
+  catch { throw new Error('Template fields are not valid JSON (expected a list).'); }
+  return { mapping, email_column: $('#emailCol').value, fallback_column: $('#fallbackCol').value,
+    template: {...cfg.template, fields, qr: $('#qrToggle').checked},
+    email_subject: $('#subj').value, email_body: $('#body').value, filename_pattern: $('#fnPattern').value };
+}
+
+async function saveConfig(scroll){
+  try {
+    const body = collectConfig();
+    const res = await api(`/api/batches/${batch.id}/config`, {method:'PUT', body:JSON.stringify(body)});
+    cfg = body; batch.placeholders = res.placeholders;
+    renderMapping(); renderTemplateEditor();
+    await refresh(); await loadPreview();
+    toast(`Saved. ${res.counts.Pending||0} ready, ${res.counts.Invalid||0} need attention.`);
+    if (scroll) $('#previewCard').scrollIntoView({behavior:'smooth'});
+  } catch(err){ toast(err.message); }
+}
+
+$('#bgFile').onchange = async e => {
+  const f = e.target.files[0]; if (!f) return;
+  const fd = new FormData(); fd.append('file', f);
+  try { const r = await api(`/api/batches/${batch.id}/background`, {method:'POST', body:fd}); cfg.template.background = r.background;
+    renderTemplateEditor(); await refresh(); loadPreview(); toast('Background uploaded. Adjust text positions under "advanced" if needed.'); }
+  catch(err){ toast(err.message); }
+};
+async function clearBg(){ cfg.template.background=''; $('#bgFile').value=''; await saveConfig(); }
+async function resetTemplate(){ const d = await api('/api/defaults'); $('#tplJson').value = JSON.stringify(d.template.fields,null,1); toast('Default fields restored. Save to apply.'); }
+
+// ---------- preview
+async function loadPreview(){
+  const r = await api(`/api/batches/${batch.id}/records?limit=1000`);
+  pvList = r.records.filter(x => x.status!=='Invalid'); if (!pvList.length) pvList = r.records;
+  pvIndex = Math.min(pvIndex, pvList.length-1); if (pvIndex<0) pvIndex=0;
+  showPreview();
+}
+function stepPreview(d){ if(!pvList.length) return; pvIndex = (pvIndex + d + pvList.length) % pvList.length; showPreview(); }
+async function showPreview(){
+  const rec = pvList[pvIndex]; if (!rec) return;
+  $('#pvInfo').textContent = `Student ${pvIndex+1} of ${pvList.length} (row ${rec.row_no})`;
+  const base = `/api/batches/${batch.id}/preview/certificate?record_id=${rec.id}&t=${Date.now()}`;
+  $('#pvPdf').href = base;
+  $('#pvImg').onerror = () => { $('#pvImg').classList.add('hidden'); $('#pvCert').classList.remove('hidden'); $('#pvCert').src = base + '#toolbar=0&view=FitH'; };
+  if (!$('#pvImg').classList.contains('hidden')) $('#pvImg').src = base + '&format=png'; else $('#pvCert').src = base + '#toolbar=0&view=FitH';
+  const e = await api(`/api/batches/${batch.id}/preview/email?record_id=${rec.id}`);
+  $('#pvEmail').innerHTML = `${e.errors?`<div class="notice bad">${esc(e.errors)}</div>`:''}
+    <div class="h">From: ${esc(e.from)}</div><div class="h">To: <b style="color:var(--ink)">${esc(e.to)}</b></div>
+    <div class="h">Subject: <b style="color:var(--ink)">${esc(e.subject)}</b></div>
+    <pre>${esc(e.body)}</pre><span class="attach">📎 ${esc(e.attachment)}</span>`;
+  $('#fnExample').textContent = e.attachment;
+}
+
+// ---------- status
+async function refresh(){
+  const b = await api(`/api/batches/${batch.id}`);
+  batch.job = b.job; const c = b.counts;
+  $('#tiles').innerHTML = STATUSES.map(s => `<div class="tile ${filter===s||(!filter&&s==='Total')?'sel':''}" onclick="setFilter('${s}')">
+    <div class="n">${c[s]||0}</div><div class="l"><span class="badge s-${s}">${s}</span></div></div>`).join('');
+  const valid = (c.Total||0) - (c.Invalid||0);
+  $('#valSummary').innerHTML = c.Invalid ? `<span class="notice bad" style="margin:0">${c.Invalid} of ${c.Total} rows have problems; they will not be sent. <a href="#" onclick="setFilter('Invalid');return false">Show them</a></span>`
+    : `<span class="notice ok" style="margin:0">All ${c.Total} rows are valid.</span>`;
+  const running = !!b.job;
+  ['#genBtn','#sendBtn','#retryBtn'].forEach(s => $(s).disabled = running);
+  $('#retryBtn').disabled = running || !c.Failed;
+  $('#jobBar').classList.toggle('hidden', !running);
+  if (running){
+    const done = b.job==='generating' ? (c.Generated||0)+(c.Sent||0) : (c.Sent||0)+(c.Failed||0)+(c.Skipped||0);
+    $('#jobLabel').textContent = b.job==='generating' ? 'Generating certificates…' : `Sending emails… (${c.Sending?'sending':'working'})`;
+    $('#jobProg').style.width = (valid ? Math.min(100, 100*done/valid) : 0) + '%';
+  }
+  await loadRecords();
+  if (running) startPoll(); else if (pollTimer){ stopPoll(); loadBatches(); toast('Job finished.'); }
+}
+function startPoll(){ if (!pollTimer) pollTimer = setInterval(refresh, 1200); }
+function stopPoll(){ clearInterval(pollTimer); pollTimer = null; }
+function setFilter(s){ filter = s==='Total' ? '' : s; refresh(); }
+let searchT; $('#search').oninput = () => { clearTimeout(searchT); searchT = setTimeout(loadRecords, 250); };
+
+async function loadRecords(){
+  const q = encodeURIComponent($('#search').value);
+  const r = await api(`/api/batches/${batch.id}/records?status=${filter}&q=${q}&limit=500`);
+  $('#recCount').textContent = `${r.total} record${r.total===1?'':'s'}${r.total>500?' (showing first 500)':''}`;
+  $('#recs').innerHTML = r.records.map(x => `<tr>
+    <td>${x.row_no}</td>
+    <td><b>${esc(x.name)||'<span class="err">(no name)</span>'}</b><br><small class="muted">${esc(x.student_id)} · ${esc(x.cert_code)}</small></td>
+    <td>${esc(x.email)||'<span class="err">—</span>'}${x.email_source?`<br><small class="muted">${esc(x.email_source)}</small>`:''}</td>
+    <td><span class="badge s-${x.status}">${x.status}</span>${x.attempts?`<br><small class="muted">${x.attempts} attempt${x.attempts>1?'s':''}</small>`:''}</td>
+    <td>${x.errors?`<div class="err">${esc(x.errors)}</div>`:''}${x.warnings?`<div class="wrn">${esc(x.warnings)}</div>`:''}${x.last_error?`<div class="err">${esc(x.last_error)}</div>`:''}${x.sent_at?`<small class="muted">Sent ${esc(x.sent_at.replace('T',' ').replace('Z',' UTC'))}</small>`:''}</td>
+    <td style="white-space:nowrap">${x.status!=='Invalid'?`<button class="btn sm" onclick="previewRec(${x.id})">Preview</button>`:''}
+      ${x.cert_file?`<a class="btn sm" href="/api/records/${x.id}/certificate" target="_blank">PDF</a>`:''}
+      ${['Sent','Skipped'].includes(x.status)?`<button class="btn sm" onclick="resend(${x.id})">Resend</button>`:''}</td></tr>`).join('')
+    || '<tr><td colspan="6" class="muted">Nothing here.</td></tr>';
+}
+function previewRec(id){ const i = pvList.findIndex(x=>x.id===id); if (i>=0){ pvIndex=i; showPreview(); $('#previewCard').scrollIntoView({behavior:'smooth'}); } }
+
+async function generate(){ try { await api(`/api/batches/${batch.id}/generate`,{method:'POST'}); refresh(); } catch(e){ toast(e.message); } }
+async function sendAll(){
+  const b = await api(`/api/batches/${batch.id}`); const c = b.counts;
+  const n = (c.Pending||0)+(c.Generated||0)+(c.Failed||0);
+  if (!n){ toast('Nothing to send. Every valid record has already been sent or skipped.'); return; }
+  const where = me.mail_mode==='smtp' ? `deliver ${n} emails via SMTP` : `write ${n} emails to the local outbox (no SMTP configured)`;
+  if (!confirm(`This will ${where}, each with that student's own certificate attached.\n\n${c.Invalid||0} invalid rows will be skipped. Students who already received this certificate are skipped automatically.\n\nContinue?`)) return;
+  try { await api(`/api/batches/${batch.id}/send`,{method:'POST',body:JSON.stringify({confirm:true})}); refresh(); } catch(e){ toast(e.message); }
+}
+async function retry(){ try { const r = await api(`/api/batches/${batch.id}/retry`,{method:'POST'}); toast(r.started?`Retrying ${r.count} failed record(s)…`:r.message); refresh(); } catch(e){ toast(e.message); } }
+async function resend(id){
+  if (!confirm('This student already received this certificate. Send it again?')) return;
+  try { await api(`/api/records/${id}/resend`,{method:'POST'}); refresh(); } catch(e){ toast(e.message); }
+}
+async function deleteBatch(){
+  if (!confirm(`Delete batch "${batch.name}" and its generated certificates? The send history is kept for duplicate prevention.`)) return;
+  await api(`/api/batches/${batch.id}`,{method:'DELETE'}); newBatch();
+}
+
+boot().catch(()=>{});
+fetch('/api/me',{credentials:'same-origin'}).then(r => { if (r.status===401) showLogin(); });
+</script>
+</body>
+</html>
