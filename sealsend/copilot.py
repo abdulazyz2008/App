@@ -13,16 +13,28 @@ import os
 import re
 
 from . import config
-from .certificate import THEMES
+from . import templates_lib as T
+from .data import STYLES
 from .mailer import PRESETS
 
 OPS = ("any_of", "contains_any", "always")
 THEME_WORDS = {
-    "gold": ["gold", "golden", "winner template", "premium"],
-    "participation": ["participation"],
-    "classic": ["classic", "standard template", "default template", "navy", "blue"],
-    "mono": ["mono", "monochrome", "black and white", "black & white", "b&w", "minimal"],
+    "gold-excellence": ["gold", "golden", "winner template", "premium", "excellence"],
+    "participation-clean": ["participation"],
+    "university-classic": ["classic", "university", "academic", "navy", "standard template", "default template"],
+    "mono-minimal": ["mono", "monochrome", "black and white", "black & white", "b&w", "minimal"],
+    "tech-hackathon": ["tech", "hackathon", "coding"],
+    "corporate-modern": ["corporate", "modern", "business"],
+    "school-stars": ["school", "kids", "stars"],
+    "sports-champion": ["sports", "sport", "champion"],
+    "medical-cme": ["medical", "cme", "health"],
+    "ngo-appreciation": ["appreciation", "volunteer template", "ngo", "green"],
+    "workshop-minimal": ["workshop", "seminar"],
+    "arts-ornate": ["arts", "ornate", "cultural", "burgundy"],
+    "government-official": ["official", "government", "formal"],
+    "internship-completion": ["internship", "completion"],
 }
+THEMES = {t["id"]: {"label": t["name"], "description": t["description"]} for t in T.BUILTINS}
 OTHERS_WORDS = ["others", "other students", "everyone else", "everybody else", "the rest", "rest of",
                 "remaining", "all other", "otherwise", "everyone", "everybody", "all students", "default"]
 WINNER_GROUP = ["winner", "winners", "won", "top 3", "top three", "podium", "prize", "placed", "ranked",
@@ -85,9 +97,10 @@ def sanitize(rules: list[dict], columns: list[str]) -> tuple[list[dict], list[st
     for r in rules if isinstance(rules, list) else []:
         if not isinstance(r, dict):
             continue
-        theme = str(r.get("theme", "")).lower()
-        if theme not in THEMES:
-            notes.append(f"Ignored a rule with unknown theme “{theme}”")
+        theme = str(r.get("template") or r.get("theme") or "").lower()
+        theme = T.LEGACY.get(theme, theme)
+        if not T.get_template(theme):
+            notes.append(f"Ignored a rule with unknown template “{theme}”")
             continue
         m = r.get("match") or {}
         op = m.get("op", "always")
@@ -103,10 +116,14 @@ def sanitize(rules: list[dict], columns: list[str]) -> tuple[list[dict], list[st
         email = r.get("email", "standard")
         if email not in PRESETS and email != "custom":
             email = "standard"
+        style = r.get("style") if r.get("style") in STYLES else {"winner": "winner", "appreciation": "appreciation",
+                                                                    "completion": "completion"}.get(email, "participation")
         clean.append({
             "label": str(r.get("label", ""))[:80] or (f"{column} rule" if column else "Everyone else"),
             "match": {"column": column, "op": op, "values": values},
-            "theme": theme, "email": email,
+            "template": theme, "email": email, "style": style,
+            "title": str(r.get("title") or STYLES[style]["title"])[:80],
+            "description": str(r.get("description", ""))[:300],
             "email_subject": str(r.get("email_subject", ""))[:300] if email == "custom" else "",
             "email_body": str(r.get("email_body", ""))[:5000] if email == "custom" else "",
         })
@@ -135,7 +152,8 @@ def _email_in(text: str, theme: str) -> str:
         return "participation"
     if re.search(r"congrat|celebrat|winner email", text):
         return "winner"
-    return {"gold": "winner", "participation": "participation"}.get(theme, "standard")
+    return {"gold-excellence": "winner", "participation-clean": "participation", "ngo-appreciation": "appreciation",
+            "internship-completion": "completion"}.get(theme, "standard")
 
 
 def _words(s: str) -> set[str]:
@@ -220,7 +238,7 @@ RULES_SCHEMA = {
                           "properties": {"column": {"type": "string"},
                                          "op": {"type": "string", "enum": list(OPS)},
                                          "values": {"type": "array", "items": {"type": "string"}}}},
-                "theme": {"type": "string", "enum": list(THEMES)},
+                "theme": {"type": "string"},
                 "email": {"type": "string", "enum": list(PRESETS) + ["custom"]},
                 "email_subject": {"type": "string"},
                 "email_body": {"type": "string"},
@@ -234,7 +252,7 @@ Rules are checked top to bottom; the first match decides the student's certifica
 - match.op "any_of": the cell in match.column equals one of match.values (case-insensitive). Prefer this, using exact values from the sheet.
 - match.op "contains_any": the cell contains any of match.values.
 - match.op "always": catch-all for "others / everyone else"; column "" and values []. Put it last.
-Themes: {themes}.
+Templates (use the id as theme): {themes}.
 Email presets: {presets}. Use "custom" only if the organizer dictates wording; then fill email_subject/email_body using placeholders like {{{{NAME}}}}, {{{{EVENT}}}}, {{{{ACHIEVEMENT}}}}, {{{{VERIFY_URL}}}}, {{{{CERT_ID}}}}. Otherwise leave them "".
 Only use column names and values that appear in the sheet profile. If part of the instruction is ambiguous, say so in notes instead of guessing."""
 
@@ -244,6 +262,8 @@ def parse_claude(text: str, columns: list[str], rows: list[dict], mapping: dict)
 
     profile = column_profile(columns, rows)
     themes = "; ".join(f"{k} ({v['description']})" for k, v in THEMES.items())
+    from . import db
+    themes += "".join(f"; {r['id']} (imported design “{r['name']}”)" for r in db.query("SELECT id, name FROM templates"))
     presets = "; ".join(f"{k} ({v['label']})" for k, v in PRESETS.items())
     mapped = {k: v.get("value") for k, v in mapping.items() if v.get("type") == "column"}
     client = anthropic.Anthropic(timeout=45.0, max_retries=1)

@@ -79,7 +79,36 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE INDEX IF NOT EXISTS idx_events_batch ON events(batch_id, id);
 CREATE INDEX IF NOT EXISTS idx_events_record ON events(record_id, id);
+CREATE TABLE IF NOT EXISTS templates (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT NOT NULL DEFAULT '',
+    kind TEXT NOT NULL,
+    file TEXT NOT NULL,
+    page_w REAL NOT NULL,
+    page_h REAL NOT NULL,
+    fields_json TEXT NOT NULL,
+    default_title TEXT NOT NULL DEFAULT '',
+    created_at TEXT NOT NULL
+);
 """
+
+# Columns added after the first release: added in place so existing data folders keep working.
+MIGRATIONS = {
+    "batches": {"sheet": "TEXT NOT NULL DEFAULT ''", "pause_reason": "TEXT NOT NULL DEFAULT ''",
+                "seal_json": "TEXT NOT NULL DEFAULT ''", "is_chaos": "INTEGER NOT NULL DEFAULT 0",
+                "chaos_json": "TEXT NOT NULL DEFAULT ''"},
+    "records": {"category": "TEXT NOT NULL DEFAULT ''", "title": "TEXT NOT NULL DEFAULT ''"},
+}
+
+
+def _migrate(c: sqlite3.Connection) -> None:
+    for table, cols in MIGRATIONS.items():
+        have = {r[1] for r in c.execute(f"PRAGMA table_info({table})")}
+        for col, ddl in cols.items():
+            if col not in have:
+                c.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+    c.commit()
 
 
 def now() -> str:
@@ -97,6 +126,7 @@ def conn() -> sqlite3.Connection:
         _conn.execute("PRAGMA journal_mode=WAL")
         _conn.execute("PRAGMA foreign_keys=ON")
         _conn.executescript(SCHEMA)
+        _migrate(_conn)
     return _conn
 
 

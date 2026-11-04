@@ -43,7 +43,34 @@ SEND_DELAY_SECONDS = float(os.environ.get("SEND_DELAY_SECONDS", "0"))
 MAX_SEND_ATTEMPTS = int(os.environ.get("MAX_SEND_ATTEMPTS", "3"))
 RETRY_BASE_SECONDS = float(os.environ.get("RETRY_BASE_SECONDS", "1"))
 MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", "20"))
-PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
+PORT = int(os.environ.get("SEALSEND_PORT", "8000"))
+SETTINGS_PATH = DATA_DIR / "settings.json"
+THUMB_DIR = DATA_DIR / "thumbs"
+
+
+def lan_ip() -> str:
+    """This computer's address on the local network (no packets are sent)."""
+    import socket
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        s.connect(("10.255.255.255", 1))
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except OSError:
+        return "127.0.0.1"
+
+
+_PUBLIC_ENV = os.environ.get("PUBLIC_BASE_URL", "")
+
+
+def public_base_url() -> str:
+    """Where QR codes and verify links point. Settings > env > this laptop's LAN address."""
+    from . import settings
+    return (settings.get("public_base_url") or _PUBLIC_ENV or f"http://{lan_ip()}:{PORT}").rstrip("/")
+
+
+PUBLIC_BASE_URL = _PUBLIC_ENV or "http://localhost:8000"  # legacy name; use public_base_url()
 
 # AI rules copilot: "auto" uses Claude when ANTHROPIC_API_KEY is set, else the offline parser.
 COPILOT_ENGINE = os.environ.get("COPILOT_ENGINE", "auto").lower()  # auto | claude | local
@@ -51,6 +78,15 @@ COPILOT_MODEL = os.environ.get("COPILOT_MODEL", "claude-opus-5-5")
 
 
 def mail_mode() -> str:
+    """sandbox | smtp | resend. The in-app Email settings win over environment variables."""
+    from . import settings
+    provider = settings.mail().get("provider", "")
+    if provider in ("gmail", "outlook", "smtp") and settings.mail().get("address"):
+        return "smtp"
+    if provider == "resend" and settings.mail().get("password"):
+        return "resend"
+    if provider == "sandbox":
+        return "sandbox"
     if SMTP_HOST:
         return "smtp"
     if RESEND_API_KEY:
@@ -58,5 +94,5 @@ def mail_mode() -> str:
     return "sandbox"
 
 
-for d in (DATA_DIR, UPLOAD_DIR, CERT_DIR, OUTBOX_DIR, KEY_DIR):
+for d in (DATA_DIR, UPLOAD_DIR, CERT_DIR, OUTBOX_DIR, KEY_DIR, DATA_DIR / "thumbs"):
     d.mkdir(parents=True, exist_ok=True)

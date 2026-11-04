@@ -38,7 +38,7 @@ def private_key() -> Ed25519PrivateKey:
                 path.parent.mkdir(parents=True, exist_ok=True)
                 pem = _priv.private_bytes(serialization.Encoding.PEM, serialization.PrivateFormat.PKCS8,
                                           serialization.NoEncryption())
-                fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+                fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL | getattr(os, "O_BINARY", 0), 0o600)
                 with os.fdopen(fd, "wb") as f:
                     f.write(pem)
         return _priv

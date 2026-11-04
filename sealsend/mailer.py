@@ -1,8 +1,9 @@
-"""Email building and delivery: sandbox (.eml files), SMTP or the Resend API."""
+"""Email: building messages, and delivering through Gmail/Outlook/SMTP, Resend or the sandbox outbox."""
 import base64
 import html
 import json
 import smtplib
+import socket
 import ssl
 import urllib.error
 import urllib.request
@@ -10,86 +11,199 @@ from datetime import datetime, timezone
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid
 
-from . import config
+from . import config, settings
 
-DEFAULT_SUBJECT = "Congratulations {{NAME}}! Your certificate for {{EVENT}}"
+SIGNOFF = """Warm regards,
+{{ORG_NAME|The Organizing Team}}"""
+
+DEFAULT_SUBJECT = "Your certificate for {{EVENT}}"
 DEFAULT_BODY = """Dear {{NAME}},
 
-Congratulations on your {{ACHIEVEMENT}} in {{EVENT}}!
+Congratulations! Your certificate for {{EVENT}} is attached to this email.
 
-Your {{CERT_TYPE}} certificate is attached to this email.
+It is digitally signed, so anyone (a university, an employer) can confirm it is genuine:
+{{VERIFY_URL}}
 Certificate ID: {{CERT_ID}}
-Anyone can confirm it is genuine here: {{VERIFY_URL}}
 
-Warm regards,
-{{ISSUER}}"""
+""" + SIGNOFF
 
 PRESETS = {
     "standard": {"label": "Standard", "subject": DEFAULT_SUBJECT, "body": DEFAULT_BODY},
     "winner": {
         "label": "Winner congratulations",
-        "subject": "🏆 {{NAME}}, you won {{ACHIEVEMENT}} at {{EVENT}}!",
+        "subject": "Congratulations, {{NAME}}! Your award certificate from {{EVENT}}",
         "body": """Dear {{NAME}},
 
-Huge congratulations! You earned {{ACHIEVEMENT}} at {{EVENT}}, and the whole committee is proud of you.
+Huge congratulations on {{HONOR_PHRASE|your achievement}} at {{EVENT}}! The whole team is proud of you.
 
-Your winner's certificate is attached. It is digitally signed, so anyone can confirm it is genuine:
+Your certificate is attached. It is digitally signed, so anyone can confirm it is genuine:
 {{VERIFY_URL}}
 Certificate ID: {{CERT_ID}}
 
-Keep building great things.
+Keep up the great work.
 
-Warm regards,
-{{ISSUER}}""",
-    },
+""" + SIGNOFF},
     "participation": {
         "label": "Thank you for participating",
-        "subject": "Thank you for taking part in {{EVENT}}, {{NAME}}",
+        "subject": "Thank you for participating in {{EVENT}}, {{NAME}}",
         "body": """Dear {{NAME}},
 
-Thank you for participating in {{EVENT}}. Your effort and ideas made the event what it was.
+Thank you for participating in {{EVENT}}. Your effort and enthusiasm made the event a success.
 
-Your certificate of {{CERT_TYPE}} is attached. You can verify it at any time:
+Your certificate of participation is attached. You can verify it at any time:
 {{VERIFY_URL}}
 Certificate ID: {{CERT_ID}}
 
 We hope to see you at the next one!
 
-Warm regards,
-{{ISSUER}}""",
-    },
+""" + SIGNOFF},
+    "appreciation": {
+        "label": "Appreciation (volunteers, organizers)",
+        "subject": "Thank you for your contribution to {{EVENT}}, {{NAME}}",
+        "body": """Dear {{NAME}},
+
+On behalf of everyone involved, thank you for your contribution to {{EVENT}}[[ as {{CATEGORY_A}}]]. The event would not have been possible without you.
+
+Your certificate of appreciation is attached. You can verify it at any time:
+{{VERIFY_URL}}
+Certificate ID: {{CERT_ID}}
+
+With sincere gratitude,
+{{ORG_NAME|The Organizing Team}}"""},
+    "completion": {
+        "label": "Completion (courses, internships)",
+        "subject": "Congratulations on completing {{EVENT}}, {{NAME}}",
+        "body": """Dear {{NAME}},
+
+Congratulations on successfully completing {{EVENT}}!
+
+Your certificate of completion is attached. It is digitally signed and can be verified here:
+{{VERIFY_URL}}
+Certificate ID: {{CERT_ID}}
+
+We wish you every success ahead.
+
+""" + SIGNOFF},
 }
 
 
 class PermanentFailure(Exception):
-    """The address itself was rejected; retrying the same address is pointless."""
+    """This recipient address was rejected; retrying it is pointless."""
 
 
 class TransientFailure(Exception):
-    """Temporary problem (network, rate limit, server busy); a retry may succeed."""
+    """Temporary problem (network, busy server); a retry may succeed."""
+
+
+class AuthFailure(Exception):
+    """The sending account's login was rejected. Stop the whole batch: every send would fail."""
+
+
+class QuotaFailure(Exception):
+    """The provider's daily sending limit was reached. Pause and resume later."""
+
+
+def sender_identity(org_name: str = "") -> tuple[str, str, str]:
+    m = settings.mail()
+    name = m.get("from_name") or org_name or settings.org().get("org_name") or config.MAIL_FROM_NAME
+    if config.mail_mode() in ("smtp", "resend") and m.get("address"):
+        return name, m["address"], m.get("reply_to", "")
+    return name, config.MAIL_FROM, ""
 
 
 def build_message(to_addr: str, to_name: str, subject: str, body: str,
-                  attachment: bytes, attachment_name: str, cert_code: str) -> EmailMessage:
+                  attachment: bytes, attachment_name: str, cert_code: str, org_name: str = "") -> EmailMessage:
+    from_name, from_addr, reply_to = sender_identity(org_name)
     msg = EmailMessage()
-    msg["From"] = formataddr((config.MAIL_FROM_NAME, config.MAIL_FROM))
+    msg["From"] = formataddr((from_name, from_addr))
     msg["To"] = formataddr((to_name, to_addr))
     msg["Subject"] = subject
-    msg["Message-ID"] = make_msgid(domain=config.MAIL_FROM.split("@")[-1] or "localhost")
+    if reply_to:
+        msg["Reply-To"] = reply_to
+    msg["Message-ID"] = make_msgid(domain=from_addr.split("@")[-1] or "localhost")
     msg["X-SealSend-Certificate"] = cert_code
     msg.set_content(body)
     paragraphs = "".join(
-        f"<p>{html.escape(p).replace(chr(10), '<br>')}</p>" for p in body.split("\n\n") if p.strip()
-    )
+        f"<p style=\"margin:0 0 14px\">{html.escape(p).replace(chr(10), '<br>')}</p>" for p in body.split("\n\n") if p.strip())
     msg.add_alternative(
-        '<div style="font-family:-apple-system,Segoe UI,Arial,sans-serif;font-size:15px;line-height:1.55;'
+        '<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:15px;line-height:1.55;'
         f'color:#111;max-width:560px">{paragraphs}</div>', subtype="html")
     msg.add_attachment(attachment, maintype="application", subtype="pdf", filename=attachment_name)
     return msg
 
 
+def _classify_smtp(e: Exception) -> Exception:
+    text = str(e).lower()
+    if isinstance(e, smtplib.SMTPAuthenticationError) or getattr(e, "smtp_code", 0) in (530, 534, 535):
+        return AuthFailure("The email account rejected the login. In Settings > Email, check the address and the "
+                           "16-letter App Password (Gmail needs 2-Step Verification on).")
+    if any(k in text for k in ("daily user sending", "quota", "limit exceeded", "sending limit", "too many messages",
+                                "5.4.5", "4.5.3", "rate limit")):
+        return QuotaFailure(f"The provider's sending limit was reached: {e}")
+    if isinstance(e, smtplib.SMTPRecipientsRefused):
+        return PermanentFailure(f"Recipient refused: {e.recipients}")
+    if isinstance(e, smtplib.SMTPResponseException):
+        code = e.smtp_code
+        if 500 <= code < 600 and code not in (500, 503):
+            return PermanentFailure(f"{code} {e.smtp_error!r}")
+        return TransientFailure(f"{code} {e.smtp_error!r}")
+    return TransientFailure(f"{type(e).__name__}: {e}")
+
+
+def connect_smtp(m: dict | None = None):
+    """Log in to the configured SMTP server. Tries STARTTLS:587, then SSL:465 (many campus networks block 587)."""
+    m = m or settings.mail()
+    host = m.get("host") or config.SMTP_HOST
+    user = m.get("username") or m.get("address") or config.SMTP_USER
+    password = m.get("password") or config.SMTP_PASSWORD
+    port = int(m.get("port") or config.SMTP_PORT)
+    security = (m.get("security") or config.SMTP_SECURITY).lower()
+    attempts = [(port, security)]
+    if (port, security) == (587, "starttls"):
+        attempts.append((465, "ssl"))
+    last = None
+    for p, sec in attempts:
+        try:
+            if sec == "ssl":
+                s = smtplib.SMTP_SSL(host, p, context=ssl.create_default_context(), timeout=20)
+            else:
+                s = smtplib.SMTP(host, p, timeout=20)
+                s.ehlo()
+                if sec == "starttls":
+                    s.starttls(context=ssl.create_default_context())
+                    s.ehlo()
+            if user:
+                s.login(user, password)
+            return s
+        except (smtplib.SMTPAuthenticationError, smtplib.SMTPResponseException) as e:
+            raise _classify_smtp(e) from e
+        except (OSError, smtplib.SMTPException) as e:
+            last = e
+            continue
+    raise TransientFailure(f"Could not reach {host} on port 587 or 465 ({type(last).__name__}: {last}). "
+                           "Check the internet connection or whether the network blocks email ports.")
+
+
+def check_connection() -> dict:
+    """Used by Settings > Test connection and before every batch."""
+    mode = config.mail_mode()
+    if mode == "sandbox":
+        return {"ok": True, "mode": mode, "message": "Sandbox: emails are saved to the outbox folder, not delivered"}
+    if mode == "resend":
+        return {"ok": bool(settings.mail().get("password") or config.RESEND_API_KEY), "mode": mode,
+                "message": "Resend API key saved"}
+    try:
+        s = connect_smtp()
+        s.quit()
+        return {"ok": True, "mode": mode, "message": "Connected and logged in"}
+    except (AuthFailure, QuotaFailure, TransientFailure, PermanentFailure) as e:
+        return {"ok": False, "mode": mode, "message": str(e)}
+    except socket.gaierror as e:
+        return {"ok": False, "mode": mode, "message": f"Server not found: {e}"}
+
+
 class Sender:
-    """One delivery channel per batch run. Reuses a single SMTP connection across the batch.
+    """One delivery channel per batch run; reuses a single SMTP connection across the batch.
 
     `faults` (Chaos Test only, sandbox only) simulates a flaky provider:
     {"transient": [addresses that fail once], "reject": [addresses that bounce permanently]}
@@ -106,17 +220,6 @@ class Sender:
 
     def __exit__(self, *exc):
         self.close()
-
-    def _connect(self):
-        if config.SMTP_SECURITY == "ssl":
-            s = smtplib.SMTP_SSL(config.SMTP_HOST, config.SMTP_PORT, context=ssl.create_default_context(), timeout=30)
-        else:
-            s = smtplib.SMTP(config.SMTP_HOST, config.SMTP_PORT, timeout=30)
-            if config.SMTP_SECURITY == "starttls":
-                s.starttls(context=ssl.create_default_context())
-        if config.SMTP_USER:
-            s.login(config.SMTP_USER, config.SMTP_PASSWORD)
-        self.smtp = s
 
     def _simulate(self, to_addr: str) -> None:
         addr = to_addr.lower()
@@ -138,46 +241,46 @@ class Sender:
         return self._send_smtp(msg)
 
     def _send_smtp(self, msg: EmailMessage) -> str:
+        if self.smtp is None:
+            self.smtp = connect_smtp()
         try:
-            if self.smtp is None:
-                self._connect()
             try:
                 self.smtp.send_message(msg)
             except smtplib.SMTPServerDisconnected:
                 self.close()
-                self._connect()
+                self.smtp = connect_smtp()
                 self.smtp.send_message(msg)
-        except smtplib.SMTPRecipientsRefused as e:
-            raise PermanentFailure(f"Recipient refused: {e.recipients}") from e
-        except smtplib.SMTPResponseException as e:
-            if 500 <= e.smtp_code < 600 and e.smtp_code not in (500, 503, 530, 535):
-                raise PermanentFailure(f"{e.smtp_code} {e.smtp_error!r}") from e
-            raise TransientFailure(f"{e.smtp_code} {e.smtp_error!r}") from e
-        except (OSError, smtplib.SMTPException) as e:
-            self.close()
-            raise TransientFailure(f"{type(e).__name__}: {e}") from e
+        except (smtplib.SMTPException, OSError) as e:
+            err = _classify_smtp(e)
+            if isinstance(err, TransientFailure):
+                self.close()
+            raise err from e
         return "Accepted by SMTP server"
 
     def _send_resend(self, msg: EmailMessage, to_addr: str) -> str:
+        key = settings.mail().get("password") or config.RESEND_API_KEY
         att = next(msg.iter_attachments())
         payload = {
             "from": msg["From"], "to": [to_addr], "subject": msg["Subject"],
-            "text": msg.get_body(("plain",)).get_content(),
-            "html": msg.get_body(("html",)).get_content(),
-            "attachments": [{"filename": att.get_filename(),
-                             "content": base64.b64encode(att.get_content()).decode()}],
+            "text": msg.get_body(("plain",)).get_content(), "html": msg.get_body(("html",)).get_content(),
+            "attachments": [{"filename": att.get_filename(), "content": base64.b64encode(att.get_content()).decode()}],
             "headers": {"X-SealSend-Certificate": msg["X-SealSend-Certificate"]},
         }
+        if msg["Reply-To"]:
+            payload["reply_to"] = msg["Reply-To"]
         req = urllib.request.Request(
             "https://api.resend.com/emails", data=json.dumps(payload).encode(), method="POST",
-            headers={"Authorization": f"Bearer {config.RESEND_API_KEY}", "Content-Type": "application/json",
-                     "User-Agent": "SealSend/1.0"})
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "User-Agent": "SealSend/1.0"})
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
                 return f"Resend accepted: {json.loads(r.read() or b'{}').get('id', '')}"
         except urllib.error.HTTPError as e:
             detail = e.read().decode(errors="replace")[:300]
-            if e.code in (429,) or e.code >= 500:
+            if e.code in (401, 403):
+                raise AuthFailure(f"Resend rejected the API key ({e.code})") from e
+            if e.code == 429:
+                raise QuotaFailure(f"Resend rate or daily limit reached: {detail}") from e
+            if e.code >= 500:
                 raise TransientFailure(f"Resend {e.code}: {detail}") from e
             raise PermanentFailure(f"Resend {e.code}: {detail}") from e
         except (urllib.error.URLError, OSError) as e:

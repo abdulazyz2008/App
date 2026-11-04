@@ -1,86 +1,118 @@
 # SealSend
 
-> Others automate certificates. SealSend makes them **impossible to get wrong** and **impossible to fake**.
+> Upload your student list once. Every student gets their own congratulatory email with the right certificate attached, and every certificate can be verified as genuine.
 
-Upload a student Excel/CSV once. SealSend validates it, maps the columns, applies plain-English design rules, then generates, signs and seals one PDF per student. Before every send it checks that the attachment really belongs to that student, then delivers it with self-healing retries and logs every step.
+SealSend reads any reasonable Excel or CSV file, works out who each student is and which category they belong to, picks the right certificate design for each category, and emails each student their own digitally signed PDF from your Gmail account. Before each email goes out, it checks that the attachment really belongs to that student.
 
-## Quick start
+---
 
-```bash
-pip install -r requirements.txt
-cp .env.example .env          # set ADMIN_PASSWORD
-python -m uvicorn sealsend.main:app --host 0.0.0.0 --port 8000
-```
+## Start it
 
-Open http://localhost:8000 and sign in. Then try:
+**You need Python 3.10 or newer** (free from [python.org](https://www.python.org/downloads/); on Windows tick *“Add Python to PATH”* during install).
 
-1. **Use the sample sheet** for the normal flow: Data → Map → Design → Preview → Send → Proof.
-2. **⚡ Run Chaos Test** for the demo. It injects 15 faults into a sandbox batch and shows how each one was contained.
-
-With no `SMTP_*` or `RESEND_API_KEY` set, SealSend runs in **sandbox mode**: every email (with its attachment) is saved as an `.eml` file in `data/outbox/`. Chaos batches always use the sandbox.
-
-## What's built (mapped to the plan)
-
-| Plan item | Where | How it works |
-|---|---|---|
-| **1. Core flow** | `pipeline.py`, `data.py` | CSV/XLSX → validation → column mapping → template → individual PDFs → personalized emails → status ledger + retry |
-| **2. Mapping Lock** | `crypto.mapping_lock`, `pipeline.check_attachment` | A keyed HMAC of (student ID + email + event + certificate ID) is embedded in each PDF. Right before sending it is recomputed from the recipient's record. The file hash, embedded ID and Ed25519 signature are also checked. A wrong file is **blocked**, regenerated from source and re-verified. |
-| **3. Signed certificates + QR** | `crypto.py`, `/verify/{id}` | Each certificate's data plus its PDF SHA-256 is signed with Ed25519. The QR opens a public page: "Verified, issued to X for Y". Uploading a PDF that was edited (even one character) shows "This file has been altered". Fake IDs show "Not verified". The public key is at `/.well-known/sealsend-public-key.pem`. |
-| **4. Batch seal** | `pipeline.seal_batch`, `verify_batch` | A SHA-256 Merkle tree over every certificate (ID, file hash, lock), with the root signed. "Verify Batch Now" re-hashes every file on disk, and the verify page shows each certificate's inclusion proof. The ZIP export includes `SEAL.json`. |
-| **5. AI rules copilot** | `copilot.py` | "winners get gold template, others participation" → ordered rules (column condition → design + email preset), shown with match counts and applied only on approval. Uses Claude (`claude-opus-5-5`, structured JSON output, server-side refusal fallback) when `ANTHROPIC_API_KEY` is set, and otherwise an offline parser, so the demo never depends on Wi-Fi. |
-| **6. Self-healing delivery** | `data.pick_email`, `pipeline._deliver` | Typo fix (`gmial.com → gmail.com`, `.con → .edu` when the sheet's domain is `.edu`, `(at)` → `@`), fallback email, retry with backoff for 4xx errors, a 550 bounce re-binding to the fallback address (with a fresh lock), and **claim links** (a private download link checked against the student ID, locked after 5 wrong tries) for students with no usable email. |
-| **Chaos Test** | `chaos.py` | Junk names (`#REF!`, `J0hn`, blank), a duplicate, typo/broken/missing emails, two PDFs swapped on disk, a name edited inside a signed PDF, a stalling mail server, a bouncing mailbox, a double-clicked Send and a forged copy sent to the verifier. Results are computed from the database and by **opening every delivered `.eml`**, not from what the pipeline reports. |
-
-## Hackathon rulebook coverage
-
-| Rule | Status |
+| Computer | Do this |
 |---|---|
-| 1 Excel/CSV input | ✓ `.xlsx`/`.csv`, delimiter and encoding detection, Excel dates and numeric IDs normalized |
-| 2 Dynamic field mapping | ✓ Any `{{PLACEHOLDER}}` mapped to a column or a fixed value |
-| 3 Individual generation | ✓ One PDF per valid student, generated in parallel |
-| 4 Template-based | ✓ 4 built-in themes or uploaded PNG/JPG artwork, positioned text fields, auto-shrink for long names |
-| 5 Personalized email | ✓ Default, winner and thank-you emails, selectable per rule |
-| **6 Correct mapping** | ✓ Mapping Lock + hash + signature checked before every send. Proven by the Chaos Test and the tests. |
-| 7 Email selection | ✓ Preferred column + fallback column |
-| 8 Validation | ✓ Missing/junk names, invalid/missing emails, duplicates, empty required fields, with row numbers |
-| 9 Preview | ✓ Every student's certificate (PNG) and exact email |
-| 10 Bulk | ✓ Parallel rendering (~2,000 certificates in ~18 s on 4 cores), one reused SMTP connection, background jobs |
-| 11 Status tracking | ✓ Pending · Generated · Sending · Sent · Failed, plus Claim · Claimed · Skipped · Invalid |
-| 12 Failure handling | ✓ Per-record isolation, retries, Retry Failed, recovery after a restart |
-| 13 Duplicate prevention | ✓ Send log across batches; organizer-authorized Resend |
-| 14 File naming | ✓ `{{ID}}_{{NAME}}_{{EVENT}}.pdf`, configurable |
-| 15 Security | ✓ Login, HttpOnly SameSite cookie, login rate limit, secrets only in `.env`, key file `0600`, size/type-checked uploads, explicit send confirmation |
+| **Windows** | Double-click `start-windows.bat` |
+| **Mac** | Double-click `start-mac.command` (first time: right-click → Open) |
+| **Linux** | Run `./start-linux.sh` |
 
-## Live demo script (about 3 minutes)
+The first start takes 1–3 minutes to set itself up (needs internet once). Then your browser opens SealSend. Keep the black window open while you use it.
 
-1. **Upload** the sample sheet. Point at the blocked rows (missing name, duplicate) and the self-healed ones (fallback email, claim link).
-2. **Design → copilot**: type "winners get gold template, others participation" → Apply → Preview shows the gold certificate and the winner email.
-3. **Send**, then show the live activity feed. **Proof → Verify Batch Now** shows the batch is intact.
-4. **⚡ Run Chaos Test**: 15/15 contained, 0 wrong attachments, batch finished.
-5. A judge **scans the QR** on a certificate: "Verified, issued to Aisha Rahman for First Place".
-6. **Download the forged PDF** from the Chaos Report and upload it to the verifier: "This file has been altered".
+**iPhone, iPad, Android:** connect to the same Wi-Fi as the computer, then in SealSend tap **Open on phone/iPad** and scan the QR code. Use *Share → Add to Home Screen* to install it like an app.
 
-For step 5, run the server on your LAN (`--host 0.0.0.0`) and set `PUBLIC_BASE_URL=http://<laptop-ip>:8000` **before** generating, so the QR points to a reachable address.
+## First-time setup (2 minutes)
+
+1. **Create a password** (only possible on the computer running SealSend).
+2. **Connect Gmail:** Settings → Gmail → your address + a **Gmail App Password**:
+   - turn on [2-Step Verification](https://myaccount.google.com/signinoptions/twosv), then open [App passwords](https://myaccount.google.com/apppasswords), type “SealSend”, and copy the 16 letters.
+   - Your normal Gmail password will **not** work; Google requires an App Password.
+3. Press **Save & Test**, then **Send test** to your own address. If the test arrives with its sample certificate, you’re ready.
+
+Until Gmail is connected, SealSend runs in **test mode**: emails and certificates are saved in `data/outbox/` instead of being sent.
+
+## Issue certificates: 4 steps
+
+| Step | What happens |
+|---|---|
+| **1 · Students** | Upload the Excel/CSV. SealSend finds the right sheet, skips title rows, and detects the name (even split across *First Name* / *Last Name*), email, backup email, ID, date and **category** columns. You can correct any of them. Problem rows are flagged with their row number. |
+| **2 · Certificates** | Each category value (e.g. *Winner, Runner Up, Volunteer, Participant*) gets a design, a title and an email, guessed from its name: winners get **Gold Excellence** and a congratulations email, volunteers get *Certificate of Appreciation*, and so on. Click any design to choose another, add your organization name, logo and signatories. |
+| **3 · Email** | Check the sending account and edit the default message if you like. Each category already has a ready-written email (winner, participation, appreciation, completion). |
+| **4 · Review & Send** | A checklist, then a preview of exactly what any student will receive (certificate + email). Press **Send**. Progress, a live activity log, a CSV delivery report and a ZIP of all certificates are on the same page. |
+
+## Certificate designs
+
+14 original designs, made for this app, so there are no licensing issues:
+
+| Niche | Design |
+|---|---|
+| Academic | University Classic |
+| Competitions & Awards | Gold Excellence |
+| Technology | Tech Hackathon |
+| Corporate & Training | Corporate Modern |
+| Schools | School Stars |
+| Sports | Sports Champion |
+| Healthcare | Medical & CME |
+| NGO & Community | Volunteer Appreciation |
+| Workshops & Seminars | Workshop Minimal |
+| Arts & Culture | Arts & Culture |
+| Government & Institutions | Official Formal |
+| Internships | Internship |
+| General | Participation, Mono Minimal |
+
+**Your own design from Canva:** Templates → *Import from Canva*. Design or pick a certificate in your Canva account, delete the sample name, then download it as **PDF Standard** or PNG and drop it in. Drag the name, description and QR code to where they belong, then press Save. Canva’s own template library can’t be bundled into another app (their license forbids it), but anything you export from your account works.
+
+## Handling the messy cases
+
+| Problem in the sheet | What SealSend does |
+|---|---|
+| Title rows above the header, several sheets, a “Total” row | Finds the real header and the sheet that has emails; skips the footer |
+| `name@gmial.com`, `.con`, spaces, `name(at)college` | Fixes it and shows what it changed |
+| Broken main email, valid personal email | Uses the backup column |
+| No email at all | Creates a private **claim link** (the student confirms their ID to download) |
+| `#REF!`, `N/A`, digits in a name, blank name | Blocks that row and shows why |
+| Same student twice | Blocks the duplicate (by ID, or by name + email) |
+| ALL CAPS names | Optional switch: *ROHAN MEHTA → Rohan Mehta* |
+| Gmail daily limit (~500/day) | Stops safely at your limit; press Send again the next day and it continues with the rest. Nobody gets two emails. |
+| Wrong App Password | Refuses to start and tells you exactly what to fix, without marking anyone as failed |
+| Network blocks port 587 | Falls back to port 465 automatically |
+| A mailbox bounces | Retries with the student’s backup email |
+| Send pressed twice / sheet uploaded again | Already-delivered students are skipped |
+
+## Why it can be trusted
+
+- **Mapping Lock:** each PDF carries a hidden keyed hash of *student ID + email + event*. Right before sending, it is recomputed from the recipient, together with the file’s hash and signature. A wrong attachment is blocked, rebuilt from the source data, and checked again.
+- **Signed certificates + QR:** every certificate is signed (Ed25519). Scanning the QR opens *“Verified, issued to X for Y”*. Uploading an edited PDF at `/verify` shows *“This file has been altered”*.
+- **Batch seal:** a signed Merkle root covers the whole batch. *Proof → Verify Batch Now* re-checks every file.
+- **Chaos Test** (sidebar, demo): injects 15 real faults into a sandbox batch and shows each one being contained. Results come from opening every delivered email, not from what the app says about itself.
+
+**About the QR link:** QR codes open the address in *Settings → Verification link*. By default that is your computer on the local Wi-Fi, which is fine for a demo. For certificates students will show to employers later, host SealSend online (any server that runs Python) and enter its public address **before** creating certificates.
 
 ## Tests
 
 ```bash
+pip install -r requirements.txt
 python -m pytest -q
 ```
 
-There are 18 tests. They cover: Merkle proofs and signatures, typo and name rules, deterministic rendering, the full flow with an audit of every delivered email, claim links, swapped and tampered files being blocked and healed, database tampering, transient failure and retry, SMTP connection reuse and bounce → fallback, the Resend request format, the copilot (offline, Claude, and fallback when Claude fails), the full Chaos Test, XLSX input, and a 120-student parallel batch.
+26 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot (offline and Claude), the full Chaos Test, and a 120-student parallel batch.
 
-## Layout
+`sample/tech_fest_2026.xlsx` is a deliberately messy workbook for trying everything.
+
+## Files
 
 ```
+run.py, start-*.{bat,command,sh}   one-click start on Windows / macOS / Linux
 sealsend/
-  main.py         API, auth, public /verify and /claim pages
-  pipeline.py     validate → generate+sign → seal → verify-or-heal → deliver
-  crypto.py       Ed25519 keys, Mapping Lock, Merkle tree
-  data.py         spreadsheet loading, mapping, validation, email self-healing
-  certificate.py  themes, PDF rendering, QR, embedded proof, forgery demo
-  mailer.py       sandbox / SMTP / Resend, email presets
-  copilot.py      plain-English rules (Claude + offline parser)
-  chaos.py        Chaos Test
-  static/index.html  black-and-white, iOS-style organizer UI
+  data.py           spreadsheet reading, column + category detection, validation, email self-healing
+  templates_lib.py  the 14 designs, fonts, text layout, imported (Canva) templates
+  certificate.py    rendering, previews, imports, proof metadata
+  pipeline.py       generate → sign → seal → verify-or-heal → deliver, daily limit, pause/resume
+  mailer.py         Gmail / Outlook / SMTP / Resend / test mode, email wording per category
+  settings.py       in-app settings (App Password encrypted at rest), admin password
+  crypto.py         Ed25519, Mapping Lock, Merkle seal
+  copilot.py        plain-English rules (Claude or offline)
+  chaos.py          Chaos Test
+  main.py           web server, public /verify and /claim pages
+  static/           the app (black-and-white, iOS-style, works on phones)
+  fonts/            bundled open-licensed fonts (SIL OFL), so certificates look identical everywhere
 ```

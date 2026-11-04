@@ -1,6 +1,6 @@
 """The core workflow and its proofs.
 
-upload -> validate -> map -> template/rules -> generate + sign -> seal (Merkle) ->
+upload -> understand columns -> categories -> template per category -> generate + sign -> seal (Merkle) ->
 verify every attachment (Mapping Lock + hash + signature) -> deliver with self-healing -> ledger
 """
 import json
@@ -13,12 +13,14 @@ import time
 from collections import Counter
 from concurrent.futures import ProcessPoolExecutor
 from concurrent.futures.process import BrokenProcessPool
-from datetime import date
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from . import certificate, config, copilot, crypto, db, mailer
-from .data import (load_table, normalize_email, fix_email_typo, placeholders_in, render, resolve_values,
-                   safe_filename, suggest_config, valid_email, validate)
+from . import certificate, config, copilot, crypto, db, mailer, settings
+from . import templates_lib as T
+from .data import (STYLES, classify, honor_phrase, with_article, fix_email_typo, guess_event_template, normalize_email, placeholders_in, read_table,
+                   render, required_in, resolve_values, safe_filename, suggest_categories, suggest_config, valid_email,
+                   validate)
 
 _jobs_lock = threading.Lock()
 _running: set[int] = set()
@@ -31,63 +33,121 @@ def new_cert_code() -> str:
 
 
 # ---------------------------------------------------------------- configuration
-def default_config(columns: list[str], event_name: str) -> dict:
-    cfg = suggest_config(columns)
-    if event_name and "EVENT" not in cfg["mapping"]:
-        cfg["mapping"]["EVENT"] = {"type": "text", "value": event_name}
+def default_config(columns: list[str], rows: list[dict], event_name: str, filename: str = "") -> dict:
+    cfg = suggest_config(columns, rows)
+    if "EVENT" not in cfg["mapping"]:
+        cfg["mapping"]["EVENT"] = {"type": "text", "value": event_name or Path(filename).stem.replace("_", " ")}
+    base = guess_event_template(" ".join([event_name or "", filename or ""]
+                                         + [r.get(cfg["mapping"]["EVENT"].get("value", ""), "") for r in rows[:3]
+                                            if cfg["mapping"]["EVENT"]["type"] == "column"]))
+    name_map = {"NAME": cfg["mapping"]["NAME"]} if cfg["mapping"].get("NAME") else {}
+    names = [resolve_values(r, name_map).get("NAME", "") for r in rows]
+    caps = sum(1 for n in names if len(n) > 3 and (n.isupper() or n.islower()))
+    org = settings.org()
     cfg.update({
-        "template": certificate.default_template(),
+        "template_id": base,
+        "qr": True,
         "email_subject": mailer.DEFAULT_SUBJECT,
         "email_body": mailer.DEFAULT_BODY,
         "filename_pattern": "{{ID}}_{{NAME}}_{{EVENT}}",
-        "rules": [],
+        "rules": suggest_categories(cfg["category_column"], rows, base) if cfg.get("category_column") else [],
         "auto_fix_emails": True,
         "claim_links": True,
+        "fix_caps": caps > len(rows) * 0.3,
+        "branding": {k: org.get(k, "") for k in settings.DEFAULT["org"]},
     })
     return cfg
 
 
+def normalize_config(cfg: dict) -> dict:
+    """Upgrade configs saved by earlier versions (single theme dict) to template ids."""
+    if "template_id" not in cfg:
+        old = cfg.get("template") or {}
+        cfg["template_id"] = T.LEGACY.get(old.get("theme", ""), certificate.DEFAULT_TEMPLATE_ID)
+        cfg["qr"] = old.get("qr", True)
+    cfg.setdefault("branding", {k: "" for k in settings.DEFAULT["org"]})
+    cfg.setdefault("rules", [])
+    cfg.setdefault("category_column", "")
+    for r in cfg["rules"]:
+        if "template" not in r:
+            r["template"] = T.LEGACY.get(r.get("theme", ""), r.get("theme", "")) or cfg["template_id"]
+    return cfg
+
+
+def used_templates(cfg: dict) -> list[str]:
+    ids = [cfg["template_id"]] + [r.get("template") for r in cfg.get("rules", []) if r.get("template")]
+    return list(dict.fromkeys(ids))
+
+
 def all_placeholders(cfg: dict) -> dict:
-    cert = placeholders_in(*certificate.template_texts(cfg["template"]))
+    cfg = normalize_config(cfg)
+    cert_texts = []
+    for tid in used_templates(cfg):
+        cert_texts += T.template_text_fields(certificate.resolve(tid))
+    descs = [r.get("description") or STYLES.get(r.get("style", ""), STYLES["participation"])["description"]
+             for r in cfg.get("rules", [])] or [STYLES["participation"]["description"]]
     email_texts = [cfg.get("email_subject", ""), cfg.get("email_body", "")]
     for r in cfg.get("rules", []):
         p = mailer.PRESETS.get(r.get("email"), {})
         email_texts += [r.get("email_subject", ""), r.get("email_body", ""), p.get("subject", ""), p.get("body", "")]
-    email = placeholders_in(*email_texts)
-    pattern = placeholders_in(cfg.get("filename_pattern", ""))
+    pattern = cfg.get("filename_pattern", "")
     ordered = []
-    for p in ["NAME", "ID"] + cert + email + pattern:
+    for p in ["NAME", "ID", "EVENT"] + placeholders_in(*cert_texts, *descs) + placeholders_in(*email_texts) + placeholders_in(pattern):
         if p not in ordered:
             ordered.append(p)
-    return {"all": ordered, "certificate": cert, "email": email}
+    return {"all": ordered, "certificate": placeholders_in(*cert_texts, *descs), "email": placeholders_in(*email_texts),
+            "required": required_in(*cert_texts, *descs)}
 
 
 def create_batch(src: Path, original_name: str, batch_name: str, cfg_overrides: dict | None = None,
-                 chaos: dict | None = None) -> int:
-    columns, rows = load_table(src)
-    cfg = default_config(columns, batch_name)
+                 chaos: dict | None = None, sheet: str | None = None) -> int:
+    table = read_table(src, sheet)
+    cfg = default_config(table["columns"], table["rows"], batch_name, original_name)
+    cfg.update({"source_file": src.name, "sheets": table["sheets"], "header_row": table["header_row"]})
     cfg.update(cfg_overrides or {})
     with db.tx() as c:
         cur = c.execute(
-            "INSERT INTO batches (name, filename, created_at, columns_json, config_json, is_chaos, chaos_json) VALUES (?,?,?,?,?,?,?)",
-            (batch_name or Path(original_name).stem, original_name, db.now(), json.dumps(columns), json.dumps(cfg),
-             1 if chaos else 0, json.dumps(chaos) if chaos else ""),
-        )
+            "INSERT INTO batches (name, filename, created_at, columns_json, config_json, is_chaos, chaos_json, sheet) VALUES (?,?,?,?,?,?,?,?)",
+            (batch_name or Path(original_name).stem, original_name, db.now(), json.dumps(table["columns"]), json.dumps(cfg),
+             1 if chaos else 0, json.dumps(chaos) if chaos else "", table["sheet"]))
         batch_id = cur.lastrowid
-        for i, row in enumerate(rows):
-            c.execute("INSERT INTO records (batch_id, row_no, data_json, cert_code, updated_at) VALUES (?,?,?,?,?)",
-                      (batch_id, i + 2, json.dumps(row), new_cert_code(), db.now()))
-    db.log(batch_id, None, "info", "upload", f"Uploaded {original_name}: {len(rows)} rows, {len(columns)} columns")
+        _insert_rows(c, batch_id, table)
+    where = f" (sheet “{table['sheet']}”, header on row {table['header_row']})" if table["sheet"] else f" (header on row {table['header_row']})"
+    db.log(batch_id, None, "info", "upload", f"Read {original_name}{where}: {len(table['rows'])} rows, {len(table['columns'])} columns")
     log_validation(batch_id, revalidate(batch_id))
     return batch_id
 
 
+def _insert_rows(c, batch_id: int, table: dict) -> None:
+    for row, row_no in zip(table["rows"], table["row_numbers"]):
+        c.execute("INSERT INTO records (batch_id, row_no, data_json, cert_code, updated_at) VALUES (?,?,?,?,?)",
+                  (batch_id, row_no, json.dumps(row), new_cert_code(), db.now()))
+
+
+def reload_sheet(batch_id: int, sheet: str) -> None:
+    """Switch to another sheet of the same workbook (only before anything is issued)."""
+    b = db.get_batch(batch_id)
+    if db.one(f"SELECT COUNT(*) n FROM records WHERE batch_id=? AND status IN ({','.join('?' * len(ISSUED))})",
+              (batch_id, *ISSUED))["n"]:
+        raise ValueError("Certificates were already issued from this batch; upload the file again as a new batch")
+    src = config.UPLOAD_DIR / b["config"]["source_file"]
+    table = read_table(src, sheet)
+    cfg = default_config(table["columns"], table["rows"], b["name"], b["filename"])
+    cfg.update({"source_file": src.name, "sheets": table["sheets"], "header_row": table["header_row"]})
+    shutil.rmtree(config.CERT_DIR / f"batch_{batch_id}", ignore_errors=True)
+    with db.tx() as c:
+        c.execute("DELETE FROM records WHERE batch_id=?", (batch_id,))
+        c.execute("UPDATE batches SET columns_json=?, config_json=?, sheet=?, seal_json='' WHERE id=?",
+                  (json.dumps(table["columns"]), json.dumps(cfg), table["sheet"], batch_id))
+        _insert_rows(c, batch_id, table)
+    db.log(batch_id, None, "info", "upload", f"Switched to sheet “{table['sheet']}”: {len(table['rows'])} rows")
+    log_validation(batch_id, revalidate(batch_id))
+
+
 def log_validation(batch_id: int, counts: dict) -> None:
-    claims = db.one("SELECT COUNT(*) n FROM records WHERE batch_id=? AND delivery='claim' AND status='Pending'",
-                    (batch_id,))["n"]
-    fixed = db.one("SELECT COUNT(*) n FROM records WHERE batch_id=? AND email_fix!='' AND status='Pending'",
-                   (batch_id,))["n"]
-    msg = f"Validation: {counts.get('Pending', 0)} ready, {counts.get('Invalid', 0)} blocked"
+    claims = db.one("SELECT COUNT(*) n FROM records WHERE batch_id=? AND delivery='claim' AND status='Pending'", (batch_id,))["n"]
+    fixed = db.one("SELECT COUNT(*) n FROM records WHERE batch_id=? AND email_fix!='' AND status='Pending'", (batch_id,))["n"]
+    msg = f"Checked: {counts.get('Pending', 0)} ready, {counts.get('Invalid', 0)} need attention"
     if fixed:
         msg += f", {fixed} emails auto-fixed"
     if claims:
@@ -96,17 +156,53 @@ def log_validation(batch_id: int, counts: dict) -> None:
 
 
 # ---------------------------------------------------------------- per-record values
+def record_rule(rec: dict, cfg: dict) -> dict | None:
+    return copilot.evaluate(cfg.get("rules", []), db.record_data(rec))
+
+
 def record_values(rec: dict, cfg: dict) -> dict:
-    values = resolve_values(db.record_data(rec), cfg.get("mapping", {}))
+    cfg = normalize_config(cfg)
+    row = db.record_data(rec)
+    values = resolve_values(row, cfg.get("mapping", {}), cfg.get("fix_caps", False))
+    rule = copilot.evaluate(cfg.get("rules", []), row)
+    cat_col = cfg.get("category_column", "")
+    category = (row.get(cat_col, "") if cat_col else "") or values.get("ACHIEVEMENT", "") or values.get("CERT_TYPE", "")
+    values["CATEGORY"] = category.strip()
+    style = (rule or {}).get("style") or classify(values["CATEGORY"] or values.get("ACHIEVEMENT", ""))
+    honor = values.get("ACHIEVEMENT", "").strip() or values["CATEGORY"]
+    if style == "winner" and not honor:
+        style = "participation"
+    tpl = certificate.resolve(rec["theme"] or (rule or {}).get("template") or cfg["template_id"])
+    values["TITLE"] = certificate_title(rule, values, style, tpl)
+    b = cfg.get("branding", {})
+    values.update({"ORG_NAME": b.get("org_name", ""), "SIGNER1_NAME": b.get("signer1_name", ""),
+                   "SIGNER1_TITLE": b.get("signer1_title", ""), "SIGNER2_NAME": b.get("signer2_name", ""),
+                   "SIGNER2_TITLE": b.get("signer2_title", "")})
     values["CERT_ID"] = rec["cert_code"]
-    values["VERIFY_URL"] = f"{config.PUBLIC_BASE_URL.rstrip('/')}/verify/{rec['cert_code']}"
+    values["VERIFY_URL"] = f"{config.public_base_url()}/verify/{rec['cert_code']}"
     values["ISSUE_DATE"] = date.today().strftime("%d %B %Y")
-    values["ISSUER"] = config.ISSUER_NAME
+    values["ISSUER"] = b.get("org_name") or config.ISSUER_NAME
+    values["HONOR_PHRASE"] = honor_phrase(honor) if honor else "outstanding achievement"
+    values["CATEGORY_A"] = with_article(values["CATEGORY"])
+    desc = (rule or {}).get("description") or STYLES[style]["description"]
+    values["DESCRIPTION"] = render(desc, values)
     return values
 
 
-def record_rule(rec: dict, cfg: dict) -> dict | None:
-    return copilot.evaluate(cfg.get("rules", []), db.record_data(rec))
+def certificate_title(rule: dict | None, values: dict, style: str, tpl: dict) -> str:
+    if rule and rule.get("title"):
+        return rule["title"]
+    ctype = values.get("CERT_TYPE", "").strip()
+    if ctype:
+        return ctype if "certificate" in ctype.lower() else f"Certificate of {ctype}"
+    if values.get("CATEGORY"):
+        return STYLES[style]["title"]
+    return tpl.get("title", "") or "Certificate of Achievement"
+
+
+def assets_for(cfg: dict) -> dict:
+    b = cfg.get("branding", {})
+    return {"logo": b.get("logo", ""), "signer1_sig": b.get("signer1_sig", ""), "signer2_sig": b.get("signer2_sig", "")}
 
 
 def email_texts(rec: dict, cfg: dict, values: dict) -> tuple[str, str]:
@@ -141,11 +237,13 @@ def _delete_cert(rec: dict) -> None:
 # ---------------------------------------------------------------- validation
 def revalidate(batch_id: int) -> dict:
     batch = db.get_batch(batch_id)
-    cfg = batch["config"]
+    cfg = normalize_config(batch["config"])
     recs = db.query("SELECT * FROM records WHERE batch_id=? ORDER BY row_no", (batch_id,))
-    results = validate([db.record_data(r) for r in recs], cfg, all_placeholders(cfg)["certificate"])
+    rows = [db.record_data(r) for r in recs]
+    results = validate(rows, cfg, all_placeholders(cfg)["required"], [r["row_no"] for r in recs])
     dropped_seal = False
-    for rec, res in zip(recs, results):
+    cat_col = cfg.get("category_column", "")
+    for rec, row, res in zip(recs, rows, results):
         if rec["status"] in ISSUED:
             continue
         warnings = list(res["warnings"])
@@ -157,13 +255,13 @@ def revalidate(batch_id: int) -> dict:
         if rec["cert_file"]:
             _delete_cert(rec)  # template, mapping or data changed: the old PDF is stale
             dropped_seal = True
-        rule = copilot.evaluate(cfg.get("rules", []), db.record_data(rec)) if not res["errors"] else None
+        rule = copilot.evaluate(cfg.get("rules", []), row) if not res["errors"] else None
         db.update_record(
             rec["id"], name=res["name"], student_id=res["student_id"], email=res["email"],
             email_source=res["email_source"], email_fix=res["email_fix"], delivery=res["delivery"],
             dedupe_key=res["dedupe_key"], errors="; ".join(res["errors"]), warnings="; ".join(warnings),
-            theme=(rule or {}).get("theme") or cfg["template"].get("theme", "classic"),
-            rule_label=(rule or {}).get("label", ""),
+            theme=(rule or {}).get("template") or cfg["template_id"], rule_label=(rule or {}).get("label", ""),
+            category=(row.get(cat_col, "") if cat_col else "").strip(),
             status="Invalid" if res["errors"] else "Pending",
             cert_file="", pdf_sha256="", mapping_lock="", payload_json="", signature="", leaf_hash="",
             last_error="", attempts=0,
@@ -179,11 +277,11 @@ PARALLEL_THRESHOLD = 40
 CHUNK = 100
 
 
-def _job(rec: dict, cfg: dict, bg: str):
+def _job(rec: dict, cfg: dict):
     values = record_values(rec, cfg)
     lock = expected_lock(rec, cfg, values)
-    theme = rec["theme"] or cfg["template"].get("theme", "classic")
-    job = (cfg["template"], values, rec["cert_code"], lock, theme, f"Certificate - {values.get('NAME', '')}", bg)
+    job = (rec["theme"] or cfg["template_id"], values, rec["cert_code"], lock, assets_for(cfg), cfg.get("qr", True),
+           f"Certificate - {values.get('NAME', '')}")
     return job, values, lock
 
 
@@ -192,8 +290,8 @@ def _render_all(jobs: list[tuple]):
     done = 0
     if len(jobs) >= PARALLEL_THRESHOLD and (os.cpu_count() or 1) > 1:
         try:
-            ctx = multiprocessing.get_context("spawn")  # safe alongside the web server's threads
-            with ProcessPoolExecutor(max_workers=os.cpu_count(), mp_context=ctx) as pool:
+            ctx = multiprocessing.get_context("spawn")  # the only start method on Windows; safe with threads
+            with ProcessPoolExecutor(max_workers=min(os.cpu_count() or 2, 8), mp_context=ctx) as pool:
                 for start in range(0, len(jobs), CHUNK):
                     futures = [pool.submit(certificate.render_job, j) for j in jobs[start:start + CHUNK]]
                     for fut in futures:
@@ -205,7 +303,7 @@ def _render_all(jobs: list[tuple]):
                             out = e
                         done += 1
                         yield out
-        except BrokenProcessPool:
+        except (BrokenProcessPool, OSError):
             pass  # worker processes unavailable: finish the remainder in-process
     for job in jobs[done:]:
         try:
@@ -226,14 +324,15 @@ def finalize(rec: dict, cfg: dict, pdf: bytes, values: dict, lock: str) -> dict:
     (folder / fname).write_bytes(pdf)
     sha = certificate.sha256(pdf)
     payload = {
-        "v": 1, "code": rec["cert_code"], "name": values.get("NAME", ""), "event": values.get("EVENT", ""),
+        "v": 2, "code": rec["cert_code"], "name": values.get("NAME", ""), "event": values.get("EVENT", ""),
+        "title": values.get("TITLE", ""), "description": values.get("DESCRIPTION", ""),
         "cert_type": values.get("CERT_TYPE", ""), "achievement": values.get("ACHIEVEMENT", ""),
-        "date": values.get("DATE", ""), "issuer": config.ISSUER_NAME, "batch": rec["batch_id"],
-        "pdf_sha256": sha, "key": crypto.fingerprint(),
+        "category": values.get("CATEGORY", ""), "date": values.get("DATE", ""), "issuer": values.get("ISSUER", ""),
+        "batch": rec["batch_id"], "pdf_sha256": sha, "key": crypto.fingerprint(),
     }
     db.update_record(
         rec["id"], status="Generated" if rec["status"] not in ISSUED else rec["status"],
-        cert_file=f"batch_{rec['batch_id']}/{fname}", pdf_sha256=sha, mapping_lock=lock,
+        cert_file=f"batch_{rec['batch_id']}/{fname}", pdf_sha256=sha, mapping_lock=lock, title=values.get("TITLE", ""),
         payload_json=json.dumps(payload, ensure_ascii=False), signature=crypto.sign(crypto.canonical(payload)),
         leaf_hash=crypto.leaf_hash(rec["cert_code"], sha, lock),
         claim_token=rec["claim_token"] or secrets.token_urlsafe(16), last_error="",
@@ -242,13 +341,12 @@ def finalize(rec: dict, cfg: dict, pdf: bytes, values: dict, lock: str) -> dict:
 
 
 def regenerate(rec: dict, cfg: dict) -> dict:
-    job, values, lock = _job(rec, cfg, certificate.background_path(cfg["template"]))
+    job, values, lock = _job(rec, cfg)
     return finalize(rec, cfg, certificate.render_job(job), values, lock)
 
 
 def _generate_records(recs: list[dict], cfg: dict) -> tuple[int, int]:
-    bg = certificate.background_path(cfg["template"])
-    prepared = [_job(r, cfg, bg) for r in recs]
+    prepared = [_job(r, cfg) for r in recs]
     ok = failed = 0
     for rec, (job, values, lock), out in zip(recs, prepared, _render_all([p[0] for p in prepared])):
         try:
@@ -264,7 +362,7 @@ def _generate_records(recs: list[dict], cfg: dict) -> tuple[int, int]:
 
 
 def generate(batch_id: int) -> None:
-    cfg = db.get_batch(batch_id)["config"]
+    cfg = normalize_config(db.get_batch(batch_id)["config"])
     recs = db.query("SELECT * FROM records WHERE batch_id=? AND status='Pending' ORDER BY row_no", (batch_id,))
     t = time.time()
     ok, failed = _generate_records(recs, cfg)
@@ -404,10 +502,28 @@ def _log_send(rec: dict, attachment: str, result: str, detail: str) -> None:
                   (rec["id"], rec["dedupe_key"], rec["email"], attachment, result, detail, db.now()))
 
 
+def sent_last_24h() -> int:
+    """Real (non-sandbox) emails accepted in the last 24 hours, across all batches."""
+    since = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    return db.one("SELECT COUNT(*) n FROM send_log WHERE result='sent' AND at>=? AND detail NOT LIKE 'Sandbox%'", (since,))["n"]
+
+
+def quota_status() -> dict:
+    mode = config.mail_mode()
+    cap = settings.mail()["daily_cap"] if mode != "sandbox" else 0
+    used = sent_last_24h() if cap else 0
+    return {"mode": mode, "cap": cap, "used": used, "left": max(cap - used, 0) if cap else None}
+
+
+class _Pause(Exception):
+    pass
+
+
 def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool = False) -> None:
     batch = db.get_batch(batch_id)
-    cfg = batch["config"]
+    cfg = normalize_config(batch["config"])
     chaos = batch["chaos"] or {}
+    db.set_batch(batch_id, pause_reason="")
     statuses = ["Pending", "Generated", "Failed"] + (["Sent", "Skipped", "Claim", "Claimed"] if allow_resend else [])
     sql = f"SELECT * FROM records WHERE batch_id=? AND status IN ({','.join('?' * len(statuses))})"
     params: list = [batch_id, *statuses]
@@ -418,62 +534,76 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
 
     missing = [r for r in targets if not r["cert_file"] or not (config.CERT_DIR / r["cert_file"]).exists()]
     if missing:
-        ok, failed = _generate_records(missing, cfg)
+        ok, _ = _generate_records(missing, cfg)
         db.log(batch_id, None, "ok", "generate", f"Generated and signed {ok} certificates before sending")
     if missing or not db.get_batch(batch_id)["seal"]:
         seal_batch(batch_id)
-    db.log(batch_id, None, "info", "send", f"Delivery started for {len(targets)} records"
-           + (" (sandbox, chaos faults armed)" if chaos else ""))
+    mode = "sandbox" if batch["is_chaos"] else config.mail_mode()
+    real = mode != "sandbox"
+    cap = settings.mail()["daily_cap"] if real else 0
+    delay = float(settings.mail().get("delay_seconds") or 0) if real else 0.0
+    delay = max(delay, config.SEND_DELAY_SECONDS) if real else 0.0
+    db.log(batch_id, None, "info", "send", f"Delivery started for {len(targets)} students via {mode}"
+           + (" (chaos faults armed)" if chaos else "") + (f"; daily limit {cap}, {sent_last_24h()} used" if cap else ""))
 
     reseal = False
     sent = failed = skipped = claim = 0
-    with mailer.Sender(mode="sandbox" if batch["is_chaos"] else None, faults=chaos.get("faults")) as sender:
-        for rec in targets:
-            rec = db.get_record(rec["id"])
-            if rec["status"] == "Failed" and rec["last_error"].startswith("Generation failed"):
+    try:
+        with mailer.Sender(mode=mode, faults=chaos.get("faults")) as sender:
+            for rec in targets:
+                rec = db.get_record(rec["id"])
+                if rec["status"] == "Failed" and rec["last_error"].startswith("Generation failed"):
+                    try:
+                        rec = regenerate(rec, cfg)
+                        reseal = True
+                    except Exception as e:
+                        db.update_record(rec["id"], last_error=f"Generation failed: {e}")
+                        failed += 1
+                        continue
+                if not allow_resend:
+                    prev = db.one("SELECT at, email FROM send_log WHERE dedupe_key=? AND result='sent' LIMIT 1",
+                                  (rec["dedupe_key"],))
+                    if prev:
+                        db.update_record(rec["id"], status="Skipped",
+                                         last_error=f"Already sent to {prev['email']} on {prev['at'][:10]}")
+                        db.log(batch_id, rec["id"], "warn", "dedupe", f"Duplicate prevented: already sent to {prev['email']}")
+                        skipped += 1
+                        continue
+                if rec["delivery"] == "claim":
+                    db.update_record(rec["id"], status="Claim", last_error="")
+                    db.log(batch_id, rec["id"], "heal", "claim", "No usable email: claim link issued instead of failing")
+                    claim += 1
+                    continue
+                if cap and sent_last_24h() >= cap:
+                    raise _Pause(f"Daily sending limit reached ({cap} emails in 24 hours). The rest are queued: press "
+                                 "Send again after the limit resets, or raise the limit in Settings if your account allows it.")
                 try:
-                    rec = regenerate(rec, cfg)
-                    reseal = True
+                    rec, pdf, healed = verified_attachment(rec, cfg)
+                    reseal |= healed
                 except Exception as e:
-                    db.update_record(rec["id"], last_error=f"Generation failed: {e}")
+                    db.update_record(rec["id"], status="Failed", last_error=str(e), attempts=rec["attempts"] + 1)
+                    db.log(batch_id, rec["id"], "error", "lock", str(e))
+                    _log_send(rec, rec["cert_file"], "failed", str(e))
                     failed += 1
                     continue
-            if not allow_resend:
-                prev = db.one("SELECT at, email FROM send_log WHERE dedupe_key=? AND result='sent' LIMIT 1",
-                              (rec["dedupe_key"],))
-                if prev:
-                    db.update_record(rec["id"], status="Skipped",
-                                     last_error=f"Already sent to {prev['email']} on {prev['at'][:10]}")
-                    db.log(batch_id, rec["id"], "warn", "dedupe", f"Duplicate prevented: already sent to {prev['email']}")
-                    skipped += 1
-                    continue
-            if rec["delivery"] == "claim":
-                db.update_record(rec["id"], status="Claim", last_error="")
-                db.log(batch_id, rec["id"], "heal", "claim", "No usable email: claim link issued instead of failing")
-                claim += 1
-                continue
-            try:
-                rec, pdf, healed = verified_attachment(rec, cfg)
-                reseal |= healed
-            except Exception as e:
-                db.update_record(rec["id"], status="Failed", last_error=str(e), attempts=rec["attempts"] + 1)
-                db.log(batch_id, rec["id"], "error", "lock", str(e))
-                _log_send(rec, rec["cert_file"], "failed", str(e))
-                failed += 1
-                continue
-
-            result = _deliver(sender, rec, cfg, pdf)
-            if result["rebound"]:
-                reseal = True
-            if result["ok"]:
-                sent += 1
-            else:
-                failed += 1
-            if config.SEND_DELAY_SECONDS:
-                time.sleep(config.SEND_DELAY_SECONDS)
-
-    if reseal:
-        seal_batch(batch_id)
+                result = _deliver(sender, rec, cfg, pdf)
+                reseal |= result["rebound"]
+                if result["ok"]:
+                    sent += 1
+                else:
+                    failed += 1
+                if delay:
+                    time.sleep(delay)
+    except (mailer.AuthFailure, mailer.QuotaFailure, _Pause) as e:
+        kind = {"AuthFailure": "Email login failed", "QuotaFailure": "Sending limit reached"}.get(type(e).__name__, "Paused")
+        db.set_batch(batch_id, pause_reason=f"{kind}: {e}")
+        with db.tx() as c:
+            c.execute("UPDATE records SET status='Generated' WHERE batch_id=? AND status='Sending'", (batch_id,))
+        db.log(batch_id, None, "error" if isinstance(e, mailer.AuthFailure) else "warn", "send",
+               f"Delivery paused. {kind}: {e}. Nothing was lost; unsent students stay queued.")
+    finally:
+        if reseal:
+            seal_batch(batch_id)
     db.log(batch_id, None, "ok" if not failed else "warn", "send",
            f"Delivery finished: {sent} sent, {claim} claim links, {skipped} duplicates skipped, {failed} failed")
 
@@ -487,7 +617,8 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
         values = record_values(rec, cfg)
         subject, body = email_texts(rec, cfg, values)
         fname = Path(rec["cert_file"]).name
-        msg = mailer.build_message(rec["email"], rec["name"], subject, body, pdf, fname, rec["cert_code"])
+        msg = mailer.build_message(rec["email"], rec["name"], subject, body, pdf, fname, rec["cert_code"],
+                                   cfg.get("branding", {}).get("org_name", ""))
         attempt += 1
         attempts += 1
         try:
@@ -497,6 +628,9 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
             db.log(batch_id, rec["id"], "ok", "send", f"Sent to {rec['email']} with {fname}"
                    + (f" (attempt {attempt})" if attempt > 1 else ""))
             return {"ok": True, "rebound": rebound}
+        except (mailer.AuthFailure, mailer.QuotaFailure):
+            db.update_record(rec["id"], status="Generated", attempts=attempts)
+            raise
         except mailer.PermanentFailure as e:
             _log_send(rec, fname, "failed", str(e))
             alt, col = alternate_email(rec, cfg) if not rebound else ("", "")

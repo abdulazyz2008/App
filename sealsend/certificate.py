@@ -1,233 +1,43 @@
-"""Certificate rendering: themes, positioned text fields, QR code and embedded proof metadata."""
-import copy
+"""Certificates: render by template id, embed proof metadata, previews, imports and the forgery demo."""
 import hashlib
+import json
+import secrets
 import shutil
 import subprocess
 import tempfile
 from io import BytesIO
 from pathlib import Path
 
-from reportlab.graphics import renderPDF
-from reportlab.graphics.barcode import qr
-from reportlab.graphics.shapes import Drawing
 from reportlab.lib.colors import HexColor
-from reportlab.lib.pagesizes import A4, landscape, portrait
-from reportlab.lib.utils import ImageReader
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 
-from . import config
-from .data import render
+from . import config, db
+from . import templates_lib as T
 
-FONT_FILES = {
-    "serif": "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf",
-    "serif-bold": "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf",
-    "serif-italic": "/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf",
-    "sans": "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
-    "sans-bold": "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
-}
-FALLBACK_FONTS = {"serif": "Times-Roman", "serif-bold": "Times-Bold", "serif-italic": "Times-Italic",
-                  "sans": "Helvetica", "sans-bold": "Helvetica-Bold"}
-_fonts: dict[str, str] = {}
-
-
-def font(key: str) -> str:
-    key = key if key in FALLBACK_FONTS else "sans"
-    if key not in _fonts:
-        path = Path(FONT_FILES[key])
-        if path.exists():  # Unicode TTF so names with accents render correctly
-            name = f"Seal-{key}"
-            pdfmetrics.registerFont(TTFont(name, str(path)))
-            _fonts[key] = name
-        else:
-            _fonts[key] = FALLBACK_FONTS[key]
-    return _fonts[key]
-
-
-THEMES = {
-    "classic": {"label": "Classic", "description": "Navy and gold, the all-round default",
-                "paper": "#fdfbf5", "frame": "#1f3a5f", "accent": "#b8892d", "title": "#1f3a5f",
-                "name": "#1f3a5f", "text": "#333333", "muted": "#666666", "medal": False},
-    "gold": {"label": "Gold", "description": "For winners: gold frame and a winner's medal",
-             "paper": "#fffbf0", "frame": "#8a6a12", "accent": "#c9a227", "title": "#7a5a0c",
-             "name": "#3d2f08", "text": "#3d3420", "muted": "#7a6b4f", "medal": True},
-    "participation": {"label": "Participation", "description": "Calm slate tones for participants",
-                      "paper": "#ffffff", "frame": "#4b5563", "accent": "#9ca3af", "title": "#374151",
-                      "name": "#111827", "text": "#374151", "muted": "#6b7280", "medal": False},
-    "mono": {"label": "Mono", "description": "Pure black and white, minimal",
-             "paper": "#ffffff", "frame": "#000000", "accent": "#000000", "title": "#000000",
-             "name": "#000000", "text": "#1a1a1a", "muted": "#666666", "medal": False},
-}
-
-DEFAULT_TEMPLATE = {
-    "orientation": "landscape",
-    "background": "",
-    "theme": "classic",
-    "qr": True,
-    "fields": [
-        {"text": "CERTIFICATE", "x": 0.5, "y": 0.80, "size": 42, "font": "serif-bold", "color": "title", "align": "center"},
-        {"text": "OF {{CERT_TYPE}}", "x": 0.5, "y": 0.735, "size": 15, "font": "sans-bold", "color": "accent", "align": "center", "upper": True},
-        {"text": "This certificate is proudly presented to", "x": 0.5, "y": 0.62, "size": 14, "font": "serif-italic", "color": "muted", "align": "center"},
-        {"text": "{{NAME}}", "x": 0.5, "y": 0.50, "size": 40, "font": "serif-bold", "color": "name", "align": "center", "max_width": 0.7, "underline": True},
-        {"text": "for {{ACHIEVEMENT}} in {{EVENT}}", "x": 0.5, "y": 0.395, "size": 16, "font": "sans", "color": "text", "align": "center", "max_width": 0.75},
-        {"text": "held on {{DATE}}", "x": 0.5, "y": 0.345, "size": 13, "font": "sans", "color": "muted", "align": "center"},
-        {"text": "Event Coordinator", "x": 0.25, "y": 0.17, "size": 11, "font": "sans", "color": "text", "align": "center", "signature_line": True},
-        {"text": "Head of Department", "x": 0.75, "y": 0.17, "size": 11, "font": "sans", "color": "text", "align": "center", "signature_line": True},
-        {"text": "Certificate ID: {{CERT_ID}}", "x": 0.075, "y": 0.075, "size": 8, "font": "sans", "color": "muted", "align": "left"},
-    ],
-}
-
-
-def default_template() -> dict:
-    return copy.deepcopy(DEFAULT_TEMPLATE)
-
-
-def template_texts(tpl: dict) -> list[str]:
-    return [f.get("text", "") for f in tpl.get("fields", [])]
-
-
-def background_path(tpl: dict) -> str:
-    if tpl.get("background"):
-        candidate = config.UPLOAD_DIR / Path(tpl["background"]).name
-        if candidate.exists():
-            return str(candidate)
-    return ""
-
-
-def _page_size(tpl: dict, bg: Path | None):
-    if bg is not None:
-        iw, ih = ImageReader(str(bg)).getSize()
-        width = landscape(A4)[0] if iw >= ih else portrait(A4)[0]
-        return width, width * ih / iw
-    return portrait(A4) if tpl.get("orientation") == "portrait" else landscape(A4)
-
-
-def _color(value: str, theme: dict):
-    return HexColor(theme.get(value, value) if not str(value).startswith("#") else value)
-
-
-def _draw_frame(c: canvas.Canvas, w: float, h: float, th: dict) -> None:
-    c.setFillColor(HexColor(th["paper"]))
-    c.rect(0, 0, w, h, stroke=0, fill=1)
-    c.setStrokeColor(HexColor(th["frame"]))
-    c.setLineWidth(10)
-    c.rect(18, 18, w - 36, h - 36)
-    c.setStrokeColor(HexColor(th["accent"]))
-    c.setLineWidth(1.5)
-    c.rect(34, 34, w - 68, h - 68)
-    c.setLineWidth(0.6)
-    c.rect(40, 40, w - 80, h - 80)
-    c.setFillColor(HexColor(th["accent"]))
-    for (x, y) in ((40, 40), (w - 40, 40), (40, h - 40), (w - 40, h - 40)):
-        c.circle(x, y, 5, stroke=0, fill=1)
-    c.setStrokeColor(HexColor(th["accent"]))
-    c.setLineWidth(1)
-    c.line(w * 0.38, h * 0.695, w * 0.62, h * 0.695)
-
-
-def _draw_medal(c: canvas.Canvas, x: float, y: float, th: dict) -> None:
-    gold, dark = HexColor(th["accent"]), HexColor(th["frame"])
-    c.setFillColor(dark)
-    p = c.beginPath()  # ribbons
-    p.moveTo(x - 16, y - 8); p.lineTo(x - 26, y - 46); p.lineTo(x - 14, y - 40); p.lineTo(x - 6, y - 50); p.lineTo(x - 2, y - 10)
-    p.moveTo(x + 16, y - 8); p.lineTo(x + 26, y - 46); p.lineTo(x + 14, y - 40); p.lineTo(x + 6, y - 50); p.lineTo(x + 2, y - 10)
-    c.drawPath(p, stroke=0, fill=1)
-    c.setFillColor(gold)
-    c.circle(x, y, 30, stroke=0, fill=1)
-    c.setStrokeColor(dark)
-    c.setLineWidth(1.2)
-    c.circle(x, y, 25, stroke=1, fill=0)
-    c.setFillColor(HexColor("#ffffff"))
-    c.setFont(font("sans-bold"), 9)
-    c.drawCentredString(x, y + 1, "WINNER")
-    c.setFont(font("sans"), 6)
-    c.drawCentredString(x, y - 9, "★ ★ ★")
+DEFAULT_TEMPLATE_ID = "university-classic"
 
 
 def proof_keywords(cert_code: str, lock: str) -> str:
     return f"sealsend:v1:{cert_code}:{lock}"
 
 
-def render_pdf(tpl: dict, values: dict, cert_code: str = "", lock: str = "", theme: str = "",
-               title: str = "Certificate", bg_path: str | None = None) -> bytes:
-    """Render one certificate. Output is byte-for-byte deterministic for the same inputs."""
-    th = THEMES.get(theme or tpl.get("theme", "classic"), THEMES["classic"])
-    if bg_path is None:
-        bg_path = background_path(tpl)
-    bg = Path(bg_path) if bg_path else None
-    w, h = _page_size(tpl, bg)
+def resolve(template_id: str) -> dict:
+    return T.get_template(template_id or DEFAULT_TEMPLATE_ID) or T.BUILTIN_BY_ID[DEFAULT_TEMPLATE_ID]
 
-    buf = BytesIO()
-    c = canvas.Canvas(buf, pagesize=(w, h), invariant=1)
-    c.setTitle(title)
-    c.setAuthor(config.ISSUER_NAME)
-    c.setCreator("SealSend")
-    c.setSubject(cert_code)
-    c.setKeywords(proof_keywords(cert_code, lock))  # the Mapping Lock travels inside the file
 
-    if bg is not None:
-        c.drawImage(ImageReader(str(bg)), 0, 0, width=w, height=h, mask="auto")
-    else:
-        _draw_frame(c, w, h, th)
-
-    for f in tpl.get("fields", []):
-        text = render(f.get("text", ""), values).strip()
-        if f.get("upper"):
-            text = text.upper()
-        if not text:
-            continue
-        fname = font(f.get("font", "sans"))
-        x, y = float(f.get("x", 0.5)) * w, float(f.get("y", 0.5)) * h
-        size = float(f.get("size", 14))
-        max_w = float(f.get("max_width", 0.85)) * w
-        while size > 6 and pdfmetrics.stringWidth(text, fname, size) > max_w:
-            size -= 0.5
-        c.setFont(fname, size)
-        c.setFillColor(_color(f.get("color", "text"), th))
-        tw = pdfmetrics.stringWidth(text, fname, size)
-        align = f.get("align", "center")
-        if align == "center":
-            c.drawCentredString(x, y, text)
-            left = x - tw / 2
-        elif align == "right":
-            c.drawRightString(x, y, text)
-            left = x - tw
-        else:
-            c.drawString(x, y, text)
-            left = x
-        if f.get("underline"):
-            c.setStrokeColor(HexColor(th["accent"]))
-            c.setLineWidth(1)
-            c.line(left - 20, y - size * 0.35, left + tw + 20, y - size * 0.35)
-        if f.get("signature_line"):
-            c.setStrokeColor(HexColor(th["text"]))
-            c.setLineWidth(0.8)
-            c.line(x - 85, y + size + 6, x + 85, y + size + 6)
-
-    if th.get("medal") and bg is None:
-        _draw_medal(c, w * 0.5, h * 0.215, th)
-
-    if tpl.get("qr", True) and values.get("VERIFY_URL"):
-        size = 62
-        widget = qr.QrCodeWidget(values["VERIFY_URL"])
-        bx0, by0, bx1, by1 = widget.getBounds()
-        d = Drawing(size, size, transform=[size / (bx1 - bx0), 0, 0, size / (by1 - by0), 0, 0])
-        d.add(widget)
-        renderPDF.draw(d, c, w - 0.075 * w - size + 6, 0.075 * h + 2)
-        c.setFont(font("sans"), 6.5)
-        c.setFillColor(HexColor(th["muted"]))
-        c.drawCentredString(w - 0.075 * w - size / 2 + 6, 0.075 * h - 4, "Scan to verify")
-
-    c.showPage()
-    c.save()
-    return buf.getvalue()
+def render_pdf(template_id: str, values: dict, cert_code: str = "", lock: str = "", assets: dict | None = None,
+               qr_on: bool = True, title: str = "Certificate") -> bytes:
+    """Byte-for-byte deterministic for the same inputs (built-in and image templates)."""
+    tpl = resolve(template_id)
+    meta = {"title": title, "author": values.get("ORG_NAME") or config.ISSUER_NAME, "subject": cert_code,
+            "keywords": proof_keywords(cert_code, lock)}
+    return T.render(tpl, values, assets or {}, meta, qr_on)
 
 
 def render_job(job: tuple) -> bytes:
-    """Process-pool entry point."""
-    tpl, values, code, lock, theme, title, bg = job
-    return render_pdf(tpl, values, code, lock, theme, title, bg_path=bg)
+    """Process-pool entry point (must be a top-level function for Windows/macOS spawn)."""
+    template_id, values, code, lock, assets, qr_on, title = job
+    return render_pdf(template_id, values, code, lock, assets, qr_on, title)
 
 
 def sha256(data: bytes) -> str:
@@ -235,7 +45,6 @@ def sha256(data: bytes) -> str:
 
 
 def read_proof(data: bytes) -> dict:
-    """Extract (code, lock) that SealSend embedded in a PDF. Empty if absent or unreadable."""
     from pypdf import PdfReader
 
     try:
@@ -249,9 +58,9 @@ def read_proof(data: bytes) -> dict:
     return {"code": str(meta.get("/Subject", "") or ""), "lock": ""}
 
 
-def forge_copy(data: bytes, new_name: str, name_y: float = 0.50) -> bytes:
-    """Demo helper: what a forger does. Paints over the name and writes a different one,
-    keeping the original metadata so the file still *claims* to be the real certificate."""
+def forge_copy(data: bytes, new_name: str) -> bytes:
+    """Demo helper: what a forger does. Paints a new name over the middle of the page and keeps
+    the original metadata, so the file still *claims* to be the genuine certificate."""
     from pypdf import PdfReader, PdfWriter
 
     reader = PdfReader(BytesIO(data))
@@ -259,14 +68,11 @@ def forge_copy(data: bytes, new_name: str, name_y: float = 0.50) -> bytes:
     w, h = float(page.mediabox.width), float(page.mediabox.height)
     buf = BytesIO()
     c = canvas.Canvas(buf, pagesize=(w, h))
-    c.setFillColor(HexColor("#fdfbf5"))
-    c.rect(w * 0.12, h * name_y - 18, w * 0.76, 58, stroke=0, fill=1)
-    c.setFillColor(HexColor("#1f3a5f"))
-    c.setFont(font("serif-bold"), 40)
-    c.drawCentredString(w * 0.5, h * name_y, new_name)
+    c.setFillColor(HexColor("#ffffff"))
+    c.rect(w * 0.12, h * 0.44, w * 0.76, h * 0.11, stroke=0, fill=1)
+    T.draw_text(c, new_name, w * 0.5, h * 0.47, "display", 38, HexColor("#1f3a5f"), max_w=w * 0.7)
     c.save()
-    overlay = PdfReader(BytesIO(buf.getvalue())).pages[0]
-    page.merge_page(overlay)
+    page.merge_page(PdfReader(BytesIO(buf.getvalue())).pages[0])
     writer = PdfWriter()
     writer.add_page(page)
     writer.add_metadata({k: v for k, v in (reader.metadata or {}).items()})
@@ -276,7 +82,13 @@ def forge_copy(data: bytes, new_name: str, name_y: float = 0.50) -> bytes:
 
 
 def pdf_to_png(data: bytes, dpi: int = 110) -> bytes | None:
-    """Rasterize for previews that work in every browser (incl. mobile). Needs poppler's pdftoppm."""
+    """Rasterize for previews. PyMuPDF works on Windows, macOS and Linux; poppler is a fallback."""
+    try:
+        import pymupdf
+        doc = pymupdf.open(stream=data, filetype="pdf")
+        return doc[0].get_pixmap(dpi=dpi, alpha=False).tobytes("png")
+    except Exception:
+        pass
     exe = shutil.which("pdftoppm")
     if not exe:
         return None
@@ -288,3 +100,128 @@ def pdf_to_png(data: bytes, dpi: int = 110) -> bytes | None:
             return out.read_bytes() if out.exists() else None
     except Exception:
         return None
+
+
+# ---------------------------------------------------------------- gallery
+def sample_values(tpl: dict, org: dict | None = None) -> dict:
+    v = dict(T.SAMPLE_VALUES)
+    v["TITLE"] = tpl.get("title", "")
+    if org:
+        for k, key in (("ORG_NAME", "org_name"), ("SIGNER1_NAME", "signer1_name"), ("SIGNER1_TITLE", "signer1_title"),
+                       ("SIGNER2_NAME", "signer2_name"), ("SIGNER2_TITLE", "signer2_title")):
+            if org.get(key):
+                v[k] = org[key]
+    return v
+
+
+def thumbnail(template_id: str, org: dict | None = None, dpi: int = 48) -> bytes:
+    """Cached PNG of a template with sample data (cache key covers template + branding)."""
+    tpl = resolve(template_id)
+    org = org or {}
+    key = hashlib.sha1(json.dumps([template_id, tpl.get("fields"), org, dpi, tpl.get("background", "")],
+                                  sort_keys=True, default=str).encode()).hexdigest()[:16]
+    path = config.THUMB_DIR / f"{tpl['id']}_{key}.png"
+    if path.exists():
+        return path.read_bytes()
+    assets = {k: org.get(k, "") for k in ("logo", "signer1_sig", "signer2_sig")}
+    png = pdf_to_png(T.render(tpl, sample_values(tpl, org), assets, {"subject": "sample"}), dpi=dpi) or b""
+    if png:
+        path.write_bytes(png)
+    return png
+
+
+def catalog() -> list[dict]:
+    out = [{"id": t["id"], "name": t["name"], "niche": t["niche"], "description": t["description"],
+            "title": t["title"], "custom": False} for t in T.BUILTINS]
+    for r in db.query("SELECT id, name, description, default_title, created_at FROM templates ORDER BY created_at DESC"):
+        out.append({"id": r["id"], "name": r["name"], "niche": "My templates", "description": r["description"],
+                    "title": r["default_title"], "custom": True, "created_at": r["created_at"]})
+    return out
+
+
+# ---------------------------------------------------------------- imports (Canva exports and other artwork)
+def import_template(data: bytes, filename: str, name: str) -> str:
+    """Store a PNG/JPG/PDF exported from Canva (or anywhere). Images are normalized to a compact
+    high-quality JPEG so every certificate email stays small."""
+    suffix = Path(filename).suffix.lower()
+    tid = "custom-" + secrets.token_hex(5)
+    if suffix == ".pdf":
+        from pypdf import PdfReader
+        try:
+            reader = PdfReader(BytesIO(data))
+            page = reader.pages[0]
+        except Exception as e:
+            raise ValueError(f"That PDF could not be read ({e})") from e
+        if reader.is_encrypted:
+            raise ValueError("That PDF is password-protected. Export it again without a password")
+        w, h = float(page.mediabox.width), float(page.mediabox.height)
+        stored = f"{tid}.pdf"
+        (config.UPLOAD_DIR / stored).write_bytes(data)
+        kind = "pdf"
+    elif suffix in (".png", ".jpg", ".jpeg", ".webp"):
+        from PIL import Image
+        try:
+            im = Image.open(BytesIO(data))
+            im.load()
+        except Exception as e:
+            raise ValueError("That image could not be read") from e
+        if im.mode in ("RGBA", "LA", "P"):
+            bg = Image.new("RGB", im.size, "white")
+            im = im.convert("RGBA")
+            bg.paste(im, mask=im.split()[-1])
+            im = bg
+        im = im.convert("RGB")
+        if max(im.size) > 3508:  # A4 at 300 dpi is plenty for print
+            im.thumbnail((3508, 3508))
+        stored = f"{tid}.jpg"
+        im.save(config.UPLOAD_DIR / stored, "JPEG", quality=90, optimize=True)
+        iw, ih = im.size
+        w = 842.0 if iw >= ih else 595.0
+        h = w * ih / iw
+        kind = "image"
+    else:
+        raise ValueError("Upload a PNG, JPG or PDF exported from Canva")
+    with db.tx() as c:
+        c.execute("INSERT INTO templates (id, name, description, kind, file, page_w, page_h, fields_json, default_title, created_at) "
+                  "VALUES (?,?,?,?,?,?,?,?,?,?)",
+                  (tid, (name or Path(filename).stem)[:80], "Imported design", kind, stored, w, h,
+                   json.dumps(T.default_imported_fields()), "Certificate of Achievement", db.now()))
+    return tid
+
+
+def update_template_fields(template_id: str, fields: list[dict], name: str | None = None) -> None:
+    clean = []
+    for f in fields[:30]:
+        kind = f.get("type", "text")
+        if kind not in ("text", "qr", "logo", "signature"):
+            continue
+        g = {"type": kind, "key": str(f.get("key", ""))[:30], "enabled": bool(f.get("enabled", True)),
+             "x": min(max(float(f.get("x", 0.5)), 0), 1), "y": min(max(float(f.get("y", 0.5)), 0), 1)}
+        if kind == "text":
+            g.update({"text": str(f.get("text", ""))[:300], "size": min(max(float(f.get("size", 14)), 5), 120),
+                      "font": f.get("font", "sans") if f.get("font") in T.FONTS else "sans",
+                      "color": f.get("color", "#1a1a1a") if str(f.get("color", "")).startswith("#") else "#1a1a1a",
+                      "align": f.get("align", "center") if f.get("align") in ("left", "center", "right") else "center",
+                      "max_width": min(max(float(f.get("max_width", 0.8)), 0.1), 1),
+                      "lines": int(min(max(int(f.get("lines", 1)), 1), 4)), "upper": bool(f.get("upper", False)),
+                      "tracking": min(max(float(f.get("tracking", 0)), 0), 10)})
+        elif kind == "qr":
+            g["size"] = min(max(float(f.get("size", 0.1)), 0.05), 0.3)
+        elif kind == "logo":
+            g["h"] = min(max(float(f.get("h", 0.08)), 0.03), 0.3)
+            g["align"] = "center"
+        elif kind == "signature":
+            g["n"] = 1 if int(f.get("n", 1)) == 1 else 2
+        clean.append(g)
+    with db.tx() as c:
+        if name:
+            c.execute("UPDATE templates SET name=? WHERE id=?", (name[:80], template_id))
+        c.execute("UPDATE templates SET fields_json=? WHERE id=?", (json.dumps(clean), template_id))
+
+
+def delete_template(template_id: str) -> None:
+    row = db.one("SELECT file FROM templates WHERE id=?", (template_id,))
+    if row:
+        (config.UPLOAD_DIR / row["file"]).unlink(missing_ok=True)
+        with db.tx() as c:
+            c.execute("DELETE FROM templates WHERE id=?", (template_id,))

@@ -11,26 +11,28 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
-from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, StreamingResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import certificate, chaos, config, copilot, crypto, db, mailer, pipeline
-from .data import load_table
+from . import certificate, chaos, config, copilot, crypto, db, mailer, pipeline, settings
+from . import templates_lib as T
+from .data import STYLES, suggest_categories
 
 STATIC = Path(__file__).parent / "static"
 
 
 @asynccontextmanager
 async def lifespan(_app):
-    # A crash mid-send leaves records in "Sending"; surface them as Failed so they can be retried.
-    with db.tx() as c:
-        c.execute("UPDATE records SET status='Failed', last_error='Interrupted while sending; retry' WHERE status='Sending'")
+    with db.tx() as c:  # a crash mid-send leaves records in "Sending": requeue them
+        c.execute("UPDATE records SET status='Generated' WHERE status='Sending'")
         c.execute("UPDATE batches SET job=''")
-    crypto.private_key()  # create the signing key on first start
+    crypto.private_key()
     yield
 
 
 app = FastAPI(title="SealSend", docs_url=None, redoc_url=None, lifespan=lifespan)
+app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
 @app.middleware("http")
@@ -45,9 +47,7 @@ async def security_headers(request: Request, call_next):
 # ---------------------------------------------------------------- auth
 SESSIONS: dict[str, float] = {}
 SESSION_TTL = 12 * 3600
-if not config.ADMIN_PASSWORD:
-    config.ADMIN_PASSWORD = secrets.token_urlsafe(9)
-    print(f"\n  No ADMIN_PASSWORD set. Temporary login -> user: {config.ADMIN_USER}  password: {config.ADMIN_PASSWORD}\n")
+_failed_logins: list[float] = []
 
 
 def require_auth(request: Request) -> None:
@@ -55,31 +55,56 @@ def require_auth(request: Request) -> None:
     exp = SESSIONS.get(token)
     if not exp or exp < time.time():
         SESSIONS.pop(token, None)
-        raise HTTPException(401, "Login required")
+        raise HTTPException(401, "Please sign in")
+
+
+def _start_session(request: Request, response: Response) -> None:
+    token = secrets.token_urlsafe(32)
+    SESSIONS[token] = time.time() + SESSION_TTL
+    response.set_cookie("sealsend_session", token, httponly=True, samesite="lax", max_age=SESSION_TTL,
+                        secure=request.url.scheme == "https")
+
+
+def _is_local(request: Request) -> bool:
+    host = request.client.host if request.client else ""
+    return host in ("127.0.0.1", "::1", "localhost", "testclient")
 
 
 class Login(BaseModel):
-    username: str
+    username: str = "admin"
     password: str
 
 
-_failed_logins: list[float] = []
+@app.get("/api/setup-status")
+def setup_status(request: Request):
+    return {"needs_setup": not settings.admin_configured(), "local": _is_local(request)}
+
+
+@app.post("/api/setup")
+def first_run_setup(body: Login, request: Request, response: Response):
+    if settings.admin_configured():
+        raise HTTPException(400, "Already set up. Sign in instead.")
+    if not _is_local(request):
+        raise HTTPException(403, "For safety, create the password on the computer running SealSend")
+    if len(body.password) < 8:
+        raise HTTPException(400, "Use at least 8 characters")
+    settings.set_admin_password(body.password)
+    _start_session(request, response)
+    return {"ok": True}
 
 
 @app.post("/api/login")
-def login(body: Login, response: Response):
+def login(body: Login, request: Request, response: Response):
     now = time.time()
     _failed_logins[:] = [t for t in _failed_logins if now - t < 300]
     if len(_failed_logins) >= 10:
         raise HTTPException(429, "Too many failed attempts. Try again in a few minutes.")
-    ok = hmac.compare_digest(body.username, config.ADMIN_USER) & hmac.compare_digest(body.password, config.ADMIN_PASSWORD)
-    if not ok:
+    if not settings.admin_configured():
+        raise HTTPException(400, "Create a password first")
+    if not settings.check_admin_password(body.password):
         _failed_logins.append(now)
-        raise HTTPException(401, "Wrong username or password")
-    token = secrets.token_urlsafe(32)
-    SESSIONS[token] = now + SESSION_TTL
-    response.set_cookie("sealsend_session", token, httponly=True, samesite="strict", max_age=SESSION_TTL,
-                        secure=config.PUBLIC_BASE_URL.startswith("https"))
+        raise HTTPException(401, "Wrong password")
+    _start_session(request, response)
     return {"ok": True}
 
 
@@ -90,15 +115,38 @@ def logout(request: Request, response: Response):
     return {"ok": True}
 
 
-@app.get("/api/me", dependencies=[Depends(require_auth)])
-def me():
+class PasswordIn(BaseModel):
+    current: str
+    new: str
+
+
+@app.put("/api/settings/password", dependencies=[Depends(require_auth)])
+def change_password(body: PasswordIn):
+    if config.ADMIN_PASSWORD:
+        raise HTTPException(400, "The password is set by ADMIN_PASSWORD in .env; change it there")
+    if not settings.check_admin_password(body.current):
+        raise HTTPException(400, "Current password is wrong")
+    if len(body.new) < 8:
+        raise HTTPException(400, "Use at least 8 characters")
+    settings.set_admin_password(body.new)
+    return {"ok": True}
+
+
+def _copilot_label() -> str:
     import os
     ai = config.COPILOT_ENGINE == "claude" or (config.COPILOT_ENGINE == "auto" and bool(os.environ.get("ANTHROPIC_API_KEY")))
-    return {"user": config.ADMIN_USER, "mail_mode": config.mail_mode(), "mail_from": config.MAIL_FROM,
-            "key_fingerprint": crypto.fingerprint(), "copilot": f"Claude · {config.COPILOT_MODEL}" if ai else "Offline parser",
-            "public_base_url": config.PUBLIC_BASE_URL, "issuer": config.ISSUER_NAME,
-            "themes": {k: {"label": v["label"], "description": v["description"]} for k, v in certificate.THEMES.items()},
-            "presets": {k: v["label"] for k, v in mailer.PRESETS.items()}}
+    return f"Claude · {config.COPILOT_MODEL}" if ai else "Offline"
+
+
+@app.get("/api/me", dependencies=[Depends(require_auth)])
+def me():
+    return {"mail_mode": config.mail_mode(), "mail": settings.public_mail(), "quota": pipeline.quota_status(),
+            "key_fingerprint": crypto.fingerprint(), "copilot": _copilot_label(),
+            "public_base_url": config.public_base_url(), "lan_url": f"http://{config.lan_ip()}:{config.PORT}",
+            "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
+            "presets": {k: v["label"] for k, v in mailer.PRESETS.items()},
+            "styles": {k: v["title"] for k, v in STYLES.items()},
+            "fonts": T.FONT_LABELS, "niches": T.NICHES + ["My templates"]}
 
 
 # ---------------------------------------------------------------- helpers
@@ -106,6 +154,7 @@ def get_batch_or_404(batch_id: int) -> dict:
     b = db.get_batch(batch_id)
     if not b:
         raise HTTPException(404, "Batch not found")
+    b["config"] = pipeline.normalize_config(b["config"])
     return b
 
 
@@ -118,39 +167,43 @@ def get_record_or_404(record_id: int) -> dict:
 
 def ensure_idle(batch_id: int) -> None:
     if pipeline.is_running(batch_id):
-        raise HTTPException(409, "A job is already running for this batch")
+        raise HTTPException(409, "Please wait: this batch is busy generating or sending")
 
 
 def batch_summary(b: dict) -> dict:
     return {"id": b["id"], "name": b["name"], "filename": b["filename"], "created_at": b["created_at"],
             "job": b["job"], "counts": db.status_counts(b["id"]), "is_chaos": bool(b["is_chaos"]),
-            "sealed": bool(b["seal"]), "chaos_phase": (b["chaos"] or {}).get("phase", "")}
+            "sealed": bool(b["seal"]), "chaos_phase": (b["chaos"] or {}).get("phase", ""),
+            "pause_reason": b.get("pause_reason", ""), "sheet": b.get("sheet", "")}
 
 
-async def _save_upload(upload: UploadFile, allowed: tuple[str, ...]) -> Path:
+async def _read_upload(upload: UploadFile, allowed: tuple[str, ...]) -> bytes:
     suffix = Path(upload.filename or "").suffix.lower()
     if suffix not in allowed:
-        raise HTTPException(400, f"Unsupported file type {suffix or '(none)'}. Allowed: {', '.join(allowed)}")
-    data = await upload.read()
+        raise HTTPException(400, f"That file type ({suffix or 'none'}) isn't supported here. Use {', '.join(allowed)}")
+    data = await upload.read(config.MAX_UPLOAD_MB * 1024 * 1024 + 1)
     if len(data) > config.MAX_UPLOAD_MB * 1024 * 1024:
         raise HTTPException(413, f"File is larger than {config.MAX_UPLOAD_MB} MB")
-    path = config.UPLOAD_DIR / f"{secrets.token_hex(8)}{suffix}"
-    path.write_bytes(data)
-    return path
+    if not data:
+        raise HTTPException(400, "The file is empty")
+    return data
 
 
 def claim_url(rec: dict) -> str:
-    return f"{config.PUBLIC_BASE_URL.rstrip('/')}/claim/{rec['claim_token']}" if rec["claim_token"] else ""
+    return f"{config.public_base_url()}/claim/{rec['claim_token']}" if rec["claim_token"] else ""
 
 
 def verify_url(rec: dict) -> str:
-    return f"{config.PUBLIC_BASE_URL.rstrip('/')}/verify/{rec['cert_code']}"
+    return f"{config.public_base_url()}/verify/{rec['cert_code']}"
 
 
 # ---------------------------------------------------------------- batches
 @app.post("/api/batches", dependencies=[Depends(require_auth)])
 async def create_batch(file: UploadFile = File(...), name: str = Form("")):
-    path = await _save_upload(file, (".csv", ".xlsx", ".xlsm", ".xls", ".txt"))
+    data = await _read_upload(file, (".xlsx", ".xlsm", ".csv", ".tsv", ".txt", ".xls"))
+    suffix = Path(file.filename or "x.csv").suffix.lower()
+    path = config.UPLOAD_DIR / f"{secrets.token_hex(8)}{suffix}"
+    path.write_bytes(data)
     try:
         batch_id = pipeline.create_batch(path, file.filename or path.name, name.strip())
     except ValueError as e:
@@ -182,59 +235,94 @@ def delete_batch(batch_id: int):
     return {"ok": True}
 
 
+class SheetIn(BaseModel):
+    sheet: str
+
+
+@app.post("/api/batches/{batch_id}/sheet", dependencies=[Depends(require_auth)])
+def switch_sheet(batch_id: int, body: SheetIn):
+    get_batch_or_404(batch_id)
+    ensure_idle(batch_id)
+    try:
+        pipeline.reload_sheet(batch_id, body.sheet)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return batch_detail(batch_id)
+
+
 class ConfigIn(BaseModel):
     mapping: dict
     email_column: str = ""
     fallback_column: str = ""
-    template: dict
+    category_column: str = ""
+    template_id: str = certificate.DEFAULT_TEMPLATE_ID
+    qr: bool = True
     email_subject: str
     email_body: str
     filename_pattern: str = "{{ID}}_{{NAME}}_{{EVENT}}"
     rules: list = []
     auto_fix_emails: bool = True
     claim_links: bool = True
+    fix_caps: bool = False
+    branding: dict = {}
 
 
 @app.put("/api/batches/{batch_id}/config", dependencies=[Depends(require_auth)])
 def save_config(batch_id: int, body: ConfigIn):
     b = get_batch_or_404(batch_id)
     ensure_idle(batch_id)
-    for col in (body.email_column, body.fallback_column):
-        if col and col not in b["columns"]:
+    cols = b["columns"]
+    for col in (body.email_column, body.fallback_column, body.category_column):
+        if col and col not in cols:
             raise HTTPException(400, f"Unknown column: {col}")
     if body.email_column and body.email_column == body.fallback_column:
-        raise HTTPException(400, "Fallback email column must differ from the preferred one")
+        raise HTTPException(400, "The backup email column must be different from the main one")
+    if not T.get_template(body.template_id):
+        raise HTTPException(400, "Unknown template")
     mapping = {}
     for ph, src in body.mapping.items():
-        if not isinstance(src, dict) or src.get("type") not in ("column", "text"):
+        if not isinstance(src, dict):
             continue
-        if src["type"] == "column" and src.get("value") not in b["columns"]:
-            continue
-        mapping[ph.upper()] = {"type": src["type"], "value": str(src.get("value", ""))[:300]}
-    tpl = body.template
-    if not isinstance(tpl.get("fields"), list) or not all(isinstance(f, dict) for f in tpl["fields"]):
-        raise HTTPException(400, "Template must contain a list of fields")
-    if tpl.get("theme", "classic") not in certificate.THEMES:
-        raise HTTPException(400, "Unknown theme")
-    rules, notes = copilot.sanitize(body.rules, b["columns"])
-    cfg = body.model_dump()
-    cfg.update({"mapping": mapping, "rules": rules})
+        kind = src.get("type")
+        if kind == "column" and src.get("value") in cols:
+            mapping[ph.upper()] = {"type": "column", "value": src["value"]}
+        elif kind == "text" and str(src.get("value", "")).strip():
+            mapping[ph.upper()] = {"type": "text", "value": str(src["value"]).strip()[:300]}
+        elif kind == "combine" and isinstance(src.get("value"), list) and src["value"] and all(c in cols for c in src["value"]):
+            mapping[ph.upper()] = {"type": "combine", "value": src["value"][:4]}
+    rules, notes = copilot.sanitize(body.rules, cols)
+    branding = {k: str(body.branding.get(k, ""))[:200] for k in settings.DEFAULT["org"]}
+    cfg = {**b["config"], **body.model_dump(), "mapping": mapping, "rules": rules, "branding": branding}
     db.save_config(batch_id, cfg)
     counts = pipeline.revalidate(batch_id)
     pipeline.log_validation(batch_id, counts)
     return {"counts": counts, "placeholders": pipeline.all_placeholders(cfg), "notes": notes, "rules": rules}
 
 
-@app.post("/api/batches/{batch_id}/background", dependencies=[Depends(require_auth)])
-async def upload_background(batch_id: int, file: UploadFile = File(...)):
+class CategoryIn(BaseModel):
+    column: str
+
+
+def _rows(batch_id: int) -> list[dict]:
+    return [json.loads(r["data_json"]) for r in db.query("SELECT data_json FROM records WHERE batch_id=? ORDER BY row_no", (batch_id,))]
+
+
+@app.post("/api/batches/{batch_id}/categories", dependencies=[Depends(require_auth)])
+def suggest_category_rules(batch_id: int, body: CategoryIn):
     b = get_batch_or_404(batch_id)
-    ensure_idle(batch_id)
-    path = await _save_upload(file, (".png", ".jpg", ".jpeg"))
-    cfg = b["config"]
-    cfg["template"]["background"] = path.name
-    db.save_config(batch_id, cfg)
-    pipeline.revalidate(batch_id)
-    return {"background": path.name}
+    if body.column and body.column not in b["columns"]:
+        raise HTTPException(400, "Unknown column")
+    rows = _rows(batch_id)
+    rules = suggest_categories(body.column, rows, b["config"]["template_id"]) if body.column else []
+    return {"rules": rules, "counts": copilot.count_matches(rules, rows), "total": len(rows)}
+
+
+@app.get("/api/batches/{batch_id}/category-counts", dependencies=[Depends(require_auth)])
+def category_counts(batch_id: int):
+    b = get_batch_or_404(batch_id)
+    rows = _rows(batch_id)
+    counts = copilot.count_matches(b["config"]["rules"], rows)
+    return {"counts": counts, "unmatched": len(rows) - sum(counts), "total": len(rows)}
 
 
 class CopilotIn(BaseModel):
@@ -244,17 +332,16 @@ class CopilotIn(BaseModel):
 @app.post("/api/batches/{batch_id}/copilot", dependencies=[Depends(require_auth)])
 def run_copilot(batch_id: int, body: CopilotIn):
     b = get_batch_or_404(batch_id)
-    rows = [json.loads(r["data_json"]) for r in db.query("SELECT data_json FROM records WHERE batch_id=? ORDER BY row_no", (batch_id,))]
-    return copilot.suggest(body.text, b["columns"], rows, b["config"]["mapping"])
+    return copilot.suggest(body.text, b["columns"], _rows(batch_id), b["config"]["mapping"])
 
 
 RECORD_FIELDS = ("id", "row_no", "name", "student_id", "email", "email_source", "email_fix", "delivery", "theme",
-                 "rule_label", "status", "errors", "warnings", "cert_code", "cert_file", "attempts", "last_error",
-                 "sent_at", "claimed_at")
+                 "rule_label", "category", "title", "status", "errors", "warnings", "cert_code", "cert_file", "attempts",
+                 "last_error", "sent_at", "claimed_at")
 
 
 @app.get("/api/batches/{batch_id}/records", dependencies=[Depends(require_auth)])
-def list_records(batch_id: int, status: str = "", q: str = "", limit: int = 200, offset: int = 0):
+def list_records(batch_id: int, status: str = "", q: str = "", category: str = "", limit: int = 200, offset: int = 0):
     get_batch_or_404(batch_id)
     sql, params = "SELECT * FROM records WHERE batch_id=?", [batch_id]
     if status == "Issues":
@@ -266,6 +353,9 @@ def list_records(batch_id: int, status: str = "", q: str = "", limit: int = 200,
     elif status:
         sql += " AND status=?"
         params.append(status)
+    if category:
+        sql += " AND rule_label=?"
+        params.append(category)
     if q:
         sql += " AND (name LIKE ? OR email LIKE ? OR student_id LIKE ? OR cert_code LIKE ?)"
         params += [f"%{q}%"] * 4
@@ -277,13 +367,14 @@ def list_records(batch_id: int, status: str = "", q: str = "", limit: int = 200,
 @app.get("/api/records/{record_id}", dependencies=[Depends(require_auth)])
 def record_detail(record_id: int):
     rec = get_record_or_404(record_id)
-    cfg = db.get_batch(rec["batch_id"])["config"]
+    cfg = pipeline.normalize_config(db.get_batch(rec["batch_id"])["config"])
     out = {k: rec[k] for k in RECORD_FIELDS}
     out.update({
         "batch_id": rec["batch_id"], "source_row": db.record_data(rec), "values": pipeline.record_values(rec, cfg),
         "mapping_lock": rec["mapping_lock"], "pdf_sha256": rec["pdf_sha256"], "signature": rec["signature"],
         "leaf_hash": rec["leaf_hash"], "verify_url": verify_url(rec) if rec["payload_json"] else "",
         "claim_url": claim_url(rec) if rec["cert_file"] else "",
+        "template_name": certificate.resolve(rec["theme"] or cfg["template_id"])["name"],
         "events": db.query("SELECT at, level, kind, message FROM events WHERE record_id=? ORDER BY id", (record_id,)),
         "proof": None,
     })
@@ -310,17 +401,16 @@ def _preview_record(batch_id: int, record_id: int | None) -> dict:
 
 
 @app.get("/api/batches/{batch_id}/preview/certificate", dependencies=[Depends(require_auth)])
-def preview_certificate(batch_id: int, record_id: int | None = None, format: str = "pdf"):
+def preview_certificate(batch_id: int, record_id: int | None = None, format: str = "png"):
     cfg = get_batch_or_404(batch_id)["config"]
     rec = _preview_record(batch_id, record_id)
     values = pipeline.record_values(rec, cfg)
-    pdf = certificate.render_pdf(cfg["template"], values, rec["cert_code"], pipeline.expected_lock(rec, cfg, values),
-                                 rec["theme"] or cfg["template"].get("theme", "classic"))
+    pdf = certificate.render_pdf(rec["theme"] or cfg["template_id"], values, rec["cert_code"],
+                                 pipeline.expected_lock(rec, cfg, values), pipeline.assets_for(cfg), cfg.get("qr", True))
     if format == "png":
-        png = certificate.pdf_to_png(pdf)
-        if png is None:
-            raise HTTPException(404, "PNG preview unavailable (install poppler-utils)")
-        return Response(png, media_type="image/png", headers={"Cache-Control": "no-store"})
+        png = certificate.pdf_to_png(pdf, 110)
+        if png:
+            return Response(png, media_type="image/png", headers={"Cache-Control": "no-store"})
     return Response(pdf, media_type="application/pdf", headers={"Content-Disposition": "inline; filename=preview.pdf"})
 
 
@@ -330,12 +420,14 @@ def preview_email(batch_id: int, record_id: int | None = None):
     rec = _preview_record(batch_id, record_id)
     values = pipeline.record_values(rec, cfg)
     subject, body = pipeline.email_texts(rec, cfg, values)
+    from_name, from_addr, _ = mailer.sender_identity(cfg.get("branding", {}).get("org_name", ""))
     to = f"{rec['name']} <{rec['email']}>" if rec["email"] else (
         "Claim link (no usable email)" if rec["delivery"] == "claim" else "(no valid email)")
+    tpl = certificate.resolve(rec["theme"] or cfg["template_id"])
     return {"record_id": rec["id"], "row_no": rec["row_no"], "status": rec["status"], "errors": rec["errors"],
-            "warnings": rec["warnings"], "theme": rec["theme"], "rule_label": rec["rule_label"],
-            "from": f"{config.MAIL_FROM_NAME} <{config.MAIL_FROM}>", "to": to, "subject": subject, "body": body,
-            "attachment": pipeline.cert_filename(rec, cfg, values)}
+            "warnings": rec["warnings"], "template": tpl["name"], "rule_label": rec["rule_label"],
+            "title": values.get("TITLE", ""), "from": f"{from_name} <{from_addr}>", "to": to, "subject": subject,
+            "body": body, "attachment": pipeline.cert_filename(rec, cfg, values)}
 
 
 class SendIn(BaseModel):
@@ -343,32 +435,47 @@ class SendIn(BaseModel):
     allow_resend: bool = False
 
 
+def _preflight(batch: dict) -> None:
+    if batch["is_chaos"] or config.mail_mode() == "sandbox":
+        return
+    q = pipeline.quota_status()
+    if q["cap"] and q["left"] == 0:
+        raise HTTPException(400, f"The daily sending limit ({q['cap']}) is used up. Try again later or raise it in Settings.")
+    res = mailer.check_connection()
+    if not res["ok"]:
+        raise HTTPException(400, f"Can't send yet: {res['message']}")
+
+
 @app.post("/api/batches/{batch_id}/generate", dependencies=[Depends(require_auth)])
 def start_generate(batch_id: int):
     get_batch_or_404(batch_id)
     if not pipeline.run_job(batch_id, "generating", pipeline.generate):
-        raise HTTPException(409, "A job is already running for this batch")
+        raise HTTPException(409, "Please wait: this batch is busy")
     return {"started": True}
 
 
 @app.post("/api/batches/{batch_id}/send", dependencies=[Depends(require_auth)])
 def start_send(batch_id: int, body: SendIn):
-    get_batch_or_404(batch_id)
+    b = get_batch_or_404(batch_id)
     if not body.confirm:
         raise HTTPException(400, "Sending requires explicit confirmation")
+    ensure_idle(batch_id)
+    _preflight(b)
     if not pipeline.run_job(batch_id, "sending", pipeline.send, allow_resend=body.allow_resend):
-        raise HTTPException(409, "A job is already running for this batch")
+        raise HTTPException(409, "Please wait: this batch is busy")
     return {"started": True}
 
 
 @app.post("/api/batches/{batch_id}/retry", dependencies=[Depends(require_auth)])
 def retry_failed(batch_id: int):
-    get_batch_or_404(batch_id)
+    b = get_batch_or_404(batch_id)
     ids = [r["id"] for r in db.query("SELECT id FROM records WHERE batch_id=? AND status='Failed'", (batch_id,))]
     if not ids:
-        return {"started": False, "message": "No failed records"}
+        return {"started": False, "message": "No failed students"}
+    ensure_idle(batch_id)
+    _preflight(b)
     if not pipeline.run_job(batch_id, "sending", pipeline.send, record_ids=ids):
-        raise HTTPException(409, "A job is already running for this batch")
+        raise HTTPException(409, "Please wait: this batch is busy")
     return {"started": True, "count": len(ids)}
 
 
@@ -376,11 +483,13 @@ def retry_failed(batch_id: int):
 def resend_record(record_id: int):
     rec = get_record_or_404(record_id)
     if rec["status"] == "Invalid":
-        raise HTTPException(400, "Fix the record's errors first")
+        raise HTTPException(400, "Fix this student's problems first")
     if rec["delivery"] == "claim":
         raise HTTPException(400, "This student has no usable email; share the claim link instead")
+    ensure_idle(rec["batch_id"])
+    _preflight(db.get_batch(rec["batch_id"]))
     if not pipeline.run_job(rec["batch_id"], "sending", pipeline.send, record_ids=[record_id], allow_resend=True):
-        raise HTTPException(409, "A job is already running for this batch")
+        raise HTTPException(409, "Please wait: this batch is busy")
     db.log(rec["batch_id"], record_id, "info", "resend", "Organizer authorized a resend")
     return {"started": True}
 
@@ -396,12 +505,11 @@ def verify_seal(batch_id: int):
 
 
 @app.get("/api/batches/{batch_id}/events", dependencies=[Depends(require_auth)])
-def batch_events(batch_id: int, limit: int = 300, after: int = 0):
+def batch_events(batch_id: int, limit: int = 300):
     get_batch_or_404(batch_id)
-    rows = db.query("SELECT e.id, e.at, e.level, e.kind, e.message, e.record_id, r.name, r.row_no FROM events e "
-                    "LEFT JOIN records r ON r.id=e.record_id WHERE e.batch_id=? AND e.id>? ORDER BY e.id DESC LIMIT ?",
-                    (batch_id, after, min(limit, 2000)))
-    return rows
+    return db.query("SELECT e.id, e.at, e.level, e.kind, e.message, e.record_id, r.name, r.row_no FROM events e "
+                    "LEFT JOIN records r ON r.id=e.record_id WHERE e.batch_id=? ORDER BY e.id DESC LIMIT ?",
+                    (batch_id, min(max(limit, 1), 2000)))
 
 
 @app.get("/api/records/{record_id}/certificate", dependencies=[Depends(require_auth)])
@@ -415,20 +523,21 @@ def download_certificate(record_id: int):
 
 @app.get("/api/batches/{batch_id}/report.csv", dependencies=[Depends(require_auth)])
 def report(batch_id: int):
-    b = get_batch_or_404(batch_id)
+    get_batch_or_404(batch_id)
     out = io.StringIO()
+    out.write("﻿")  # BOM so Excel opens UTF-8 names (José, Fatima Al-Sayed) correctly
     w = csv.writer(out)
-    w.writerow(["Row", "Student ID", "Name", "Email", "Email Source", "Email Fix", "Delivery", "Theme", "Rule",
-                "Status", "Certificate ID", "Certificate File", "SHA-256", "Mapping Lock", "Attempts", "Sent At",
+    w.writerow(["Row", "Student ID", "Name", "Email", "Email Source", "Email Fix", "Delivery", "Category", "Template",
+                "Certificate Title", "Status", "Certificate ID", "Certificate File", "SHA-256", "Attempts", "Sent At",
                 "Claim Link", "Verify Link", "Errors", "Warnings", "Last Error"])
     for r in db.query("SELECT * FROM records WHERE batch_id=? ORDER BY row_no", (batch_id,)):
         w.writerow([r["row_no"], r["student_id"], r["name"], r["email"], r["email_source"], r["email_fix"],
-                    r["delivery"], r["theme"], r["rule_label"], r["status"], r["cert_code"],
-                    Path(r["cert_file"]).name if r["cert_file"] else "", r["pdf_sha256"], r["mapping_lock"],
-                    r["attempts"], r["sent_at"], claim_url(r) if r["cert_file"] else "",
+                    r["delivery"], r["rule_label"] or r["category"], certificate.resolve(r["theme"])["name"] if r["theme"] else "",
+                    r["title"], r["status"], r["cert_code"], Path(r["cert_file"]).name if r["cert_file"] else "",
+                    r["pdf_sha256"], r["attempts"], r["sent_at"], claim_url(r) if r["cert_file"] else "",
                     verify_url(r) if r["payload_json"] else "", r["errors"], r["warnings"], r["last_error"]])
-    fname = f"sealsend_report_{b['id']}.csv"
-    return Response(out.getvalue(), media_type="text/csv", headers={"Content-Disposition": f'attachment; filename="{fname}"'})
+    return Response(out.getvalue(), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="sealsend_report_{batch_id}.csv"'})
 
 
 @app.get("/api/batches/{batch_id}/certificates.zip", dependencies=[Depends(require_auth)])
@@ -440,8 +549,9 @@ def certificates_zip(batch_id: int):
         for r in db.query("SELECT * FROM records WHERE batch_id=? AND cert_file!='' ORDER BY row_no", (batch_id,)):
             p = config.CERT_DIR / r["cert_file"]
             if p.exists():
-                z.write(p, p.name)
-                manifest.append({"file": p.name, "code": r["cert_code"], "sha256": r["pdf_sha256"],
+                folder = (r["rule_label"] or "All").replace("/", "-").replace("\\", "-")
+                z.write(p, f"{folder}/{p.name}")
+                manifest.append({"file": f"{folder}/{p.name}", "code": r["cert_code"], "sha256": r["pdf_sha256"],
                                  "leaf": r["leaf_hash"], "signature": r["signature"], "payload": json.loads(r["payload_json"] or "{}")})
         z.writestr("SEAL.json", json.dumps({"seal": b["seal"], "public_key_pem": crypto.public_pem(),
                                             "certificates": manifest}, indent=2, ensure_ascii=False))
@@ -450,10 +560,251 @@ def certificates_zip(batch_id: int):
                              headers={"Content-Disposition": f'attachment; filename="sealsend_batch_{batch_id}.zip"'})
 
 
-@app.get("/api/defaults", dependencies=[Depends(require_auth)])
-def defaults():
-    return {"fields": certificate.default_template()["fields"], "email_subject": mailer.DEFAULT_SUBJECT,
-            "email_body": mailer.DEFAULT_BODY}
+# ---------------------------------------------------------------- templates
+@app.get("/api/templates", dependencies=[Depends(require_auth)])
+def list_templates():
+    return certificate.catalog()
+
+
+def _org_for(batch: int | None) -> dict:
+    org = settings.org()
+    if batch:
+        b = db.get_batch(batch)
+        if b:
+            org = {**org, **{k: v for k, v in pipeline.normalize_config(b["config"])["branding"].items() if v}}
+    return org
+
+
+@app.get("/api/templates/{template_id}/thumb.png", dependencies=[Depends(require_auth)])
+def template_thumb(template_id: str, batch: int | None = None, dpi: int = 48):
+    if not T.get_template(template_id):
+        raise HTTPException(404, "Unknown template")
+    png = certificate.thumbnail(template_id, _org_for(batch), dpi=min(max(dpi, 30), 110))
+    return Response(png, media_type="image/png", headers={"Cache-Control": "private, max-age=300"})
+
+
+@app.get("/api/templates/{template_id}", dependencies=[Depends(require_auth)])
+def template_detail(template_id: str):
+    t = T.get_template(template_id)
+    if not t:
+        raise HTTPException(404, "Unknown template")
+    w, h = T.page_size(t)
+    return {"id": t["id"], "name": t["name"], "custom": bool(t.get("custom")), "fields": t["fields"], "width": w,
+            "height": h, "title": t.get("title", "")}
+
+
+@app.get("/api/templates/{template_id}/background.png", dependencies=[Depends(require_auth)])
+def template_background(template_id: str):
+    t = T.get_template(template_id)
+    if not t:
+        raise HTTPException(404, "Unknown template")
+    png = certificate.pdf_to_png(T.render(dict(t, fields=[]), {}, {}, {}), 90)
+    return Response(png or b"", media_type="image/png", headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/templates/import", dependencies=[Depends(require_auth)])
+async def import_template(file: UploadFile = File(...), name: str = Form("")):
+    data = await _read_upload(file, (".png", ".jpg", ".jpeg", ".webp", ".pdf"))
+    try:
+        tid = certificate.import_template(data, file.filename or "design.png", name.strip())
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    return template_detail(tid)
+
+
+class TemplateIn(BaseModel):
+    fields: list
+    name: str | None = None
+
+
+@app.put("/api/templates/{template_id}", dependencies=[Depends(require_auth)])
+def save_template(template_id: str, body: TemplateIn):
+    t = T.get_template(template_id)
+    if not t or not t.get("custom"):
+        raise HTTPException(400, "Only imported templates can be edited")
+    certificate.update_template_fields(template_id, body.fields, body.name)
+    for b in db.query("SELECT id, config_json FROM batches"):  # make certificates that use it re-render
+        cfg = pipeline.normalize_config(json.loads(b["config_json"]))
+        if template_id in pipeline.used_templates(cfg) and not pipeline.is_running(b["id"]):
+            pipeline.revalidate(b["id"])
+    return template_detail(template_id)
+
+
+@app.post("/api/templates/{template_id}/preview", dependencies=[Depends(require_auth)])
+def preview_template_fields(template_id: str, body: TemplateIn, batch: int | None = None):
+    t = T.get_template(template_id)
+    if not t:
+        raise HTTPException(404, "Unknown template")
+    org = _org_for(batch)
+    pdf = T.render(dict(t, fields=body.fields), certificate.sample_values(t, org),
+                   {k: org.get(k, "") for k in ("logo", "signer1_sig", "signer2_sig")}, {})
+    return Response(certificate.pdf_to_png(pdf, 90) or b"", media_type="image/png", headers={"Cache-Control": "no-store"})
+
+
+@app.delete("/api/templates/{template_id}", dependencies=[Depends(require_auth)])
+def remove_template(template_id: str):
+    t = T.get_template(template_id)
+    if not t or not t.get("custom"):
+        raise HTTPException(400, "Built-in templates can't be deleted")
+    for b in db.query("SELECT id, name, config_json FROM batches"):
+        if template_id in pipeline.used_templates(pipeline.normalize_config(json.loads(b["config_json"]))):
+            raise HTTPException(400, f"“{b['name']}” still uses this template. Pick another one there first.")
+    certificate.delete_template(template_id)
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------- settings
+@app.get("/api/settings", dependencies=[Depends(require_auth)])
+def get_settings():
+    return {"mail": settings.public_mail(), "org": settings.org(), "public_base_url": config.public_base_url(),
+            "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": f"http://{config.lan_ip()}:{config.PORT}",
+            "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
+            "admin_from_env": bool(config.ADMIN_PASSWORD)}
+
+
+class MailIn(BaseModel):
+    provider: str
+    address: str = ""
+    from_name: str = ""
+    reply_to: str = ""
+    password: str = ""
+    host: str = ""
+    port: int = 587
+    security: str = "starttls"
+    username: str = ""
+    daily_cap: int = 0
+    delay_seconds: float = 1.0
+
+
+@app.put("/api/settings/mail", dependencies=[Depends(require_auth)])
+def save_mail(body: MailIn):
+    from .data import valid_email
+    if body.provider not in settings.PROVIDERS:
+        raise HTTPException(400, "Choose an email provider")
+    if body.provider in ("gmail", "outlook", "smtp", "resend") and not valid_email(body.address.strip()):
+        raise HTTPException(400, "Enter the email address the certificates will be sent from")
+    if body.provider == "gmail" and body.password and len(body.password.replace(" ", "")) != 16:
+        raise HTTPException(400, "A Gmail App Password is exactly 16 letters (spaces don't matter). "
+                                 "It is not your normal Gmail password.")
+    if body.provider == "smtp" and not body.host.strip():
+        raise HTTPException(400, "Enter the SMTP server address")
+    if body.security not in ("starttls", "ssl", "none"):
+        raise HTTPException(400, "Unknown security setting")
+    settings.update_mail({**body.model_dump(), "address": body.address.strip(), "host": body.host.strip(),
+                          "daily_cap": max(0, min(body.daily_cap, 100000)), "delay_seconds": max(0.0, min(body.delay_seconds, 30.0))})
+    return {"mail": settings.public_mail(), "mode": config.mail_mode()}
+
+
+@app.post("/api/settings/test-connection", dependencies=[Depends(require_auth)])
+def test_connection():
+    res = mailer.check_connection()
+    if res["ok"] and res["mode"] != "sandbox":
+        settings.mark_verified(db.now())
+    return res
+
+
+class TestEmailIn(BaseModel):
+    to: str
+
+
+@app.post("/api/settings/test-email", dependencies=[Depends(require_auth)])
+def test_email(body: TestEmailIn):
+    from .data import valid_email
+    if not valid_email(body.to.strip()):
+        raise HTTPException(400, "Enter a valid email address")
+    org = settings.org()
+    tpl = certificate.resolve(certificate.DEFAULT_TEMPLATE_ID)
+    pdf = T.render(tpl, certificate.sample_values(tpl, org), {k: org.get(k, "") for k in ("logo", "signer1_sig", "signer2_sig")},
+                   {"title": "Sample certificate", "subject": "SS-SAMPLE0000"})
+    msg = mailer.build_message(body.to.strip(), "SealSend test", "SealSend test email: your setup works",
+                               "Hello!\n\nThis is a test from SealSend. If you can read this and open the attached sample "
+                               "certificate, students will receive their certificates the same way.\n\nSealSend",
+                               pdf, "Sample_Certificate.pdf", "SS-SAMPLE0000")
+    try:
+        with mailer.Sender() as s:
+            detail = s.send(msg, body.to.strip(), "TEST")
+    except Exception as e:
+        return {"ok": False, "message": str(e)}
+    return {"ok": True, "message": detail}
+
+
+class OrgIn(BaseModel):
+    org_name: str = ""
+    logo: str = ""
+    signer1_name: str = ""
+    signer1_title: str = ""
+    signer1_sig: str = ""
+    signer2_name: str = ""
+    signer2_title: str = ""
+    signer2_sig: str = ""
+
+
+@app.put("/api/settings/org", dependencies=[Depends(require_auth)])
+def save_org(body: OrgIn):
+    settings.update_org(body.model_dump())
+    return settings.org()
+
+
+class UrlIn(BaseModel):
+    url: str = ""
+
+
+@app.put("/api/settings/public-url", dependencies=[Depends(require_auth)])
+def save_public_url(body: UrlIn):
+    url = body.url.strip().rstrip("/")
+    if url and not (url.startswith("http://") or url.startswith("https://")):
+        raise HTTPException(400, "The address must start with http:// or https://")
+    data = settings.load()
+    data["public_base_url"] = url
+    settings.save(data)
+    return {"public_base_url": config.public_base_url()}
+
+
+@app.post("/api/branding/upload", dependencies=[Depends(require_auth)])
+async def upload_branding(file: UploadFile = File(...), kind: str = Form("logo")):
+    if kind not in ("logo", "signer1_sig", "signer2_sig"):
+        raise HTTPException(400, "Unknown image kind")
+    data = await _read_upload(file, (".png", ".jpg", ".jpeg", ".webp"))
+    from PIL import Image
+    try:
+        im = Image.open(io.BytesIO(data))
+        im.load()
+    except Exception:
+        raise HTTPException(400, "That image could not be read")
+    im = im.convert("RGBA")
+    im.thumbnail((1200, 1200))
+    name = f"{kind.split('_')[0]}_{secrets.token_hex(6)}.png"
+    im.save(config.UPLOAD_DIR / name, "PNG", optimize=True)
+    return {"file": name}
+
+
+@app.get("/api/branding/{name}", dependencies=[Depends(require_auth)])
+def branding_image(name: str):
+    path = config.UPLOAD_DIR / Path(name).name
+    if not path.exists() or path.name.split("_")[0] not in ("logo", "signer1", "signer2") or path.suffix != ".png":
+        raise HTTPException(404, "Not found")
+    return FileResponse(path, media_type="image/png")
+
+
+@app.get("/api/qr.png", dependencies=[Depends(require_auth)])
+def qr_png(data: str):
+    """QR code image, e.g. for opening SealSend on a phone. Generated locally, no outside service."""
+    from reportlab.graphics import renderPDF
+    from reportlab.graphics.barcode import qr as rl_qr
+    from reportlab.graphics.shapes import Drawing
+    from reportlab.pdfgen import canvas as rl_canvas
+    if len(data) > 500:
+        raise HTTPException(400, "Too long")
+    size = 200
+    widget = rl_qr.QrCodeWidget(data)
+    x0, y0, x1, y1 = widget.getBounds()
+    d = Drawing(size, size, transform=[size / (x1 - x0), 0, 0, size / (y1 - y0), 0, 0])
+    d.add(widget)
+    buf = io.BytesIO()
+    c = rl_canvas.Canvas(buf, pagesize=(size + 20, size + 20))
+    renderPDF.draw(d, c, 10, 10)
+    c.save()
+    return Response(certificate.pdf_to_png(buf.getvalue(), 144) or b"", media_type="image/png")
 
 
 # ---------------------------------------------------------------- chaos test
@@ -474,16 +825,19 @@ def chaos_forged(batch_id: int):
                         filename=f"FORGED_{rep['verify_code']}.pdf")
 
 
-@app.get("/sample/students.csv", dependencies=[Depends(require_auth)])
-def sample_csv():
-    return FileResponse(config.ROOT / "sample" / "students.csv", media_type="text/csv", filename="students.csv")
+@app.get("/sample/{name}", dependencies=[Depends(require_auth)])
+def sample_file(name: str):
+    path = config.ROOT / "sample" / Path(name).name
+    if not path.exists() or path.suffix not in (".csv", ".xlsx"):
+        raise HTTPException(404, "Not found")
+    return FileResponse(path, filename=path.name)
 
 
 # ---------------------------------------------------------------- public pages
 PUBLIC_CSS = """
 :root{--bg:#f2f2f2;--card:#fff;--ink:#000;--sub:#6e6e73;--line:#e5e5e5;--fill:#000;--on:#fff}
 @media (prefers-color-scheme:dark){:root{--bg:#000;--card:#1c1c1e;--ink:#fff;--sub:#98989f;--line:#38383a;--fill:#fff;--on:#000}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;-webkit-font-smoothing:antialiased}
 .wrap{max-width:520px;margin:0 auto;padding:40px 16px 60px}
 .brand{font-size:13px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--sub);text-align:center;margin-bottom:28px}
 .icon{width:76px;height:76px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:38px;font-weight:700}
@@ -492,11 +846,11 @@ h1{font-size:30px;line-height:1.15;margin:0 0 6px;text-align:center;letter-spaci
 .lead{text-align:center;color:var(--sub);margin:0 0 26px}.lead b{color:var(--ink)}
 .group{background:var(--card);border-radius:14px;overflow:hidden;margin:0 0 22px}
 .row{display:flex;justify-content:space-between;gap:16px;padding:13px 16px;border-top:.5px solid var(--line);font-size:15px}
-.row:first-child{border-top:0}.row span:first-child{color:var(--sub)}.row span:last-child{text-align:right;font-weight:500;word-break:break-all}
+.row:first-child{border-top:0}.row span:first-child{color:var(--sub)}.row span:last-child{text-align:right;font-weight:500;word-break:break-word}
 .cap{font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin:0 16px 8px}
 .btn{display:block;width:100%;border:0;border-radius:12px;padding:15px;font-family:inherit;font-size:17px;font-weight:600;line-height:1.2;background:var(--fill);color:var(--on);cursor:pointer;text-align:center;text-decoration:none}
 input[type=text],input[type=file]{width:100%;font:inherit;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin-bottom:12px}
-.note{font-size:13px;color:var(--sub);text-align:center;margin-top:18px}.mono{font-family:ui-monospace,Menlo,monospace;font-size:13px}
+.note{font-size:13px;color:var(--sub);text-align:center;margin-top:18px}.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
 """
 
 
@@ -512,8 +866,9 @@ def _upload_form() -> str:
 <input type="file" name="file" accept="application/pdf" required><button class="btn">Verify file</button></form>"""
 
 
-def _footer() -> str:
-    return (f'<p class="note">Issuer: {html.escape(config.ISSUER_NAME)}<br>Signing key '
+def _footer(issuer: str = "") -> str:
+    issuer = issuer or settings.org().get("org_name") or config.ISSUER_NAME
+    return (f'<p class="note">Issuer: {html.escape(issuer)}<br>Signing key '
             f'<span class="mono">{crypto.fingerprint()}</span> · <a href="/.well-known/sealsend-public-key.pem" '
             'style="color:inherit">public key</a></p>')
 
@@ -521,13 +876,13 @@ def _footer() -> str:
 def _proof_rows(rec: dict, proof: dict) -> str:
     p = proof["payload"]
     tick = lambda ok: "✓ Valid" if ok else "✕ Failed"  # noqa: E731
-    rows = [("Certificate ID", rec["cert_code"]), ("Issued by", p.get("issuer", "")),
+    rows = [("Certificate", p.get("title", "")), ("Certificate ID", rec["cert_code"]), ("Issued by", p.get("issuer", "")),
             ("Digital signature", f"Ed25519 {tick(proof['signature_valid'] and proof['record_consistent'])}"),
             ("Batch seal", (f"✓ Included (#{proof.get('leaf_index', 0) + 1} of {proof.get('leaf_count', 0)})"
                             if proof["in_seal"] else "✕ Not in seal")),
             ("Seal signature", tick(proof["seal_signature_valid"])),
             ("File fingerprint", f"{rec['pdf_sha256'][:12]}…{rec['pdf_sha256'][-6:]}")]
-    return "".join(f"<div class='row'><span>{html.escape(k)}</span><span>{html.escape(str(v))}</span></div>" for k, v in rows)
+    return "".join(f"<div class='row'><span>{html.escape(k)}</span><span>{html.escape(str(v))}</span></div>" for k, v in rows if v)
 
 
 @app.get("/verify", response_class=HTMLResponse)
@@ -551,10 +906,10 @@ def verify(code: str):
         return page("Verification failed", f"""<div class="icon bad">✕</div><h1>Verification failed</h1>
 <p class="lead">The issuer’s records for <b>{html.escape(code)}</b> do not pass the cryptographic checks.</p>
 <div class="group">{_proof_rows(rec, proof)}</div>{_footer()}""")
-    detail = " · ".join(html.escape(x) for x in (p.get("achievement"), p.get("event")) if x)
+    detail = html.escape(p.get("description") or " · ".join(x for x in (p.get("achievement"), p.get("event")) if x))
     return page("Verified", f"""<div class="icon ok">✓</div><h1>Verified</h1>
-<p class="lead">Issued to <b>{html.escape(p.get('name', ''))}</b><br>{detail}{('<br>' + html.escape(p['date'])) if p.get('date') else ''}</p>
-<div class="group">{_proof_rows(rec, proof)}</div>{_upload_form()}{_footer()}""")
+<p class="lead">Issued to <b>{html.escape(p.get('name', ''))}</b><br>{detail}</p>
+<div class="group">{_proof_rows(rec, proof)}</div>{_upload_form()}{_footer(p.get('issuer', ''))}""")
 
 
 @app.post("/verify", response_class=HTMLResponse)
@@ -603,7 +958,7 @@ def claim_download(token: str, student_id: str = Form("")):
     rec = _claim_rec(token)
     if rec["claim_attempts"] >= 5:
         return page("Locked", '<div class="icon bad">✕</div><h1>Link locked</h1><p class="lead">Too many wrong attempts. Ask the organizer for help.</p>')
-    if rec["student_id"] and not hmac.compare_digest(student_id.strip().lower(), rec["student_id"].strip().lower()):
+    if rec["student_id"] and not hmac.compare_digest(student_id.strip().lower().encode(), rec["student_id"].strip().lower().encode()):
         db.update_record(rec["id"], claim_attempts=rec["claim_attempts"] + 1)
         db.log(rec["batch_id"], rec["id"], "warn", "claim", "Claim attempt with a wrong student ID")
         left = 4 - rec["claim_attempts"]
@@ -617,7 +972,16 @@ def claim_download(token: str, student_id: str = Form("")):
     return FileResponse(path, media_type="application/pdf", filename=path.name)
 
 
-# ---------------------------------------------------------------- organizer UI
+# ---------------------------------------------------------------- organizer UI (+ installable web app)
+@app.get("/manifest.webmanifest")
+def manifest():
+    return JSONResponse({"name": "SealSend", "short_name": "SealSend", "start_url": "/", "display": "standalone",
+                         "background_color": "#000000", "theme_color": "#000000",
+                         "icons": [{"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
+                                   {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"}]},
+                        media_type="application/manifest+json")
+
+
 @app.get("/", response_class=HTMLResponse)
 def index():
-    return (STATIC / "index.html").read_text()
+    return (STATIC / "index.html").read_text(encoding="utf-8")
