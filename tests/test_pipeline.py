@@ -565,6 +565,45 @@ def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert r["engine"] == "offline" and "App Password" in r["answer"]
 
 
+@pytest.mark.skipif(not hasattr(__import__("os"), "fork"), reason="fake tunnel tool is a shell script")
+def test_share_online_with_fake_tunnel_tool(client, tmp_path, monkeypatch):
+    import os
+    from sealsend import tunnel
+    assert client.get("/api/share").status_code == 401 and client.post("/api/share/start").status_code == 401
+    login(client)
+    assert client.get("/api/share").json() == {"state": "off", "url": "", "error": "", "available": True, "external_url": ""}
+    fake = tmp_path / "bin"
+    fake.mkdir()
+    tool = fake / "cloudflared"
+    tool.write_text("#!/bin/sh\necho 'INF Requesting new quick Tunnel on trycloudflare.com...'\n"
+                    "echo 'INF |  https://fuzzy-cats-dance.trycloudflare.com  |'\nexec sleep 60\n")
+    tool.chmod(0o755)
+    monkeypatch.setenv("PATH", f"{fake}{os.pathsep}{os.environ['PATH']}")
+
+    def wait_for(state):
+        for _ in range(100):
+            st = client.get("/api/share").json()
+            if st["state"] == state:
+                return st
+            time.sleep(0.05)
+        raise AssertionError(st)
+
+    assert client.post("/api/share/start").json()["state"] in ("starting", "on")
+    st = wait_for("on")
+    assert st["url"] == "https://fuzzy-cats-dance.trycloudflare.com"
+    me = client.get("/api/me").json()
+    assert me["public_base_url"] == st["url"] and me["temporary_url"]  # QR codes now point at the public link
+    proc = tunnel.share._proc
+    assert client.post("/api/share/stop").json()["state"] == "off"
+    assert proc.wait(timeout=5) is not None  # the tunnel process is gone
+    assert client.get("/api/me").json()["public_base_url"] != st["url"]
+
+    tool.write_text("#!/bin/sh\necho 'ERR failed to connect'\nexit 1\n")  # no link this time
+    client.post("/api/share/start")
+    assert "Couldn't open the public link" in wait_for("error")["error"]
+    tunnel.share.stop()
+
+
 def test_chaos_test_contains_every_fault(client):
     login(client)
     bid = client.post("/api/chaos").json()["batch_id"]
