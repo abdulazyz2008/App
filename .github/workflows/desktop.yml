@@ -1,6 +1,6 @@
 # Builds the SendEZ desktop apps for Mac and Windows, checks that each built app really works,
-# and (for a version tag such as v1.0.0) publishes them to a GitHub Release. The newest release
-# is always at these permanent links:
+# and publishes them to a GitHub Release for a version tag such as v1.0.0, or when started by hand
+# from the Actions tab with a version number in "publish". The newest release is always at:
 #   https://github.com/abdulazyz2008/App/releases/latest/download/SendEZ-Mac.zip
 #   https://github.com/abdulazyz2008/App/releases/latest/download/SendEZ-Windows.zip
 name: Desktop apps
@@ -9,6 +9,11 @@ on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+    inputs:
+      publish:
+        description: "Version to publish, e.g. 1.0.1 (creates tag v1.0.1 and the release). Leave empty for a test build."
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -56,8 +61,11 @@ jobs:
         run: pip install -r requirements-desktop.txt
       - name: Version number
         shell: bash
+        env:
+          PUBLISH: ${{ inputs.publish }}
         run: |
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then v="${GITHUB_REF_NAME#v}"; else v="1.0.0"; fi
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then v="${GITHUB_REF_NAME#v}"; elif [[ -n "$PUBLISH" ]]; then v="${PUBLISH#v}"; else v="1.0.0"; fi
+          [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Version must look like 1.0.0, got '$v'"; exit 1; }
           echo "SEALSEND_VERSION=$v" >> "$GITHUB_ENV"
       - name: Build the app
         run: pyinstaller packaging/sealsend.spec --noconfirm
@@ -79,16 +87,27 @@ jobs:
 
   release:
     needs: build
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: startsWith(github.ref, 'refs/tags/v') || inputs.publish != ''
     runs-on: ubuntu-latest
     steps:
+      - name: Version tag
+        id: tag
+        shell: bash
+        env:
+          PUBLISH: ${{ inputs.publish }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then t="$GITHUB_REF_NAME"; else t="v${PUBLISH#v}"; fi
+          [[ "$t" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Version must look like 1.0.0, got '$t'"; exit 1; }
+          echo "tag=$t" >> "$GITHUB_OUTPUT"
       - uses: actions/download-artifact@v4
         with:
           path: out
           merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:
-          name: SendEZ ${{ github.ref_name }}
+          tag_name: ${{ steps.tag.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: SendEZ ${{ steps.tag.outputs.tag }}
           files: out/*.zip
           make_latest: "true"
           body: |
