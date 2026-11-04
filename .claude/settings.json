@@ -5,9 +5,16 @@
         "source": "git",
         "url": "https://github.com/affaan-m/ECC.git"
       }
+    },
+    "last30days-skill": {
+      "source": {
+        "source": "github",
+        "repo": "mvanhorn/last30days-skill"
+      }
     }
   },
   "enabledPlugins": {
-    "ecc@ecc": true
+    "ecc@ecc": true,
+    "last30days@last30days-skill": true
   }
 }
