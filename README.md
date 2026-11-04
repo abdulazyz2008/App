@@ -6,7 +6,13 @@ SealSend reads any reasonable Excel or CSV file, works out who each student is a
 
 ---
 
-## Start it
+## Put it online (one link)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/abdulazyz2008/App)
+
+Press the button, sign in to Render, type a password for **ADMIN_PASSWORD**, and press **Deploy Blueprint**. A few minutes later you get a permanent link like `https://sealsend-xxxx.onrender.com` that works on any phone, tablet or computer. It uses a paid Render instance with a 1 GB disk, because free instances block email ports and delete data on restart. Check the exact price on Render before confirming.
+
+## Or run it on your own computer
 
 **You need Python 3.10 or newer** (free from [python.org](https://www.python.org/downloads/); on Windows tick *“Add Python to PATH”* during install).
 

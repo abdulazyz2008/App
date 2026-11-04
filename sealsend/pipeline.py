@@ -288,10 +288,10 @@ def _job(rec: dict, cfg: dict):
 def _render_all(jobs: list[tuple]):
     """Yield PDF bytes or the exception, in order. Large batches use every CPU core."""
     done = 0
-    if len(jobs) >= PARALLEL_THRESHOLD and (os.cpu_count() or 1) > 1:
+    if len(jobs) >= PARALLEL_THRESHOLD and config.WORKERS > 1:
         try:
             ctx = multiprocessing.get_context("spawn")  # the only start method on Windows; safe with threads
-            with ProcessPoolExecutor(max_workers=min(os.cpu_count() or 2, 8), mp_context=ctx) as pool:
+            with ProcessPoolExecutor(max_workers=config.WORKERS, mp_context=ctx) as pool:
                 for start in range(0, len(jobs), CHUNK):
                     futures = [pool.submit(certificate.render_job, j) for j in jobs[start:start + CHUNK]]
                     for fut in futures:

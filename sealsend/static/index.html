@@ -231,7 +231,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
       <button onclick="openSettings()"><span class="ico">⚙︎</span><span>Settings</span></button>
       <button onclick="openTemplates()"><span class="ico">▦</span><span>Templates</span></button>
       <a href="/verify" target="_blank"><span class="ico">✓</span><span>Verify a certificate</span></a>
-      <button onclick="openPhone()"><span class="ico">▯</span><span>Open on phone/iPad</span></button>
+      <button onclick="openPhone()"><span class="ico">▯</span><span>Open on another device</span></button>
       <button id="chaosBtn" onclick="runChaos()"><span class="ico">⚡</span><span>Run Chaos Test <span class="lbl2 sub sm">(demo)</span></span></button>
       <button onclick="logout()"><span class="ico">⎋</span><span>Sign out</span></button>
       <div class="foot lbl2" style="margin:8px 10px 0" id="sideStatus"></div>
@@ -421,7 +421,9 @@ async function start(){
   const s = await fetch('/api/setup-status').then(r=>r.json());
   if (s.needs_setup){
     showOnly('setup');
-    if (!s.local){ $('#setupForm').classList.add('hidden'); $('#setupMsg').textContent = 'Open SealSend on the computer that runs it to create the password (for safety, this can’t be done from another device).'; }
+    if (!s.local){ $('#setupForm').classList.add('hidden'); $('#setupMsg').textContent = s.hosted
+      ? 'No password is set yet. In your Render dashboard open this service → Environment, add ADMIN_PASSWORD with a password of your choice, save, and reload this page.'
+      : 'Open SealSend on the computer that runs it to create the password (for safety, this can’t be done from another device).'; }
     return;
   }
   const r = await fetch('/api/me',{credentials:'same-origin'});
@@ -977,7 +979,7 @@ async function openSettings(){
       <div class="item"><span class="grow"></span><button class="btn sm fill" onclick="saveOrg()">Save</button></div></div>
     <p class="foot">New events start with these. Logos and signature images are added per event in step 2.</p>
     <div class="cap">Verification link (QR codes)</div>
-    <div class="group"><div class="item" style="display:block"><div class="desc" style="margin-bottom:6px">QR codes on certificates open <b class="mono">${esc(s.public_base_url)}</b>${s.public_base_url_custom?'.':': this computer on your Wi-Fi, so it works for phones on the same Wi-Fi.'} So that anyone can verify from anywhere, host SealSend online and enter its address here <b>before</b> creating certificates.</div>
+    <div class="group"><div class="item" style="display:block"><div class="desc" style="margin-bottom:6px">QR codes on certificates open <b class="mono">${esc(s.public_base_url)}</b>${s.public_base_url_custom||s.hosted?'. Anyone can open it from anywhere.':': this computer on your Wi-Fi, so it works for phones on the same Wi-Fi. So that anyone can verify from anywhere, host SealSend online and enter its address here <b>before</b> creating certificates.'}</div>
       <div class="row"><input type="url" id="pubUrl" value="${esc(s.public_base_url_custom)}" placeholder="https://certificates.your-college.edu" style="flex:1"><button class="btn sm" onclick="savePubUrl()">Save</button></div></div></div>
     <div class="cap">Security</div>
     <div class="group">${s.admin_from_env?'<div class="item"><span class="desc">Password is set in the .env file.</span></div>':`<div class="item"><input type="password" id="pwOld" placeholder="Current password" style="background:transparent;padding:0"></div><div class="item"><input type="password" id="pwNew" placeholder="New password (8+ characters)" style="background:transparent;padding:0"></div><div class="item"><span class="grow"></span><button class="btn sm" onclick="changePw()">Change password</button></div>`}
@@ -1034,6 +1036,12 @@ async function savePubUrl(){ try { const r = await put('/api/settings/public-url
 async function changePw(){ try { await put('/api/settings/password', {current:$('#pwOld').value, new:$('#pwNew').value}); toast('Password changed'); } catch(e){ toast(e.message); } }
 function openPhone(){
   $('#sheet').className = 'sheet';
+  if (me.hosted){ $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Open on any device</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
+    <p class="sub">SealSend is online. Scan this or open the link on any phone, tablet or computer:</p>
+    <div style="text-align:center"><img src="/api/qr.png?data=${encodeURIComponent(me.lan_url)}" alt="QR code" style="width:220px;background:#fff;border-radius:12px;padding:6px"></div>
+    <p style="text-align:center" class="mono">${esc(me.lan_url)}</p>
+    <div class="group"><div class="check"><span class="ck y">1</span><div>Sign in with your password.</div></div>
+      <div class="check"><span class="ck y">2</span><div><b>iPhone/iPad:</b> Share → Add to Home Screen. <b>Android:</b> ⋮ → Install app.</div></div></div>`; return openSheet(); }
   $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Open on phone or iPad</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
     <p class="sub">Connect the phone or iPad to the <b>same Wi-Fi</b> as this computer, then scan:</p>
     <div style="text-align:center"><img src="/api/qr.png?data=${encodeURIComponent(me.lan_url)}" alt="QR code" style="width:220px;background:#fff;border-radius:12px;padding:6px"></div>

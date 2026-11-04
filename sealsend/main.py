@@ -77,7 +77,12 @@ class Login(BaseModel):
 
 @app.get("/api/setup-status")
 def setup_status(request: Request):
-    return {"needs_setup": not settings.admin_configured(), "local": _is_local(request)}
+    return {"needs_setup": not settings.admin_configured(), "local": _is_local(request), "hosted": bool(config.HOSTED_URL)}
+
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True}
 
 
 @app.post("/api/setup")
@@ -142,7 +147,7 @@ def _copilot_label() -> str:
 def me():
     return {"mail_mode": config.mail_mode(), "mail": settings.public_mail(), "quota": pipeline.quota_status(),
             "key_fingerprint": crypto.fingerprint(), "copilot": _copilot_label(),
-            "public_base_url": config.public_base_url(), "lan_url": f"http://{config.lan_ip()}:{config.PORT}",
+            "public_base_url": config.public_base_url(), "lan_url": config.app_url(), "hosted": bool(config.HOSTED_URL),
             "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
             "presets": {k: v["label"] for k, v in mailer.PRESETS.items()},
             "styles": {k: v["title"] for k, v in STYLES.items()},
@@ -657,7 +662,7 @@ def remove_template(template_id: str):
 @app.get("/api/settings", dependencies=[Depends(require_auth)])
 def get_settings():
     return {"mail": settings.public_mail(), "org": settings.org(), "public_base_url": config.public_base_url(),
-            "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": f"http://{config.lan_ip()}:{config.PORT}",
+            "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": config.app_url(), "hosted": bool(config.HOSTED_URL),
             "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
             "admin_from_env": bool(config.ADMIN_PASSWORD)}
 

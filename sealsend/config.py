@@ -62,12 +62,19 @@ def lan_ip() -> str:
 
 
 _PUBLIC_ENV = os.environ.get("PUBLIC_BASE_URL", "")
+HOSTED_URL = os.environ.get("RENDER_EXTERNAL_URL", "") or os.environ.get("SEALSEND_HOSTED_URL", "")  # set by the host
+WORKERS = int(os.environ.get("SEALSEND_WORKERS", "0")) or min(os.cpu_count() or 1, 8)
 
 
 def public_base_url() -> str:
-    """Where QR codes and verify links point. Settings > env > this laptop's LAN address."""
+    """Where QR codes and verify links point. Settings > env > website address > this laptop's LAN address."""
     from . import settings
-    return (settings.get("public_base_url") or _PUBLIC_ENV or f"http://{lan_ip()}:{PORT}").rstrip("/")
+    return (settings.get("public_base_url") or _PUBLIC_ENV or HOSTED_URL or f"http://{lan_ip()}:{PORT}").rstrip("/")
+
+
+def app_url() -> str:
+    """The address people open the app at: the website when hosted, else this laptop on the Wi-Fi."""
+    return (HOSTED_URL or f"http://{lan_ip()}:{PORT}").rstrip("/")
 
 
 PUBLIC_BASE_URL = _PUBLIC_ENV or "http://localhost:8000"  # legacy name; use public_base_url()
