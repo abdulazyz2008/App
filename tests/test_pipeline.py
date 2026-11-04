@@ -706,6 +706,37 @@ def test_google_sheets_link_import(client, monkeypatch):
     assert r.status_code == 400 and "Google Sheets link" in r.json()["detail"]
 
 
+def test_linkedin_button_and_share_card(client):
+    import io as _io
+    from urllib.parse import parse_qs, urlparse
+    from PIL import Image
+    login(client)
+    bid = upload(client)["id"]
+    send(client, bid)
+    rec = records(client, bid, "Sent")[0]
+    client.post("/api/logout")  # the verify page is public
+    page_html = client.get(f"/verify/{rec['cert_code']}").text
+    import html as _html, re as _re
+    link = _html.unescape(_re.search(r'href="(https://www.linkedin.com/profile/add\?[^"]+)"', page_html).group(1))
+    q = {k: v[0] for k, v in parse_qs(urlparse(link).query).items()}
+    assert q["startTask"] == "CERTIFICATION_NAME" and q["certId"] == rec["cert_code"]
+    assert q["certUrl"].endswith(f"/verify/{rec['cert_code']}") and "AI Hackathon 2026" in q["name"] and q["issueYear"].isdigit()
+    assert f'/verify/{rec["cert_code"]}/card.png' in page_html and 'property="og:title"' in page_html and "navigator.share" in page_html
+    card = client.get(f"/verify/{rec['cert_code']}/card.png")
+    assert card.status_code == 200 and Image.open(_io.BytesIO(card.content)).size == (1200, 630)
+    fake = client.get("/verify/SS-NOTAREAL123").text
+    assert "linkedin.com" not in fake and client.get("/verify/SS-NOTAREAL123/card.png").status_code == 404
+    login(client)
+    b = client.get(f"/api/batches/{bid}").json()
+    cfg = b["config"]
+    cfg["email_body"] = "Add it to LinkedIn: {{LINKEDIN_URL}}"
+    for r in cfg["rules"]:
+        r["email"] = "standard"
+    save(client, bid, cfg)
+    e = client.get(f"/api/batches/{bid}/preview/email", params={"record_id": rec["id"]}).json()
+    assert "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME" in e["body"]
+
+
 def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
     login(client)

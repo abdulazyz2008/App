@@ -977,7 +977,7 @@ function loadEmail(){
   const rules = cfg.rules || [];
   $('#emailCats').innerHTML = (rules.length ? rules : [{label:'All students', email:'standard'}]).map(r => `<div class="item"><span class="grow lbl">${esc(r.label)}</span><span class="val">${esc(me.presets[r.email]||'Custom')}</span></div>`).join('');
   $('#subj').value = cfg.email_subject; $('#body').value = cfg.email_body; $('#fnPattern').value = cfg.filename_pattern;
-  const ph = ['NAME','EVENT','CATEGORY','TITLE','DATE','ID','ORG_NAME','CERT_ID','VERIFY_URL'];
+  const ph = ['NAME','EVENT','CATEGORY','TITLE','DATE','ID','ORG_NAME','CERT_ID','VERIFY_URL','LINKEDIN_URL'];
   $('#chips').innerHTML = ph.map(p=>`<span class="phchip" onclick="insertPh('${p}')">{{${p}}}</span>`).join('');
   $('#fnExample').textContent = '…';
   api(`/api/batches/${batch.id}/preview/email`).then(e => $('#fnExample').textContent = e.attachment).catch(()=>{});

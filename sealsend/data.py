@@ -19,7 +19,7 @@ EMAIL_RE = re.compile(
     r"^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?"
     r"(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$"
 )
-BUILTIN = {"CERT_ID", "VERIFY_URL", "ISSUE_DATE", "ISSUER", "ORG_NAME", "TITLE", "DESCRIPTION", "CATEGORY", "HONOR_PHRASE", "CATEGORY_A",
+BUILTIN = {"CERT_ID", "VERIFY_URL", "LINKEDIN_URL", "ISSUE_DATE", "ISSUER", "ORG_NAME", "TITLE", "DESCRIPTION", "CATEGORY", "HONOR_PHRASE", "CATEGORY_A",
            "SIGNER1_NAME", "SIGNER1_TITLE", "SIGNER2_NAME", "SIGNER2_TITLE"}
 
 HINTS = {

@@ -16,7 +16,7 @@ from concurrent.futures.process import BrokenProcessPool
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from . import certificate, config, copilot, crypto, db, keepawake, mailer, settings
+from . import certificate, config, copilot, crypto, db, keepawake, mailer, settings, sharecard
 from . import templates_lib as T
 from .data import (STYLES, classify, honor_phrase, with_article, fix_email_typo, guess_event_template, normalize_email, placeholders_in, read_table,
                    render, required_in, resolve_values, safe_filename, suggest_categories, suggest_config, valid_email,
@@ -236,6 +236,8 @@ def record_values(rec: dict, cfg: dict) -> dict:
     values["VERIFY_URL"] = f"{config.public_base_url()}/verify/{rec['cert_code']}"
     values["ISSUE_DATE"] = date.today().strftime("%d %B %Y")
     values["ISSUER"] = b.get("org_name") or config.ISSUER_NAME
+    values["LINKEDIN_URL"] = sharecard.linkedin_url(values["TITLE"], values.get("EVENT", ""), values["ISSUER"],
+                                                    values["VERIFY_URL"], rec["cert_code"], sharecard.issued_on(rec))
     values["HONOR_PHRASE"] = honor_phrase(honor) if honor else "outstanding achievement"
     values["CATEGORY_A"] = with_article(values["CATEGORY"])
     desc = (rule or {}).get("description") or STYLES[style]["description"]

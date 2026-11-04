@@ -9,13 +9,14 @@ import time
 import zipfile
 from contextlib import asynccontextmanager
 from pathlib import Path
+from urllib.parse import urlencode
 
 from fastapi import Depends, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTextResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, gsheets, mailer, pipeline, settings, tunnel
+from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, gsheets, mailer, pipeline, settings, sharecard, tunnel
 from . import templates_lib as T
 from .data import STYLES, suggest_categories
 
@@ -1078,13 +1079,16 @@ h1{font-size:30px;line-height:1.15;margin:0 0 6px;text-align:center;letter-spaci
 .cap{font-size:13px;color:var(--sub);text-transform:uppercase;letter-spacing:.04em;margin:0 16px 8px}
 .btn{display:block;width:100%;border:0;border-radius:12px;padding:15px;font-family:inherit;font-size:17px;font-weight:600;line-height:1.2;background:var(--fill);color:var(--on);cursor:pointer;text-align:center;text-decoration:none}
 input[type=text],input[type=file]{width:100%;font:inherit;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin-bottom:12px}
+.actions{display:grid;gap:10px;margin:0 0 22px}.btn.li{background:#0a66c2;color:#fff}
+.btn.sec{background:var(--card);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.sharealt{display:flex;gap:10px}.sharealt[hidden]{display:none}.sharealt .btn{font-size:15px;padding:12px}
 .note{font-size:13px;color:var(--sub);text-align:center;margin-top:18px}.mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
 """
 
 
-def page(title: str, body: str) -> HTMLResponse:
+def page(title: str, body: str, head: str = "") -> HTMLResponse:
     return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · SendEZ</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · SendEZ</title>{head}
 <style>{PUBLIC_CSS}</style></head><body><div class="wrap"><div class="brand">SendEZ Verify</div>{body}</div></body></html>""")
 
 
@@ -1137,7 +1141,53 @@ def verify(code: str):
     detail = html.escape(p.get("description") or " · ".join(x for x in (p.get("achievement"), p.get("event")) if x))
     return page("Verified", f"""<div class="icon ok">✓</div><h1>Verified</h1>
 <p class="lead">Issued to <b>{html.escape(p.get('name', ''))}</b><br>{detail}</p>
-<div class="group">{_proof_rows(rec, proof)}</div>{_upload_form()}{_footer(p.get('issuer', ''))}""")
+{_share_actions(rec, p)}<div class="group">{_proof_rows(rec, proof)}</div>{_upload_form()}{_footer(p.get('issuer', ''))}""",
+                head=_share_meta(rec, p))
+
+
+def _verify_link(code: str) -> str:
+    return f"{config.public_base_url()}/verify/{code}"
+
+
+def _share_meta(rec: dict, p: dict) -> str:
+    """Open Graph tags: a shared verify link shows a proper preview card in WhatsApp, LinkedIn, X and iMessage."""
+    url = _verify_link(rec["cert_code"])
+    title = f"Verified certificate: {p.get('name', '')}"
+    desc = " · ".join(x for x in (sharecard.certification_name(p.get("title", ""), p.get("event", "")), p.get("issuer", "")) if x)
+    tags = {"og:type": "website", "og:title": title, "og:description": desc, "og:url": url,
+            "og:image": f"{url}/card.png", "og:image:width": "1200", "og:image:height": "630"}
+    return "".join(f'<meta property="{k}" content="{html.escape(v)}">' for k, v in tags.items()) + \
+        f'<meta name="twitter:card" content="summary_large_image"><meta name="description" content="{html.escape(desc)}">'
+
+
+def _share_actions(rec: dict, p: dict) -> str:
+    url = _verify_link(rec["cert_code"])
+    li = sharecard.linkedin_url(p.get("title", ""), p.get("event", ""), p.get("issuer", ""), url, rec["cert_code"],
+                                sharecard.issued_on(rec))
+    text = f"My certificate for {p.get('event') or 'the event'} is verified:"
+    wa = "https://wa.me/?" + urlencode({"text": f"{text} {url}"})
+    return f"""<div class="actions"><a class="btn li" href="{html.escape(li)}" target="_blank" rel="noopener">Add to LinkedIn profile</a>
+<button class="btn sec" id="shareBtn" type="button">Share</button>
+<div class="sharealt" id="shareAlt" hidden><a class="btn sec" href="{html.escape(wa)}" target="_blank" rel="noopener">WhatsApp</a>
+<button class="btn sec" id="copyBtn" type="button">Copy link</button></div></div>
+<script>(function(){{var u={json.dumps(url)},t={json.dumps(text)},b=document.getElementById('shareBtn'),a=document.getElementById('shareAlt');
+b.onclick=function(){{if(navigator.share){{navigator.share({{title:document.title,text:t,url:u}}).catch(function(){{}});}}else{{b.hidden=true;a.hidden=false;}}}};
+document.getElementById('copyBtn').onclick=function(){{var c=this;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){{c.textContent='Copied';}},function(){{prompt('Copy this link',u);}});}};}})();</script>"""
+
+
+@app.get("/verify/{code}/card.png")
+def verify_card(code: str):
+    rec = db.one("SELECT * FROM records WHERE cert_code=? AND payload_json!=''", (code,))
+    if not rec or not pipeline.record_proof(rec)["valid"]:
+        raise HTTPException(404, "No verified certificate with that ID")
+    p = json.loads(rec["payload_json"])
+    path = config.THUMB_DIR / f"card_{code}_{(rec['pdf_sha256'] or '')[:10]}.png"
+    if not path.exists():
+        b = db.get_batch(rec["batch_id"])
+        logo = (b["config"].get("branding") or {}).get("logo", "") if b else ""
+        logo_path = config.UPLOAD_DIR / Path(logo).name if logo else None
+        path.write_bytes(sharecard.render_card(p, logo_path if logo_path and logo_path.exists() else None))
+    return FileResponse(path, media_type="image/png", headers={"Cache-Control": "public, max-age=86400"})
 
 
 @app.post("/verify", response_class=HTMLResponse)
