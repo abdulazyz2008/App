@@ -103,17 +103,24 @@ class QuotaFailure(Exception):
     """The provider's daily sending limit was reached. Pause and resume later."""
 
 
-def sender_identity(org_name: str = "") -> tuple[str, str, str]:
-    m = settings.mail()
-    name = m.get("from_name") or org_name or settings.org().get("org_name") or config.MAIL_FROM_NAME
+def sender_identity(org_name: str = "", account: dict | None = None) -> tuple[str, str, str]:
+    """(display name, from address, reply-to). `account` is the sending account (default: the main one);
+    the second account uses the main account's sender name and sends replies to the main inbox."""
+    main = settings.mail()
+    m = account or main
+    name = m.get("from_name") or main.get("from_name") or org_name or settings.org().get("org_name") or config.MAIL_FROM_NAME
     if config.mail_mode() in ("smtp", "resend") and m.get("address"):
-        return name, m["address"], m.get("reply_to", "")
+        reply = m.get("reply_to", "")
+        if not reply and m.get("slot") == "mail2":
+            reply = main.get("reply_to") or main.get("address", "")
+        return name, m["address"], reply
     return name, config.MAIL_FROM, ""
 
 
 def build_message(to_addr: str, to_name: str, subject: str, body: str,
-                  attachment: bytes, attachment_name: str, cert_code: str, org_name: str = "") -> EmailMessage:
-    from_name, from_addr, reply_to = sender_identity(org_name)
+                  attachment: bytes, attachment_name: str, cert_code: str, org_name: str = "",
+                  account: dict | None = None) -> EmailMessage:
+    from_name, from_addr, reply_to = sender_identity(org_name, account)
     msg = EmailMessage()
     msg["From"] = formataddr((from_name, from_addr))
     msg["To"] = formataddr((to_name, to_addr))
@@ -184,8 +191,16 @@ def connect_smtp(m: dict | None = None):
                            "Check the internet connection or whether the network blocks email ports.")
 
 
-def check_connection() -> dict:
-    """Used by Settings > Test connection and before every batch."""
+def check_connection(account: dict | None = None) -> dict:
+    """Used by Settings > Test connection and before every batch. `account`: test that account instead."""
+    if account:
+        try:
+            connect_smtp(account).quit()
+            return {"ok": True, "mode": "smtp", "message": "Connected and logged in"}
+        except (AuthFailure, QuotaFailure, TransientFailure, PermanentFailure) as e:
+            return {"ok": False, "mode": "smtp", "message": str(e)}
+        except socket.gaierror as e:
+            return {"ok": False, "mode": "smtp", "message": f"Server not found: {e}"}
     mode = config.mail_mode()
     if mode == "sandbox":
         return {"ok": True, "mode": mode, "message": "Sandbox: emails are saved to the outbox folder, not delivered"}
@@ -209,8 +224,9 @@ class Sender:
     {"transient": [addresses that fail once], "reject": [addresses that bounce permanently]}
     """
 
-    def __init__(self, mode: str | None = None, faults: dict | None = None):
+    def __init__(self, mode: str | None = None, faults: dict | None = None, account: dict | None = None):
         self.mode = mode or config.mail_mode()
+        self.account = account  # which sending account this connection logs in as (None: the main one)
         self.smtp = None
         self.faults = {k: {a.lower() for a in v} for k, v in (faults or {}).items()}
         self._tripped: set[str] = set()
@@ -242,13 +258,13 @@ class Sender:
 
     def _send_smtp(self, msg: EmailMessage) -> str:
         if self.smtp is None:
-            self.smtp = connect_smtp()
+            self.smtp = connect_smtp(self.account)
         try:
             try:
                 self.smtp.send_message(msg)
             except smtplib.SMTPServerDisconnected:
                 self.close()
-                self.smtp = connect_smtp()
+                self.smtp = connect_smtp(self.account)
                 self.smtp.send_message(msg)
         except (smtplib.SMTPException, OSError) as e:
             err = _classify_smtp(e)

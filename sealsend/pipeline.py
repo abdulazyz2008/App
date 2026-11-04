@@ -550,23 +550,34 @@ def alternate_email(rec: dict, cfg: dict) -> tuple[str, str]:
     return "", ""
 
 
-def _log_send(rec: dict, attachment: str, result: str, detail: str) -> None:
+def _log_send(rec: dict, attachment: str, result: str, detail: str, account: str = "") -> None:
     with db.tx() as c:
-        c.execute("INSERT INTO send_log (record_id, dedupe_key, email, attachment, result, detail, at) VALUES (?,?,?,?,?,?,?)",
-                  (rec["id"], rec["dedupe_key"], rec["email"], attachment, result, detail, db.now()))
+        c.execute("INSERT INTO send_log (record_id, dedupe_key, email, attachment, result, detail, at, account) VALUES (?,?,?,?,?,?,?,?)",
+                  (rec["id"], rec["dedupe_key"], rec["email"], attachment, result, detail, db.now(), account))
 
 
-def sent_last_24h() -> int:
-    """Real (non-sandbox) emails accepted in the last 24 hours, across all batches."""
+def sent_last_24h(account: dict | None = None) -> int:
+    """Real (non-sandbox) emails accepted in the last 24 hours, across all batches; for one account if given.
+    Rows from before accounts were recorded count for the main account."""
     since = (datetime.now(timezone.utc) - timedelta(hours=24)).strftime("%Y-%m-%dT%H:%M:%SZ")
-    return db.one("SELECT COUNT(*) n FROM send_log WHERE result='sent' AND at>=? AND detail NOT LIKE 'Sandbox%'", (since,))["n"]
+    sql, params = "SELECT COUNT(*) n FROM send_log WHERE result='sent' AND at>=? AND detail NOT LIKE 'Sandbox%'", [since]
+    if account is not None:
+        addr = (account.get("address") or "").lower()
+        sql += " AND account=?" if account.get("slot") == "mail2" else " AND account IN ('', ?)"
+        params.append(addr)
+    return db.one(sql, params)["n"]
 
 
 def quota_status() -> dict:
     mode = config.mail_mode()
-    cap = settings.mail()["daily_cap"] if mode != "sandbox" else 0
-    used = sent_last_24h() if cap else 0
-    return {"mode": mode, "cap": cap, "used": used, "left": max(cap - used, 0) if cap else None}
+    accts = []
+    for a in settings.accounts():
+        used = sent_last_24h(a)
+        accts.append({"address": a.get("address", ""), "provider": a.get("provider", ""), "slot": a["slot"],
+                      "cap": a["daily_cap"], "used": used, "left": max(a["daily_cap"] - used, 0)})
+    cap = sum(a["cap"] for a in accts)
+    return {"mode": mode, "cap": cap, "used": sum(a["used"] for a in accts),
+            "left": sum(a["left"] for a in accts) if cap else None, "accounts": accts}
 
 
 def _ts(dt: datetime) -> str:
@@ -595,6 +606,11 @@ def preflight(batch: dict, check_quota: bool = True) -> tuple[str, str]:
     res = mailer.check_connection()
     if not res["ok"]:
         return "connection", f"Can't send yet: {res['message']}"
+    extra = settings.mail2()
+    if extra and config.mail_mode() == "smtp":
+        res = mailer.check_connection(extra)
+        if not res["ok"]:
+            return "connection", f"Can't send yet: second account {extra['address']}: {res['message']}"
     return "", ""
 
 
@@ -623,17 +639,35 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
         seal_batch(batch_id)
     mode = "sandbox" if batch["is_chaos"] else config.mail_mode()
     real = mode != "sandbox"
-    cap = settings.mail()["daily_cap"] if real else 0
+    accounts = settings.accounts() if real else []
+    cap = sum(a["daily_cap"] for a in accounts)
     auto_resume = real and settings.mail().get("auto_resume", True) is not False
     delay = float(settings.mail().get("delay_seconds") or 0) if real else 0.0
     delay = max(delay, config.SEND_DELAY_SECONDS) if real else 0.0
     db.log(batch_id, None, "info", "send", f"Delivery started for {len(targets)} students via {mode}"
-           + (" (chaos faults armed)" if chaos else "") + (f"; daily limit {cap}, {sent_last_24h()} used" if cap else ""))
+           + (" (chaos faults armed)" if chaos else "") + (f"; daily limit {cap}, {sent_last_24h()} used" if cap else "")
+           + (f"; accounts: {', '.join(a['address'] for a in accounts)}" if len(accounts) > 1 else ""))
+
+    exhausted: set[str] = set()
+    senders: dict[str, mailer.Sender] = {}
+
+    def pick_account():
+        """The first account with room left today (the main one fills up first)."""
+        for a in accounts:
+            if a["slot"] not in exhausted and (not a["daily_cap"] or sent_last_24h(a) < a["daily_cap"]):
+                return a
+        return None
+
+    def sender_for(acct):
+        key = acct["slot"] if acct else "default"
+        if key not in senders:
+            senders[key] = mailer.Sender(mode=mode, faults=chaos.get("faults"), account=acct)
+        return senders[key]
 
     reseal = False
     sent = failed = skipped = claim = 0
     try:
-        with mailer.Sender(mode=mode, faults=chaos.get("faults")) as sender:
+        if True:
             for rec in targets:
                 rec = db.get_record(rec["id"])
                 if rec["status"] == "Failed" and rec["last_error"].startswith("Generation failed"):
@@ -658,7 +692,8 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
                     db.log(batch_id, rec["id"], "heal", "claim", "No usable email: claim link issued instead of failing")
                     claim += 1
                     continue
-                if cap and sent_last_24h() >= cap:
+                acct = pick_account() if real else None
+                if real and acct is None:
                     raise _Pause(f"Daily sending limit reached ({cap} emails in 24 hours). The rest are queued"
                                  + ("; SendEZ continues automatically when the limit resets (keep it open)." if auto_resume else
                                     ": press Send again after the limit resets, or raise the limit in Settings if your account allows it."))
@@ -671,7 +706,24 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
                     _log_send(rec, rec["cert_file"], "failed", str(e))
                     failed += 1
                     continue
-                result = _deliver(sender, rec, cfg, pdf)
+                while True:
+                    try:
+                        result = _deliver(sender_for(acct), rec, cfg, pdf)
+                        break
+                    except mailer.QuotaFailure:
+                        if acct is not None:  # this account hit its provider limit early: use the next one
+                            exhausted.add(acct["slot"])
+                            nxt = pick_account()
+                            if nxt is not None:
+                                db.log(batch_id, None, "warn", "send", f"{acct['address']} reached its sending limit; "
+                                                                        f"continuing from {nxt['address']}")
+                                acct, rec = nxt, db.get_record(rec["id"])
+                                continue
+                        raise
+                    except mailer.AuthFailure as e:
+                        if acct is not None and acct["slot"] == "mail2":
+                            raise mailer.AuthFailure(f"Second account {acct['address']}: {e}") from e
+                        raise
                 reseal |= result["rebound"]
                 if result["ok"]:
                     sent += 1
@@ -691,6 +743,8 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
         db.log(batch_id, None, "error" if isinstance(e, mailer.AuthFailure) else "warn", "send",
                f"Delivery paused. {kind}: {e}. Nothing was lost; unsent students stay queued.")
     finally:
+        for snd in senders.values():
+            snd.close()
         if reseal:
             seal_batch(batch_id)
     db.log(batch_id, None, "ok" if not failed else "warn", "send",
@@ -699,6 +753,7 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
 
 def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
     batch_id = rec["batch_id"]
+    acct_key = ((sender.account or {}).get("address") or "").lower()  # which account's daily count this uses
     rebound, attempts = False, rec["attempts"]
     db.update_record(rec["id"], status="Sending")
     attempt = 0
@@ -707,13 +762,13 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
         subject, body = email_texts(rec, cfg, values)
         fname = Path(rec["cert_file"]).name
         msg = mailer.build_message(rec["email"], rec["name"], subject, body, pdf, fname, rec["cert_code"],
-                                   cfg.get("branding", {}).get("org_name", ""))
+                                   cfg.get("branding", {}).get("org_name", ""), account=sender.account)
         attempt += 1
         attempts += 1
         try:
             detail = sender.send(msg, rec["email"], f"{rec['cert_code']}_{Path(fname).stem}")
             db.update_record(rec["id"], status="Sent", sent_at=db.now(), attempts=attempts, last_error="")
-            _log_send(rec, fname, "sent", detail)
+            _log_send(rec, fname, "sent", detail, account=acct_key)
             db.log(batch_id, rec["id"], "ok", "send", f"Sent to {rec['email']} with {fname}"
                    + (f" (attempt {attempt})" if attempt > 1 else ""))
             return {"ok": True, "rebound": rebound}
@@ -721,7 +776,7 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
             db.update_record(rec["id"], status="Generated", attempts=attempts)
             raise
         except mailer.PermanentFailure as e:
-            _log_send(rec, fname, "failed", str(e))
+            _log_send(rec, fname, "failed", str(e), account=acct_key)
             alt, col = alternate_email(rec, cfg) if not rebound else ("", "")
             if alt:
                 db.log(batch_id, rec["id"], "heal", "bounce", f"{rec['email']} bounced ({e}); switching to {col}: {alt}")
@@ -743,7 +798,7 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
                 time.sleep(min(config.RETRY_BASE_SECONDS * 2 ** (attempt - 1), 8))
             else:
                 db.update_record(rec["id"], status="Failed", attempts=attempts, last_error=last)
-                _log_send(rec, fname, "failed", last)
+                _log_send(rec, fname, "failed", last, account=acct_key)
                 return {"ok": False, "rebound": rebound}
     return {"ok": False, "rebound": rebound}
 

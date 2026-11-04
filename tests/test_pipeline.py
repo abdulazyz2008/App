@@ -497,6 +497,51 @@ def test_auto_continue_after_daily_limit(client, monkeypatch):
     assert done["send_at"] == "" and "press Send again" in done["pause_reason"]
 
 
+def test_second_sending_account(client, monkeypatch):
+    from sealsend import db, pipeline
+    log = _fake_smtp(monkeypatch, {})
+    login(client)
+    _gmail(client, cap=3)
+    m2 = {"provider": "gmail", "address": "second@gmail.com", "password": "bcdefghijklmnopq", "daily_cap": 2}
+    assert client.put("/api/settings/mail2", json={**m2, "password": "short"}).status_code == 400  # not an App Password
+    assert client.put("/api/settings/mail2", json={**m2, "address": "me@gmail.com"}).status_code == 400  # same as main
+    assert client.put("/api/settings/mail2", json={**m2, "password": ""}).status_code == 400  # needs a password first time
+    r = client.put("/api/settings/mail2", json=m2)
+    assert r.status_code == 200 and r.json()["quota"]["cap"] == 5 and len(r.json()["quota"]["accounts"]) == 2
+    assert client.post("/api/settings/test-connection2").json()["ok"]
+    assert client.get("/api/me").json()["mail2"]["address"] == "second@gmail.com"
+
+    bid = upload(client)["id"]
+    done = send(client, bid)
+    froms = [m["From"] for m in log["sent"]]
+    assert len(froms) == 5 and sum("me@gmail.com" in f for f in froms) == 3 and sum("second@gmail.com" in f for f in froms) == 2
+    assert froms.index(next(f for f in froms if "second@" in f)) == 3  # the main account fills up first
+    second = [m for m in log["sent"] if "second@" in m["From"]]
+    assert all(m["Reply-To"] == "me@gmail.com" for m in second)  # replies still reach the main inbox
+    assert "Daily sending limit reached (5 emails" in done["pause_reason"]
+    accts = {r["account"]: r["n"] for r in db.query("SELECT account, COUNT(*) n FROM send_log WHERE result='sent' GROUP BY account")}
+    assert accts == {"me@gmail.com": 3, "second@gmail.com": 2}
+    q = client.get("/api/me").json()["quota"]
+    assert (q["cap"], q["left"]) == (5, 0) and [a["left"] for a in q["accounts"]] == [0, 0]
+
+    # Gmail says "limit reached" early on the main account: the rest go from the second account
+    with db.tx() as c:
+        c.execute("UPDATE send_log SET at='2000-01-01T00:00:00Z'")
+    client.put("/api/settings/mail2", json={**m2, "password": "", "daily_cap": 100})  # keeps the saved password
+
+    def send_(msg):
+        if "me@gmail.com" in msg["From"]:
+            raise smtplib.SMTPDataError(550, b"5.4.5 Daily user sending quota exceeded.")
+    _fake_smtp(monkeypatch, {"send": send_})
+    done = send(client, bid)
+    assert done["counts"]["Sent"] == 11 and done["pause_reason"] == "" and not done["counts"].get("Failed")
+    ev = client.get(f"/api/batches/{bid}/events", params={"limit": 200}).json()
+    assert any("reached its sending limit; continuing from second@gmail.com" in e["message"] for e in ev)
+
+    assert client.delete("/api/settings/mail2").json()["quota"]["cap"] == 3
+    assert client.get("/api/me").json()["mail2"] is None
+
+
 def test_provider_quota_error_pauses(client, monkeypatch):
     calls = {"n": 0}
 

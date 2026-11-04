@@ -28,6 +28,8 @@ PROVIDERS = {
 DEFAULT = {
     "mail": {"provider": "", "address": "", "from_name": "", "reply_to": "", "host": "", "port": 587, "security": "starttls",
              "username": "", "password_enc": "", "daily_cap": 0, "delay_seconds": 1.0, "verified_at": "", "auto_resume": True},
+    "mail2": {"provider": "", "address": "", "from_name": "", "reply_to": "", "host": "", "port": 587, "security": "starttls",
+              "username": "", "password_enc": "", "daily_cap": 0, "verified_at": ""},
     "org": {"org_name": "", "logo": "", "signer1_name": "", "signer1_title": "Event Coordinator", "signer1_sig": "",
             "signer2_name": "", "signer2_title": "Head of Department", "signer2_sig": ""},
     "admin": {"password_hash": ""},
@@ -97,9 +99,11 @@ def get(key: str, default=None):
     return load().get(key, default)
 
 
-def mail() -> dict:
-    """Effective mail settings with the password decrypted and provider defaults applied."""
-    m = dict(load()["mail"])
+def mail(slot: str = "mail") -> dict:
+    """Effective mail settings with the password decrypted and provider defaults applied.
+    slot "mail" is the main sending account, "mail2" the optional second one."""
+    m = dict(load()[slot])
+    m["slot"] = slot
     prov = PROVIDERS.get(m.get("provider") or "", {})
     if m.get("provider") in ("gmail", "outlook"):
         m["host"], m["port"], m["security"] = prov["host"], prov["port"], prov["security"]
@@ -109,16 +113,38 @@ def mail() -> dict:
     return m
 
 
-def public_mail() -> dict:
-    m = mail()
+def public_mail(slot: str = "mail") -> dict:
+    m = mail(slot)
     has = bool(m.pop("password"))
     m["has_password"] = has
     return m
 
 
-def update_mail(fields: dict) -> None:
+def mail2() -> dict:
+    """The second sending account, or {} when none is set up."""
+    m = mail("mail2")
+    return m if m.get("provider") in ("gmail", "outlook", "smtp") and m.get("address") and m.get("password") else {}
+
+
+def accounts() -> list[dict]:
+    """Accounts that send real email, in the order they are used: the main one fills up first.
+    A second account is only used alongside an SMTP main account (Gmail, Outlook or other)."""
+    main = mail()
+    if config.mail_mode() == "sandbox":
+        return []
+    extra = mail2()
+    return [main] + ([extra] if extra and config.mail_mode() == "smtp" else [])
+
+
+def clear_mail2() -> None:
     data = load()
-    m = data["mail"]
+    data["mail2"] = json.loads(json.dumps(DEFAULT["mail2"]))
+    save(data)
+
+
+def update_mail(fields: dict, slot: str = "mail") -> None:
+    data = load()
+    m = data[slot]
     for k in ("provider", "address", "from_name", "reply_to", "host", "port", "security", "username", "daily_cap", "delay_seconds", "auto_resume"):
         if k in fields and fields[k] is not None:
             m[k] = fields[k]
@@ -130,9 +156,9 @@ def update_mail(fields: dict) -> None:
     save(data)
 
 
-def mark_verified(when: str) -> None:
+def mark_verified(when: str, slot: str = "mail") -> None:
     data = load()
-    data["mail"]["verified_at"] = when
+    data[slot]["verified_at"] = when
     save(data)
 
 

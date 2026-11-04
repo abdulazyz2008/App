@@ -614,7 +614,7 @@ function renderSide(){
   $('#browserBtn').classList.toggle('hidden', !me.desktop);
   $('#helpFab').classList.remove('hidden');
   const sandbox = me.mail_mode==='sandbox', prov = me.mail_mode==='resend' ? 'resend' : (sandbox ? 'sandbox' : me.mail.provider);
-  const mode = {smtp:`Sending from ${me.mail.address}`, resend:`Resend · ${me.mail.address}`, sandbox:'Email not connected (test mode)'}[me.mail_mode];
+  const mode = {smtp:`Sending from ${me.mail.address}${me.mail2 ? ` + ${me.mail2.address}` : ''}`, resend:`Resend · ${me.mail.address}`, sandbox:'Email not connected (test mode)'}[me.mail_mode];
   $('#sideStatus').innerHTML = `<span style="display:inline-flex;gap:6px;align-items:flex-start">${mailIcon(prov)}<span>${esc(mode)}${me.quota.cap?`<br>${me.quota.left} of ${me.quota.cap} emails left today`:''}</span></span>`;
   $('#mStatusPill').innerHTML = sandbox ? `${mailIcon('sandbox')}<span style="color:var(--orange-ink)">Connect Gmail</span>` : `${mailIcon(prov)}<span>${esc(me.mail.address)}</span>`;
   $('#setupNudge').innerHTML = sandbox ? `<div class="banner light"><span class="mtile">${GMAIL}</span><div class="grow"><b>Connect your email first</b><div class="desc">Until you connect Gmail or Outlook, certificates are only saved on this computer (test mode), not emailed.</div></div><button class="btn sm fill" onclick="openSettings()">Connect</button></div>` : '';
@@ -972,7 +972,7 @@ function loadEmail(){
   const m = me.mail, q = me.quota;
   $('#acctBox').innerHTML = me.mail_mode === 'sandbox'
     ? `<div class="banner light" style="margin-top:0"><span class="mtile">${GMAIL}</span><div class="grow"><b>No email account connected</b><div class="desc">Certificates will be saved on this computer instead of emailed. Connect Gmail or Outlook to send them for real.</div></div><button class="btn sm fill" onclick="openSettings()">Connect</button></div>`
-    : `<div class="group"><div class="item"><span class="mtile">${mailIcon(me.mail_mode==='resend'?'resend':m.provider)}</span><div class="grow"><b>${esc(m.address)}</b><div class="desc">${esc(me.providers[m.provider]||'SMTP')}${m.verified_at?` · <span class="ok">✓ connection tested</span> ${when(m.verified_at)}`:' · not tested yet'}${q.cap?` · ${q.left} of ${q.cap} emails left today`:''}</div></div><button class="btn sm" onclick="openSettings()">Change</button></div></div>`;
+    : `<div class="group"><div class="item"><span class="mtile">${mailIcon(me.mail_mode==='resend'?'resend':m.provider)}</span><div class="grow"><b>${esc(m.address)}</b><div class="desc">${esc(me.providers[m.provider]||'SMTP')}${m.verified_at?` · <span class="ok">✓ connection tested</span> ${when(m.verified_at)}`:' · not tested yet'}${q.cap?` · ${q.left} of ${q.cap} emails left today`:''}</div></div><button class="btn sm" onclick="openSettings()">Change</button></div>${me.mail2 ? `<div class="item"><span class="mtile">${mailIcon(me.mail2.provider)}</span><div class="grow"><b>${esc(me.mail2.address)}</b><div class="desc">Second account · used when the first reaches its daily limit${q.accounts && q.accounts[1] ? ` · ${q.accounts[1].left} of ${q.accounts[1].cap} left today` : ''}</div></div></div>` : ''}</div>`;
   const rules = cfg.rules || [];
   $('#emailCats').innerHTML = (rules.length ? rules : [{label:'All students', email:'standard'}]).map(r => `<div class="item"><span class="grow lbl">${esc(r.label)}</span><span class="val">${esc(me.presets[r.email]||'Custom')}</span></div>`).join('');
   $('#subj').value = cfg.email_subject; $('#body').value = cfg.email_body; $('#fnPattern').value = cfg.filename_pattern;
@@ -1010,7 +1010,7 @@ async function loadReview(){
   const items = [
     [c.Invalid ? 'w':'y', `${ready} student${ready===1?'':'s'} ready`, c.Invalid ? `${c.Invalid} row${c.Invalid===1?'':'s'} with problems will be skipped. <a href="#" onclick="filter='Invalid';showTab('students');return false">See them</a>` : 'Every row passed the checks'],
     ['y', `${(cfg.rules||[]).length || 1} design${(cfg.rules||[]).length>1?'s':''} assigned`, (cfg.rules||[]).map(r=>`${esc(r.label)} → ${esc(tplName(r.template))}`).join(' · ') || esc(tplName(cfg.template_id))],
-    [sandbox ? 'n':'y', sandbox ? 'Email not connected' : `<span style="display:inline-flex;gap:6px;align-items:center">${mailIcon(me.mail_mode==='resend'?'resend':me.mail.provider)}Sending from ${esc(me.mail.address)}</span>`, sandbox ? 'Certificates will only be saved on this computer. <a href="#" onclick="openSettings();return false">Connect Gmail</a>' : (me.mail.verified_at ? 'Connection tested' : 'Tip: test the connection in Settings first')],
+    [sandbox ? 'n':'y', sandbox ? 'Email not connected' : `<span style="display:inline-flex;gap:6px;align-items:center">${mailIcon(me.mail_mode==='resend'?'resend':me.mail.provider)}Sending from ${esc(me.mail.address)}${me.mail2 ? ` + ${esc(me.mail2.address)}` : ''}</span>`, sandbox ? 'Certificates will only be saved on this computer. <a href="#" onclick="openSettings();return false">Connect Gmail</a>' : (me.mail.verified_at ? 'Connection tested' : 'Tip: test the connection in Settings first')],
     [q.cap && toEmail > q.left ? 'w':'y', q.cap ? `${q.left} of ${q.cap} emails left today` : 'No daily limit in test mode', q.cap && toEmail > q.left ? `${toEmail} emails needed: the first ${q.left} go now, then sending pauses safely. Press Send again tomorrow for the rest.` : 'Enough for this batch'],
     [claimsPending ? 'w':'y', claimsPending ? `${claimsPending} will get a claim link` : 'Everyone has an email', claimsPending ? 'Copy their links from the student list after sending' : ''],
   ];
@@ -1212,6 +1212,9 @@ async function openSettings(){
     <div class="cap">Email account</div>
     <div class="chips" style="margin:0 0 10px" id="provChips">${['gmail','outlook','smtp','sandbox'].map(k=>`<button class="chipb ${k===prov?'on':''}" data-p="${k}">${mailIcon(k)}${esc({gmail:'Gmail',outlook:'Outlook / Microsoft 365',smtp:'Other',sandbox:'Test mode'}[k])}</button>`).join('')}</div>
     <div id="mailForm"></div>
+    <div class="cap">Second sending account <span class="ter sm" style="font-weight:400">optional</span></div>
+    <div id="mail2Form"></div>
+    <p class="foot">When the first account reaches its daily limit, SendEZ continues from this one, so you can send about twice as many a day. Replies still go to your first address.</p>
     <div class="cap">Mahindra University logos</div>
     <div class="group" id="muLogos"></div>
     <p class="foot">Upload once. Every club event then shows Mahindra University’s logo next to the club’s logo. PNG with a transparent background looks best.</p>
@@ -1229,6 +1232,7 @@ async function openSettings(){
     <div class="group">${s.admin_from_env?'<div class="item"><span class="desc">Password is set in the .env file.</span></div>':`<div class="item"><input type="password" id="pwOld" placeholder="Current password" style="background:transparent;padding:0"></div><div class="item"><input type="password" id="pwNew" placeholder="New password (8+ characters)" style="background:transparent;padding:0"></div><div class="item"><span class="grow"></span><button class="btn sm" onclick="changePw()">Change password</button></div>`}
       <div class="item"><span class="grow lbl">Signing key</span><span class="val mono">${esc(me.key_fingerprint)}</span></div></div>`;
   window._settings = s;
+  renderMail2();
   renderMuLogos();
   document.querySelectorAll('#provChips .chipb').forEach(b => b.onclick = () => setProvider(b.dataset.p));
   setProvider(prov); openSheet(); setTabbar('settings');
@@ -1256,6 +1260,41 @@ function setProvider(k){
       <div class="item"><span class="grow" id="mStatus">${same&&m.verified_at?`<span class="ok sm">✓ Tested ${when(m.verified_at)}</span>`:''}</span><button class="btn sm fill" onclick="saveMail('${k}')">Save &amp; Test</button></div>
       <div class="item"><input type="email" id="mTestTo" placeholder="Send a test email to…" style="flex:1"><button class="btn sm" onclick="sendTest()">Send test</button></div>
     </div>${help}`;
+}
+function renderMail2(prov){
+  const s = window._settings, m = s.mail2 || {};
+  if (!['gmail','outlook','smtp'].includes(s.mail.provider) || !s.mail.address){
+    $('#mail2Form').innerHTML = `<div class="group"><div class="item"><span class="desc">Connect your main Gmail or Outlook account above first.</span></div></div>`; return;
+  }
+  const has = ['gmail','outlook','smtp'].includes(m.provider) && m.address && m.has_password;
+  const k = prov || (has ? m.provider : 'gmail'), same = has && m.provider === k;
+  const cap = (same && m.daily_cap) || s.providers[k].daily_cap;
+  $('#mail2Form').innerHTML = `<div class="chips" style="margin:0 0 10px">${['gmail','outlook','smtp'].map(p => `<button class="chipb ${p===k?'on':''}" onclick="renderMail2('${p}')">${mailIcon(p)}${esc({gmail:'Gmail',outlook:'Outlook',smtp:'Other'}[p])}</button>`).join('')}</div>
+    <div class="group">
+      <div class="item">${k!=='smtp'?mailIcon(k):''}<span class="grow lbl">${k==='gmail'?'Gmail address':'Email address'}</span><input class="inl" type="email" id="m2Addr" value="${esc(same?m.address:'')}" placeholder="${k==='gmail'?'second@gmail.com':'events@college.edu'}"></div>
+      <div class="item"><span class="grow lbl">${k==='gmail'?'App Password':'Password'}</span><input class="inl" type="password" id="m2Pass" placeholder="${same?'Saved. Leave empty to keep it':(k==='gmail'?'16-letter App Password':'Password')}" autocomplete="new-password"></div>
+      ${k==='smtp'?`<div class="item"><span class="grow lbl">SMTP server</span><input class="inl" type="text" id="m2Host" value="${esc(same?m.host:'')}" placeholder="smtp.example.com"></div><div class="item"><span class="grow lbl">Port</span><input class="inl" type="number" id="m2Port" value="${same?m.port:587}"></div><div class="item"><span class="grow lbl">Security</span><select id="m2Sec">${['starttls','ssl','none'].map(x=>`<option ${x===(same?m.security:'starttls')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}
+      <div class="item"><div class="grow"><div class="lbl">Daily limit</div><div class="desc">This account's own limit</div></div><input class="inl" type="number" id="m2Cap" value="${cap}" style="max-width:90px"></div>
+      <div class="item"><span class="grow" id="m2Status">${same && m.verified_at ? `<span class="ok sm">✓ Tested ${when(m.verified_at)}</span>` : ''}</span>${has?`<button class="btn sm danger" onclick="removeMail2()">Remove</button>`:''}<button class="btn sm fill" onclick="saveMail2('${k}')">Save &amp; Test</button></div>
+    </div>`;
+}
+async function saveMail2(k){
+  const body = {provider:k, address:$('#m2Addr').value.trim(), password:$('#m2Pass').value, daily_cap:+$('#m2Cap').value||0,
+    host: k==='smtp'?$('#m2Host').value:'', port: k==='smtp'?+$('#m2Port').value:587, security: k==='smtp'?$('#m2Sec').value:'starttls'};
+  try {
+    await put('/api/settings/mail2', body);
+    $('#m2Status').innerHTML = '<span class="spin"></span> <span class="sub sm">Testing the connection…</span>';
+    const r = await post('/api/settings/test-connection2');
+    window._settings = await api('/api/settings'); await refreshMe(); renderMail2(k);
+    $('#m2Status').innerHTML = r.ok ? '<span class="ok">✓ Connected</span>' : `<span class="issue e">${esc(r.message)}</span>`;
+    toast(r.ok ? 'Second account connected' : 'Saved, but the connection failed. See the message');
+    if (batch && tab==='email') loadEmail();
+  } catch(e){ toast(e.message); }
+}
+async function removeMail2(){
+  if (!confirm('Remove the second sending account? Certificates will only be sent from your first account.')) return;
+  try { await api('/api/settings/mail2', {method:'DELETE'}); window._settings = await api('/api/settings'); await refreshMe(); renderMail2(); toast('Second account removed'); }
+  catch(e){ toast(e.message); }
 }
 async function saveMail(k){
   try {

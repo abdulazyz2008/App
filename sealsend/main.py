@@ -151,7 +151,9 @@ def _copilot_label() -> str:
 
 @app.get("/api/me", dependencies=[Depends(require_auth)])
 def me():
+    m2 = settings.mail2()
     return {"mail_mode": config.mail_mode(), "mail": settings.public_mail(), "quota": pipeline.quota_status(),
+            "mail2": {"address": m2["address"], "provider": m2["provider"], "verified_at": m2.get("verified_at", "")} if m2 else None,
             "key_fingerprint": crypto.fingerprint(), "copilot": _copilot_label(),
             "public_base_url": config.public_base_url(), "lan_url": config.app_url(), "hosted": bool(config.hosted_url()),
             "temporary_url": config.is_temporary_url(), "lan_available": not config.LOCAL_ONLY, "desktop": config.DESKTOP, "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
@@ -741,7 +743,7 @@ def remove_template(template_id: str):
 # ---------------------------------------------------------------- settings
 @app.get("/api/settings", dependencies=[Depends(require_auth)])
 def get_settings():
-    return {"mail": settings.public_mail(), "org": settings.org(), "public_base_url": config.public_base_url(),
+    return {"mail": settings.public_mail(), "mail2": settings.public_mail("mail2"), "org": settings.org(), "public_base_url": config.public_base_url(),
             "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": config.app_url(), "hosted": bool(config.hosted_url()),
             "temporary_url": config.is_temporary_url(), "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
             "admin_from_env": bool(config.ADMIN_PASSWORD)}
@@ -779,6 +781,52 @@ def save_mail(body: MailIn):
     settings.update_mail({**body.model_dump(), "address": body.address.strip(), "host": body.host.strip(),
                           "daily_cap": max(0, min(body.daily_cap, 100000)), "delay_seconds": max(0.0, min(body.delay_seconds, 30.0))})
     return {"mail": settings.public_mail(), "mode": config.mail_mode()}
+
+
+@app.put("/api/settings/mail2", dependencies=[Depends(require_auth)])
+def save_mail2(body: MailIn):
+    """The optional second sending account: used when the main one reaches its daily limit."""
+    from .data import valid_email
+    if body.provider not in ("gmail", "outlook", "smtp"):
+        raise HTTPException(400, "The second account can be Gmail, Outlook or another SMTP server")
+    address = body.address.strip()
+    if not valid_email(address):
+        raise HTTPException(400, "Enter the second account's email address")
+    if address.lower() == (settings.mail().get("address") or "").lower():
+        raise HTTPException(400, "That is already your main sending account. Use a different address.")
+    if body.provider == "gmail" and body.password and len(body.password.replace(" ", "")) != 16:
+        raise HTTPException(400, "A Gmail App Password is exactly 16 letters (spaces don't matter). "
+                                 "It is not your normal Gmail password.")
+    old = settings.mail("mail2")
+    same = old.get("provider") == body.provider and (old.get("address") or "").lower() == address.lower()
+    if not body.password and not (same and old.get("password")):
+        raise HTTPException(400, "Enter the App Password for the second account" if body.provider == "gmail"
+                            else "Enter the password for the second account")
+    if body.provider == "smtp" and not body.host.strip():
+        raise HTTPException(400, "Enter the SMTP server address")
+    if body.security not in ("starttls", "ssl", "none"):
+        raise HTTPException(400, "Unknown security setting")
+    settings.update_mail({"provider": body.provider, "address": address, "password": body.password, "host": body.host.strip(),
+                          "port": body.port, "security": body.security, "reply_to": body.reply_to.strip(),
+                          "daily_cap": max(0, min(body.daily_cap, 100000))}, slot="mail2")
+    return {"mail2": settings.public_mail("mail2"), "quota": pipeline.quota_status()}
+
+
+@app.delete("/api/settings/mail2", dependencies=[Depends(require_auth)])
+def remove_mail2():
+    settings.clear_mail2()
+    return {"mail2": settings.public_mail("mail2"), "quota": pipeline.quota_status()}
+
+
+@app.post("/api/settings/test-connection2", dependencies=[Depends(require_auth)])
+def test_connection2():
+    m2 = settings.mail2()
+    if not m2:
+        raise HTTPException(400, "Add the second account first")
+    res = mailer.check_connection(m2)
+    if res["ok"]:
+        settings.mark_verified(db.now(), slot="mail2")
+    return res
 
 
 @app.post("/api/settings/test-connection", dependencies=[Depends(require_auth)])
