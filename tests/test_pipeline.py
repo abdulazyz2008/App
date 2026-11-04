@@ -544,3 +544,43 @@ def test_bulk_parallel_generation(client, tmp_path):
     assert done["counts"] == {"Sent": 120, "Total": 120}
     assert audit(bid) == {"emails_checked": 120, "wrong": 0, "wrong_files": []}
     assert client.post(f"/api/batches/{bid}/verify-seal").json()["intact"]
+
+
+def _png(color, size=(400, 200)):
+    import io
+    from PIL import Image
+    buf = io.BytesIO()
+    Image.new("RGBA", size, color).save(buf, "PNG")
+    return buf.getvalue()
+
+
+def test_mahindra_university_clubs(client):
+    login(client)
+    cat = client.get("/api/clubs").json()
+    assert cat["university"]["name"] == "Mahindra University" and len(cat["clubs"]) == 10
+    assert [c["name"] for c in cat["clubs"]][:3] == ["Kalakriti", "Roboverse", "Synolo"]
+    assert client.get("/api/clubs/roboverse/logo.png").content[:4] == b"\x89PNG"  # placeholder before upload
+    with open(ROOT / "sample" / "students.csv", "rb") as f:
+        assert client.post("/api/batches", files={"file": ("s.csv", f)}, data={"name": "X", "club": "nope"}).status_code == 400
+    # an event created before logos exist still works, then picks up the logos once uploaded
+    with open(ROOT / "sample" / "students.csv", "rb") as f:
+        b = client.post("/api/batches", files={"file": ("s.csv", f)}, data={"name": "RoboWars 2026", "club": "roboverse"}).json()
+    cfg = b["config"]
+    assert cfg["club"] == "roboverse" and cfg["template_id"] == "tech-hackathon"
+    assert cfg["branding"]["org_name"] == "Mahindra University · Roboverse"
+    for key, color in (("university", (200, 0, 0, 255)), ("roboverse", (0, 0, 200, 255))):
+        r = client.post(f"/api/clubs/{key}/logo", files={"file": (f"{key}.png", _png(color))})
+        assert r.status_code == 200, r.text
+    assert client.post("/api/clubs/unknown/logo", files={"file": ("x.png", _png((0, 0, 0, 255)))}).status_code == 400
+    cfg = client.get(f"/api/batches/{b['id']}").json()["config"]
+    from sealsend import config
+    from PIL import Image
+    combo = Image.open(config.UPLOAD_DIR / cfg["branding"]["logo"])
+    assert combo.height == 300 and combo.width > 600  # both logos side by side
+    done = send(client, b["id"])
+    assert done["counts"]["Sent"] == 11 and audit(b["id"])["wrong"] == 0
+    rec = records(client, b["id"], "Sent")[0]
+    vals = client.get(f"/api/records/{rec['id']}").json()["values"]
+    assert vals["ORG_NAME"] == "Mahindra University · Roboverse"
+    pv = client.get(f"/api/batches/{b['id']}/preview/email", params={"record_id": rec["id"]}).json()
+    assert "Mahindra University · Roboverse" in pv["from"] and "Mahindra University · Roboverse" in pv["body"]

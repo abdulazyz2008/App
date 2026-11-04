@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import certificate, chaos, config, copilot, crypto, db, mailer, pipeline, settings, tunnel
+from . import certificate, chaos, clubs, config, copilot, crypto, db, mailer, pipeline, settings, tunnel
 from . import templates_lib as T
 from .data import STYLES, suggest_categories
 
@@ -208,13 +208,15 @@ def verify_url(rec: dict) -> str:
 
 # ---------------------------------------------------------------- batches
 @app.post("/api/batches", dependencies=[Depends(require_auth)])
-async def create_batch(file: UploadFile = File(...), name: str = Form("")):
+async def create_batch(file: UploadFile = File(...), name: str = Form(""), club: str = Form("")):
+    if club and club not in clubs.CLUB_BY_ID:
+        raise HTTPException(400, "Unknown club")
     data = await _read_upload(file, (".xlsx", ".xlsm", ".csv", ".tsv", ".txt", ".xls"))
     suffix = Path(file.filename or "x.csv").suffix.lower()
     path = config.UPLOAD_DIR / f"{secrets.token_hex(8)}{suffix}"
     path.write_bytes(data)
     try:
-        batch_id = pipeline.create_batch(path, file.filename or path.name, name.strip())
+        batch_id = pipeline.create_batch(path, file.filename or path.name, name.strip(), club=club)
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception as e:
@@ -803,6 +805,40 @@ def open_in_browser(request: Request):
     import webbrowser
     webbrowser.open(f"http://127.0.0.1:{config.PORT}/")
     return {"ok": True}
+
+
+# ---------------------------------------------------------------- Mahindra University clubs
+@app.get("/api/clubs", dependencies=[Depends(require_auth)])
+def list_clubs():
+    return clubs.catalog()
+
+
+@app.get("/api/clubs/{key}/logo.png", dependencies=[Depends(require_auth)])
+def club_logo(key: str):
+    if key != "university" and key not in clubs.CLUB_BY_ID:
+        raise HTTPException(404, "Unknown club")
+    p = clubs.logo_path(key)
+    if p:
+        return FileResponse(p, headers={"Cache-Control": "no-store"})
+    return Response(clubs.placeholder_png(key), media_type="image/png", headers={"Cache-Control": "no-store"})
+
+
+@app.post("/api/clubs/{key}/logo", dependencies=[Depends(require_auth)])
+async def upload_club_logo(key: str, file: UploadFile = File(...)):
+    data = await _read_upload(file, (".png", ".jpg", ".jpeg", ".webp"))
+    try:
+        clubs.set_logo(key, data)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    # events that use this club pick up the new combined logo
+    for b in db.query("SELECT id, config_json FROM batches"):
+        cfg = json.loads(b["config_json"])
+        club = cfg.get("club", "")
+        if club and (key == "university" or key == club) and not pipeline.is_running(b["id"]):
+            cfg.setdefault("branding", {})["logo"] = clubs.composite_logo(club)
+            db.save_config(b["id"], cfg)
+            pipeline.revalidate(b["id"])
+    return clubs.catalog()
 
 
 # ---------------------------------------------------------------- share online (free public link)

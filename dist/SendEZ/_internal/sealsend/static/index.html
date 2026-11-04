@@ -1,0 +1,1103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#000000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SendEZ">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
+<link rel="icon" href="/static/icon-192.png">
+<title>SendEZ</title>
+<style>
+:root{
+  --bg:#f2f2f2; --card:#ffffff; --ink:#000000; --sub:#6e6e73; --ter:#aeaeb2;
+  --line:rgba(0,0,0,.12); --fill:#000000; --on:#ffffff; --tint:#e9e9eb; --tint2:#f5f5f7; --track:#e3e3e6;
+  --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05); --r:14px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --sub:#98989f; --ter:#636366;
+  --line:rgba(255,255,255,.14); --fill:#ffffff; --on:#000000; --tint:#2c2c2e; --tint2:#242426; --track:#3a3a3c; --shadow:none;
+}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:15px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+.hidden{display:none!important}
+.mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;letter-spacing:0}
+.sub{color:var(--sub)} .ter{color:var(--ter)} .sm{font-size:13px}
+.cap{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:24px 16px 7px;font-weight:500}
+.foot{font-size:12.5px;color:var(--sub);margin:7px 16px 0}
+.btn{appearance:none;border:0;border-radius:11px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--tint);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;transition:transform .08s,opacity .15s;min-height:40px}
+.btn:active{transform:scale(.97)} .btn:disabled{opacity:.35;cursor:default;transform:none}
+.btn.fill{background:var(--fill);color:var(--on)}
+.btn.plain{background:transparent;padding:6px 8px;font-weight:500;min-height:0}
+.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px;min-height:32px}
+.btn.block{display:flex;width:100%}
+.btn.lg{padding:15px 22px;font-size:16.5px;border-radius:13px}
+.app{display:grid;grid-template-columns:276px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;overflow:auto;padding:22px 14px 16px;border-right:.5px solid var(--line);display:flex;flex-direction:column}
+.logo{font-size:27px;font-weight:700;letter-spacing:-.03em;margin:0 6px;display:flex;align-items:center}
+.logo i{font-style:normal;display:inline-flex;width:30px;height:30px;border-radius:9px;background:var(--fill);color:var(--on);font-size:17px;align-items:center;justify-content:center;margin-right:9px}
+.tagline{color:var(--sub);font-size:13px;margin:3px 6px 18px}
+.side .btn.block{margin-bottom:8px}
+.navl{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:14px}
+.navl a,.navl button{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;text-decoration:none;background:none;border:0;cursor:pointer;text-align:left;font-weight:500}
+.navl a:hover,.navl button:hover{background:var(--tint)}
+.navl .ico{width:22px;text-align:center}
+main{padding:28px 32px 90px;min-width:0;max-width:1180px}
+.title{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin:0}
+.subtitle{color:var(--sub);margin:5px 0 0}
+.group{background:var(--card);border-radius:var(--r);overflow:hidden}
+.item{display:flex;align-items:center;gap:12px;padding:11px 16px;min-height:48px;position:relative}
+.item+.item:before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--line)}
+.item .grow{flex:1;min-width:0}
+.item .lbl{font-weight:500}
+.item .val{color:var(--sub);text-align:right;min-width:0;overflow-wrap:anywhere}
+.item.tap{cursor:pointer} .item.tap:active{background:var(--tint)}
+.desc{font-size:13px;color:var(--sub)}
+.card{background:var(--card);border-radius:var(--r);padding:18px}
+.blist .item{border-radius:11px;margin-bottom:2px;padding:9px 12px;min-height:0}
+.blist .item:before{display:none}
+.blist .item.sel{background:var(--card);box-shadow:var(--shadow)}
+.bname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bmeta{font-size:12.5px;color:var(--sub)}
+.steps{display:flex;background:var(--track);border-radius:11px;padding:3px;gap:3px;overflow-x:auto;margin:22px 0 4px;scrollbar-width:none}
+.steps::-webkit-scrollbar{display:none}
+.steps button{flex:1 0 auto;border:0;background:transparent;border-radius:9px;padding:8px 14px;font-weight:500;font-size:13.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:7px}
+.steps button .n{width:20px;height:20px;border-radius:50%;background:var(--ter);color:var(--on);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.steps button.done .n{background:var(--ink)}
+.steps button.on{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
+.steps button.on .n{background:var(--ink)}
+@media (prefers-color-scheme:dark){.steps button.on{background:#636366}}
+select,input[type=text],input[type=password],input[type=search],input[type=email],input[type=number],input[type=url],textarea{width:100%;background:var(--tint2);border:0;border-radius:10px;padding:10px 12px;outline:none;min-height:40px}
+.item select{width:auto;max-width:62%;background:transparent;text-align:right;padding:4px 0;color:var(--sub);cursor:pointer;min-height:0}
+.item input.inl{background:transparent;text-align:right;padding:0;min-height:0;color:var(--sub);max-width:62%}
+textarea{resize:vertical;min-height:90px;line-height:1.45}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
+.switch{position:relative;width:51px;height:31px;flex:none}
+.switch input{opacity:0;width:0;height:0}
+.switch span{position:absolute;inset:0;background:var(--track);border-radius:31px;transition:.2s;cursor:pointer}
+.switch span:before{content:"";position:absolute;width:27px;height:27px;left:2px;top:2px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:.2s}
+.switch input:checked+span{background:var(--fill)}
+@media (prefers-color-scheme:dark){.switch input:checked+span{background:#fff}.switch input:checked+span:before{background:#000}}
+.switch input:checked+span:before{transform:translateX(20px)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent;line-height:1.3}
+.st-Sent,.st-Claimed{background:var(--fill);color:var(--on)}
+.st-Generated{border-color:var(--ink)}
+.st-Pending,.st-Sending,.st-Skipped{background:var(--tint)}
+.st-Failed{border:1.5px solid var(--ink);background:var(--card)}
+.st-Invalid{border:1.5px dashed var(--ink)}
+.st-Claim{border:1px solid var(--ink);background:var(--tint2)}
+.tagc{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--tint);font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:10px}
+.stat{background:var(--card);border-radius:var(--r);padding:13px 15px;cursor:pointer;border:1.5px solid transparent}
+.stat.on{border-color:var(--ink)}
+.stat .n{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.stat .l{font-size:12.5px;color:var(--sub);margin-top:1px}
+.tbl{width:100%;border-collapse:collapse;font-size:13.5px}
+.tbl th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);font-weight:500;text-align:left;padding:10px 12px;border-bottom:.5px solid var(--line);position:sticky;top:0;background:var(--card);z-index:1}
+.tbl td{padding:11px 12px;border-bottom:.5px solid var(--line);vertical-align:top}
+.tbl tr.tap{cursor:pointer} .tbl tr.tap:hover td{background:var(--tint2)}
+.tbl tr:last-child td{border-bottom:0}
+.tablebox{max-height:560px;overflow:auto;border-radius:var(--r);background:var(--card)}
+.issue{font-size:12.5px;margin-top:2px}
+.issue.e:before{content:"✕ ";font-weight:700} .issue.w{color:var(--sub)} .issue.w:before{content:"! ";font-weight:700}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.spacer{flex:1}
+.drop{border:1.5px dashed var(--ter);border-radius:var(--r);padding:44px 20px;text-align:center;cursor:pointer;background:var(--card);transition:.15s}
+.drop.over{border-color:var(--ink);background:var(--tint2)}
+.drop b{display:block;font-size:18px;margin-bottom:4px}
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
+.howc{background:var(--card);border-radius:var(--r);padding:15px}
+.howc .k{font-size:12px;color:var(--sub);font-weight:600;letter-spacing:.04em}
+.howc .t{font-weight:600;margin:3px 0 2px}
+.howc .d{font-size:13px;color:var(--sub)}
+.banner{border-radius:var(--r);padding:13px 16px;margin-top:14px;display:flex;gap:12px;align-items:flex-start}
+.banner.dark{background:var(--fill);color:var(--on)} .banner.light{background:var(--card);border:1.5px solid var(--ink)}
+.banner .ico{font-weight:800;font-size:16px;line-height:1.2}
+.thumbbtn{display:flex;gap:10px;align-items:center;cursor:pointer;border:0;background:none;padding:0;text-align:left}
+.thumbbtn img{width:92px;height:65px;object-fit:cover;border-radius:6px;box-shadow:0 0 0 .5px var(--line),var(--shadow);background:#fff}
+.catrow{display:grid;grid-template-columns:minmax(120px,1fr) 64px minmax(200px,1.4fr) minmax(170px,1.2fr) minmax(160px,1fr);gap:12px;align-items:center;padding:12px 16px;position:relative}
+.catrow+.catrow:before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--line)}
+.catrow.head{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);padding-top:10px;padding-bottom:6px}
+.catrow input,.catrow select{min-height:36px;padding:7px 10px;font-size:13.5px}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+.galc{background:var(--card);border-radius:var(--r);padding:10px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.galc:hover{transform:translateY(-2px)}
+.galc.on{border-color:var(--ink)}
+.galc img{width:100%;aspect-ratio:1.414;object-fit:cover;border-radius:7px;display:block;background:#fff;box-shadow:0 0 0 .5px var(--line)}
+.galc b{display:block;margin-top:8px;font-size:14px}
+.galc small{color:var(--sub);font-size:12px;display:block;line-height:1.35}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chipb{display:inline-block;font-size:13px;background:var(--tint);padding:6px 11px;border-radius:999px;cursor:pointer;border:0;font-weight:500}
+.chipb.on{background:var(--fill);color:var(--on)}
+.phchip{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--tint);padding:3px 8px;border-radius:7px;margin:0 4px 4px 0;cursor:pointer}
+.preview{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
+.certimg{width:100%;display:block;border-radius:10px;box-shadow:var(--shadow);background:#fff}
+.mail .hdr{padding:12px 16px;border-bottom:.5px solid var(--line);font-size:13.5px}
+.mail .hdr div{display:flex;gap:8px}.mail .hdr span:first-child{color:var(--sub);width:58px;flex:none}
+.mail pre{white-space:pre-wrap;font:inherit;margin:0;padding:16px;font-size:14px;overflow-wrap:anywhere}
+.attach{margin:0 16px 16px;display:flex;align-items:center;gap:10px;background:var(--tint2);border-radius:10px;padding:10px 12px;font-size:13px}
+.attach .pdf{width:34px;height:40px;border-radius:5px;background:var(--fill);color:var(--on);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.progress{height:6px;background:var(--track);border-radius:9px;overflow:hidden}
+.progress div{height:100%;background:var(--fill);border-radius:9px;transition:width .4s}
+.feed .item{align-items:flex-start;padding:10px 16px}
+.lv{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none;margin-top:1px}
+.lv-ok{background:var(--fill);color:var(--on)} .lv-heal{border:1.5px solid var(--ink)} .lv-block{background:var(--ink);color:var(--on);border-radius:5px}
+.lv-warn,.lv-info{background:var(--tint)} .lv-error{border:2px solid var(--ink)}
+.feed .msg{font-size:13.5px} .feed .when{font-size:11.5px;color:var(--sub)}
+.big{font-size:56px;font-weight:700;letter-spacing:-.04em;line-height:1}
+.hash{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;background:var(--tint2);padding:10px 12px;border-radius:10px}
+.check{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;position:relative}
+.check+.check:before{content:"";position:absolute;top:0;left:52px;right:0;border-top:.5px solid var(--line)}
+.ck{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.ck.y{background:var(--fill);color:var(--on)} .ck.n{border:2px solid var(--ink)} .ck.w{background:var(--tint);color:var(--ink)}
+.empty{padding:30px;text-align:center;color:var(--sub)}
+.nextbar{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.38);display:flex;align-items:flex-end;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.backdrop.open{opacity:1;pointer-events:auto}
+.sheet{background:var(--bg);width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:8px 18px 34px;transform:translateY(30px);transition:transform .25s cubic-bezier(.2,.9,.3,1)}
+.sheet.wide{width:min(1100px,100%)}
+.backdrop.open .sheet{transform:none}
+.grabber{width:38px;height:5px;border-radius:3px;background:var(--ter);margin:4px auto 12px}
+.sheethead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sheethead h2{margin:0;font-size:24px;letter-spacing:-.02em;flex:1}
+@media (min-width:900px){.backdrop{align-items:center}.sheet{border-radius:16px;max-height:88vh}}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--fill);color:var(--on);padding:11px 18px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:60;font-weight:500;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.2);text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+.login{max-width:400px;margin:12vh auto;padding:0 16px}
+.spin{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block;flex:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.editor{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
+.canvas{position:relative;user-select:none;touch-action:none;border-radius:8px;overflow:hidden;box-shadow:var(--shadow);background:#fff}
+.canvas img{width:100%;display:block;pointer-events:none}
+.fbox{position:absolute;padding:2px 6px;border:1.5px dashed rgba(0,0,0,.55);border-radius:4px;cursor:move;white-space:nowrap;color:#111;background:rgba(255,255,255,.55);line-height:1.15;touch-action:none}
+.fbox.sel{border:2px solid #000;background:rgba(255,255,255,.8)}
+.fbox.qr{background:repeating-conic-gradient(#000 0 25%,#fff 0 50%) 50%/10px 10px;border:2px solid #000}
+.steplist{margin:6px 0 0;padding-left:20px} .steplist li{margin:5px 0}
+@media (max-width:980px){.catrow{grid-template-columns:1fr 1fr}.catrow.head{display:none}.catrow>*:first-child{grid-column:1/-1;font-weight:600}}
+@media (max-width:900px){
+  .app{grid-template-columns:1fr}
+  .side{position:static;height:auto;border-right:0;border-bottom:.5px solid var(--line);padding:14px}
+  .side .blist{max-height:170px;overflow:auto}
+  .tagline,.navl .lbl2{display:none}
+  .navl{flex-direction:row;flex-wrap:wrap;margin-top:8px}
+  main{padding:20px 16px 80px}
+  .grid2,.preview,.editor{grid-template-columns:1fr}
+  .title{font-size:29px}
+}
+</style>
+</head>
+<body>
+
+<!-- first run -->
+<div id="setup" class="login hidden">
+  <div class="logo" style="margin:0 0 8px;font-size:34px"><i>✓</i>SendEZ</div>
+  <p class="sub" style="margin:0 0 26px">Welcome! Create a password to protect your student data and email account.</p>
+  <div id="setupForm">
+    <div class="group">
+      <div class="item"><input type="password" id="sp1" placeholder="New password (8+ characters)" autocomplete="new-password" style="background:transparent;padding:0"></div>
+      <div class="item"><input type="password" id="sp2" placeholder="Repeat password" autocomplete="new-password" style="background:transparent;padding:0"></div>
+    </div>
+    <button class="btn fill block lg" style="margin-top:16px" onclick="doSetup()">Create Password</button>
+  </div>
+  <p id="setupMsg" class="foot" style="text-align:center"></p>
+</div>
+
+<!-- sign in -->
+<div id="login" class="login hidden">
+  <div class="logo" style="margin:0 0 8px;font-size:34px"><i>✓</i>SendEZ</div>
+  <p class="sub" style="margin:0 0 26px">Certificates that are provable, not just automated.</p>
+  <form id="loginForm" class="group"><div class="item"><input type="password" id="lp" placeholder="Password" autocomplete="current-password" aria-label="Password" style="background:transparent;padding:0"></div></form>
+  <button class="btn fill block lg" style="margin-top:16px" form="loginForm">Sign In</button>
+  <p id="loginErr" class="foot" style="text-align:center"></p>
+</div>
+
+<div id="app" class="app hidden">
+  <aside class="side">
+    <div class="logo"><i>✓</i>SendEZ</div>
+    <div class="tagline">Impossible to get wrong. Impossible to fake.</div>
+    <button class="btn fill block" onclick="showHome()">＋ New Event</button>
+    <div class="cap" style="margin:16px 6px 8px">Events</div>
+    <div class="blist" id="batches"></div>
+    <div class="navl">
+      <button onclick="openSettings()"><span class="ico">⚙︎</span><span>Settings</span></button>
+      <button onclick="openTemplates()"><span class="ico">▦</span><span>Templates</span></button>
+      <a href="/verify" target="_blank"><span class="ico">✓</span><span>Verify a certificate</span></a>
+      <button onclick="openPhone()"><span class="ico">⇪</span><span>Share online</span></button>
+      <button id="browserBtn" class="hidden" onclick="post('/api/desktop/open-browser').catch(e=>toast(e.message))"><span class="ico">↗</span><span>Open in your browser</span></button>
+      <button id="chaosBtn" onclick="runChaos()"><span class="ico">⚡</span><span>Run Chaos Test <span class="lbl2 sub sm">(demo)</span></span></button>
+      <button onclick="logout()"><span class="ico">⎋</span><span>Sign out</span></button>
+      <div class="foot lbl2" style="margin:8px 10px 0" id="sideStatus"></div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- HOME -->
+    <section id="home">
+      <h1 class="title">New Event</h1>
+      <p class="subtitle">Upload your student list. SendEZ reads it, picks the right certificate for each category, and emails every student their own signed certificate.</p>
+      <div id="setupNudge"></div>
+      <div class="cap">Event name</div>
+      <div class="group"><div class="item"><input type="text" id="batchName" placeholder="e.g. National Tech Fest 2026" style="background:transparent;padding:0"></div></div>
+      <p class="foot">Used on the certificates and in the emails. It also helps choose a matching design.</p>
+      <div class="cap">Student list</div>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload Excel or CSV"><b>Drop your Excel or CSV file here</b><span class="sub">or tap to choose · .xlsx or .csv · any column names</span></div>
+      <input type="file" id="file" accept=".csv,.xlsx,.xlsm,.tsv,.xls" hidden>
+      <p class="foot">Want to try first? <a href="#" onclick="useSample('tech_fest_2026.xlsx','National Tech Fest 2026');return false"><b>Use a sample Excel file</b></a> (messy on purpose: title rows, typos, missing emails, mixed categories).</p>
+      <div class="cap">How it works</div>
+      <div class="how">
+        <div class="howc"><div class="k">1 · STUDENTS</div><div class="t">Reads any sheet</div><div class="d">Finds names, emails and categories on its own. Fixes typos like gmial.com and flags bad rows.</div></div>
+        <div class="howc"><div class="k">2 · CERTIFICATES</div><div class="t">A design per category</div><div class="d">Winners, participants and volunteers each get a fitting template. Pick from 14 designs, or use your own from Canva.</div></div>
+        <div class="howc"><div class="k">3 · EMAIL</div><div class="t">Personal congratulations</div><div class="d">Each student gets a personal email from your Gmail with their own certificate attached.</div></div>
+        <div class="howc"><div class="k">4 · PROOF</div><div class="t">Can’t be faked</div><div class="d">Every PDF is digitally signed and has a QR code. Before sending, each attachment is checked against its recipient.</div></div>
+      </div>
+    </section>
+
+    <!-- EVENT -->
+    <section id="batch" class="hidden">
+      <div class="row" style="align-items:flex-start">
+        <div style="min-width:0;flex:1"><h1 class="title" id="bTitle"></h1><p class="subtitle" id="bSub"></p></div>
+        <button class="btn sm" onclick="deleteBatch()">Delete</button>
+      </div>
+      <div id="pauseBanner"></div>
+      <div class="steps" id="tabs" role="tablist"></div>
+
+      <!-- 1 STUDENTS -->
+      <div id="tab-students" class="tab">
+        <div id="sheetBox"></div>
+        <div class="cap">What we found in your sheet</div>
+        <div class="group" id="colMap"></div>
+        <p class="foot">Not right? Change any of these and the list updates instantly.</p>
+        <div class="cap">Automatic clean-up</div>
+        <div class="group">
+          <div class="item"><div class="grow"><div class="lbl">Fix email typos</div><div class="desc">gmial.com → gmail.com, .con → .com, extra spaces, “name(at)college”</div></div><label class="switch"><input type="checkbox" id="autoFix" onchange="saveConfig()"><span></span></label></div>
+          <div class="item"><div class="grow"><div class="lbl">Claim links for missing emails</div><div class="desc">Instead of failing, these students get a private download link you can share</div></div><label class="switch"><input type="checkbox" id="claimLinks" onchange="saveConfig()"><span></span></label></div>
+          <div class="item"><div class="grow"><div class="lbl">Fix name capitalization</div><div class="desc">ROHAN MEHTA → Rohan Mehta (only ALL CAPS or all lowercase names)</div></div><label class="switch"><input type="checkbox" id="fixCaps" onchange="saveConfig()"><span></span></label></div>
+        </div>
+        <div class="cap">Students</div>
+        <div class="stats" id="dataStats"></div>
+        <div class="row" style="margin:12px 0 10px">
+          <input type="search" id="search" placeholder="Search name, email, ID or certificate" style="max-width:340px">
+          <span class="sub sm" id="recCount"></span>
+        </div>
+        <div class="tablebox"><table class="tbl">
+          <thead><tr><th style="width:52px">Row</th><th>Student</th><th>Sends to</th><th>Category</th><th>Status</th></tr></thead>
+          <tbody id="recs"></tbody></table></div>
+        <p class="foot">Tap a student to see everything about them. Rows marked ! Invalid are skipped; fix them in the sheet and upload again, or leave them out.</p>
+        <div class="nextbar"><button class="btn fill lg" onclick="showTab('certs')">Next: Certificates ›</button></div>
+      </div>
+
+      <!-- 2 CERTIFICATES -->
+      <div id="tab-certs" class="tab hidden">
+        <div class="cap">Group students by</div>
+        <div class="group">
+          <div class="item"><div class="grow"><div class="lbl">Category column</div><div class="desc">Each value (Winner, Participant, Volunteer…) can get its own design, title and email</div></div><select id="catCol" onchange="changeCategoryColumn()"></select></div>
+        </div>
+        <div class="cap" id="catCap">Certificate for each category</div>
+        <div class="group" id="cats"></div>
+        <p class="foot" id="catFoot"></p>
+        <div class="cap">Certificate details</div>
+        <div class="group" id="brand"></div>
+        <p class="foot">These print on every certificate. Use “Save as my defaults” to reuse them for future events.</p>
+        <details style="margin-top:18px"><summary class="sub" style="cursor:pointer;margin-left:16px">Advanced: describe rules in plain English</summary>
+          <div class="card" style="margin-top:10px">
+            <textarea id="copilotText" rows="2" placeholder="e.g. winners get gold template, volunteers get appreciation, others participation" style="min-height:60px"></textarea>
+            <div class="row" style="margin-top:10px"><button class="btn fill sm" id="copilotBtn" onclick="askCopilot()">Suggest rules</button><span class="sub sm" id="engine"></span></div>
+            <div id="proposal"></div>
+          </div>
+        </details>
+        <div class="nextbar"><button class="btn lg" onclick="showTab('students')">‹ Back</button><button class="btn fill lg" onclick="showTab('email')">Next: Email ›</button></div>
+      </div>
+
+      <!-- 3 EMAIL -->
+      <div id="tab-email" class="tab hidden">
+        <div class="cap">Sending account</div>
+        <div id="acctBox"></div>
+        <div class="cap">Message for each category</div>
+        <div class="group" id="emailCats"></div>
+        <p class="foot">Each category uses a ready-written email. Change it in step 2, or customise the default message below.</p>
+        <div class="cap">Default message</div>
+        <div class="group">
+          <div class="item"><input type="text" id="subj" data-ins placeholder="Subject" style="background:transparent;padding:0;font-weight:600"></div>
+          <div class="item"><textarea id="body" data-ins rows="11" style="background:transparent;padding:0;min-height:220px"></textarea></div>
+        </div>
+        <p class="foot">Tap to insert. <span class="mono">[[…]]</span> parts are left out when a value is empty.</p>
+        <div id="chips" style="margin:8px 16px 0"></div>
+        <div class="cap">Attachment file name</div>
+        <div class="group"><div class="item" style="display:block"><input type="text" id="fnPattern" data-ins><div class="foot" style="margin:6px 0 0">e.g. <span class="mono" id="fnExample"></span></div></div></div>
+        <div class="nextbar"><button class="btn lg" onclick="showTab('certs')">‹ Back</button><button class="btn lg" onclick="saveConfig(false,'Email saved')">Save</button><button class="btn fill lg" onclick="saveConfig(false,'Saved').then(()=>showTab('review'))">Next: Review &amp; Send ›</button></div>
+      </div>
+
+      <!-- 4 REVIEW & SEND -->
+      <div id="tab-review" class="tab hidden">
+        <div class="cap">Checklist</div>
+        <div class="group" id="checklist"></div>
+        <div class="cap">Preview exactly what each student gets</div>
+        <div class="row" style="margin:0 0 12px">
+          <select id="pvCat" style="max-width:240px" onchange="pvIndex=0;loadPreview()"></select>
+          <button class="btn sm" onclick="stepPreview(-1)">‹ Previous</button>
+          <button class="btn sm" onclick="stepPreview(1)">Next ›</button>
+          <span class="sub sm" id="pvInfo"></span>
+        </div>
+        <div class="preview">
+          <div><img id="pvImg" class="certimg" alt="Certificate preview"><p class="foot"><a id="pvOpen" target="_blank">Open as PDF ↗</a></p></div>
+          <div class="group mail" id="pvMail"></div>
+        </div>
+        <div class="cap">Send</div>
+        <div class="stats" id="sendStats"></div>
+        <div id="jobBox" class="card hidden" style="margin-top:10px"><div class="row" style="margin-bottom:8px"><span class="spin"></span><b id="jobLabel"></b><span class="spacer"></span><span class="sub" id="jobPct"></span></div><div class="progress"><div id="jobProg" style="width:0"></div></div></div>
+        <div class="row" style="margin-top:14px">
+          <button class="btn fill lg" id="sendBtn" onclick="sendAll()">Send Certificates</button>
+          <button class="btn" id="retryBtn" onclick="retry()">Retry Failed</button>
+          <span class="spacer"></span>
+          <a class="btn sm" id="zipBtn">⬇ All certificates (.zip)</a>
+          <a class="btn sm" id="csvBtn">⬇ Delivery report (.csv)</a>
+        </div>
+        <div class="cap">Live activity</div>
+        <div class="group feed" id="feed"></div>
+      </div>
+
+      <!-- PROOF -->
+      <div id="tab-proof" class="tab hidden">
+        <div class="cap">Batch seal</div>
+        <div class="group" id="sealBox"></div>
+        <div class="row" style="margin-top:12px"><button class="btn fill" id="verifySealBtn" onclick="verifySeal()">Verify Batch Now</button><span class="sub sm">Re-checks every PDF on disk against the signed Merkle root.</span></div>
+        <div id="sealResult"></div>
+        <div class="cap">How anyone can check a certificate</div>
+        <div class="group">
+          <div class="check"><span class="ck y">1</span><div><b>Scan the QR</b><div class="desc">Opens a public page: “Verified, issued to X for Y”. A fake ID shows “Not verified”.</div></div></div>
+          <div class="check"><span class="ck y">2</span><div><b>Upload the PDF</b><div class="desc">Its fingerprint must match the signed original. Editing even one letter fails.</div></div></div>
+          <div class="check"><span class="ck y">3</span><div><b>Check the issuer key</b><div class="desc">Ed25519 signatures; the public key is published so anyone can verify independently.</div></div></div>
+        </div>
+        <div class="row" style="margin-top:12px"><a class="btn sm" href="/verify" target="_blank">Open Verifier ↗</a><a class="btn sm" href="/.well-known/sealsend-public-key.pem" target="_blank">Public Key ↗</a><a class="btn sm" id="sampleVerify" target="_blank">Sample Verify Page ↗</a></div>
+        <div class="cap">Ledger</div>
+        <div class="group feed" id="ledger"></div>
+      </div>
+
+      <div id="tab-chaos" class="tab hidden"><div id="chaosBox"></div></div>
+    </section>
+  </main>
+</div>
+
+<div class="backdrop" id="sheetWrap" onclick="if(event.target===this)closeSheet()"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let me = null, batch = null, cfg = null, tab = 'students', filter = '', pvList = [], pvIndex = 0, pollTimer = null, lastFocus = null, proposal = null, catalog = [];
+const ICON = {Sent:'✓', Claimed:'✓', Generated:'◆', Pending:'○', Sending:'◌', Failed:'✕', Invalid:'!', Skipped:'⤼', Claim:'↗'};
+const LABEL = {Claim:'Claim link', Pending:'Ready', Generated:'Ready'};
+const LV = {ok:'✓', heal:'↻', block:'■', warn:'!', error:'✕', info:'·'};
+const chip = s => `<span class="chip st-${esc(s)}">${ICON[s]||''} ${esc(LABEL[s]||s)}</span>`;
+const when = t => t ? new Date(t).toLocaleString([], {month:'short', day:'numeric', hour:'2-digit', minute:'2-digit'}) : '';
+const tplName = id => (catalog.find(t=>t.id===id)||{}).name || id;
+let thumbV = Date.now();
+const thumb = (id, dpi=40) => `/api/templates/${encodeURIComponent(id)}/thumb.png?dpi=${dpi}${batch?`&batch=${batch.id}`:''}&v=${thumbV}`;
+
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3400); }
+async function api(path, opts={}){
+  const r = await fetch(path, {credentials:'same-origin', ...opts, headers: opts.body && !(opts.body instanceof FormData) ? {'Content-Type':'application/json'} : {}});
+  if (r.status === 401 && !path.startsWith('/api/login')){ showLogin(); throw new Error('Please sign in'); }
+  const ct = r.headers.get('content-type') || '';
+  const data = ct.includes('json') ? await r.json() : await r.text();
+  if (!r.ok) throw new Error((data && data.detail) || r.statusText);
+  return data;
+}
+const put = (p, b) => api(p, {method:'PUT', body: JSON.stringify(b)});
+const post = (p, b) => api(p, {method:'POST', body: JSON.stringify(b||{})});
+
+// ---------- auth
+function showOnly(id){ ['setup','login','app'].forEach(x => $('#'+x).classList.toggle('hidden', x!==id)); }
+function showLogin(){ showOnly('login'); setTimeout(()=>$('#lp').focus(),50); }
+async function start(){
+  const s = await fetch('/api/setup-status').then(r=>r.json());
+  if (s.needs_setup){
+    showOnly('setup');
+    if (!s.local){ $('#setupForm').classList.add('hidden'); $('#setupMsg').textContent = s.hosted
+      ? 'No password is set yet. In your Render dashboard open this service → Environment, add ADMIN_PASSWORD with a password of your choice, save, and reload this page.'
+      : 'Open SendEZ on the computer that runs it to create the password (for safety, this can’t be done from another device).'; }
+    return;
+  }
+  const r = await fetch('/api/me',{credentials:'same-origin'});
+  if (r.ok) boot(); else showLogin();
+}
+async function doSetup(){
+  const a=$('#sp1').value, b=$('#sp2').value;
+  if (a.length<8) return $('#setupMsg').textContent='Use at least 8 characters';
+  if (a!==b) return $('#setupMsg').textContent='The passwords don’t match';
+  try { await post('/api/setup',{password:a}); boot(true); } catch(e){ $('#setupMsg').textContent=e.message; }
+}
+$('#loginForm').onsubmit = async e => { e.preventDefault(); $('#loginErr').textContent='';
+  try { await post('/api/login',{password:$('#lp').value}); boot(); } catch(err){ $('#loginErr').textContent = err.message; } };
+async function logout(){ await post('/api/logout'); showLogin(); }
+
+async function boot(firstRun){
+  me = await api('/api/me'); catalog = await api('/api/templates');
+  showOnly('app'); renderSide();
+  const list = await loadBatches();
+  if (list.length && !firstRun) openBatch(list[0].id); else showHome();
+  if (firstRun) setTimeout(()=>{ openSettings(); toast('Next: connect the Gmail account that will send certificates'); }, 400);
+}
+// In the desktop window, links that need your sign-in (PDFs) download inside the app instead of
+// opening the normal browser, which isn't signed in.
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[target="_blank"]');
+  if (me && me.desktop && a && (a.getAttribute('href') || '').startsWith('/api/')) { a.removeAttribute('target'); a.setAttribute('download', ''); }
+}, true);
+function renderSide(){
+  $('#browserBtn').classList.toggle('hidden', !me.desktop);
+  const mode = {smtp:`Sending from ${me.mail.address}`, resend:`Resend · ${me.mail.address}`, sandbox:'Email not connected (test mode)'}[me.mail_mode];
+  $('#sideStatus').innerHTML = `${esc(mode)}${me.quota.cap?`<br>${me.quota.left} of ${me.quota.cap} emails left today`:''}`;
+  $('#setupNudge').innerHTML = me.mail_mode==='sandbox' ? `<div class="banner light"><span class="ico">!</span><div class="grow"><b>Connect your email first</b><div class="desc">Until you connect Gmail, certificates are only saved on this computer (test mode), not emailed.</div></div><button class="btn sm fill" onclick="openSettings()">Connect Gmail</button></div>` : '';
+}
+async function refreshMe(){ me = await api('/api/me'); renderSide(); }
+
+async function loadBatches(){
+  const list = await api('/api/batches');
+  $('#batches').innerHTML = list.map(b => `<div class="item tap ${batch&&batch.id===b.id?'sel':''}" onclick="openBatch(${b.id})">
+    <div class="grow"><div class="bname">${b.is_chaos?'⚡ ':''}${esc(b.name)}</div>
+    <div class="bmeta">${b.job?'<span class="spin" style="width:10px;height:10px"></span> working · ':''}${b.counts.Total||0} students · ${(b.counts.Sent||0)} sent${b.counts.Failed?` · ${b.counts.Failed} failed`:''}${b.pause_reason?' · paused':''}</div></div></div>`).join('')
+    || '<p class="foot" style="margin:0 6px">No events yet.</p>';
+  return list;
+}
+function showHome(){ batch=null; cfg=null; stopPoll(); $('#batch').classList.add('hidden'); $('#home').classList.remove('hidden'); loadBatches(); }
+
+// ---------- upload
+const drop = $('#drop');
+drop.onclick = () => $('#file').click();
+drop.onkeydown = e => { if (e.key==='Enter'||e.key===' ') $('#file').click(); };
+drop.ondragover = e => { e.preventDefault(); drop.classList.add('over'); };
+drop.ondragleave = () => drop.classList.remove('over');
+drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); };
+$('#file').onchange = e => { if (e.target.files[0]) upload(e.target.files[0]); e.target.value=''; };
+async function upload(file){
+  const fd = new FormData(); fd.append('file', file); fd.append('name', $('#batchName').value);
+  drop.innerHTML = '<span class="spin"></span> <span class="sub">Reading your sheet…</span>';
+  try { const b = await api('/api/batches',{method:'POST',body:fd}); $('#batchName').value=''; tab='students'; await openBatch(b.id); toast('Sheet read. Check what we found, then press Next.'); }
+  catch(err){ toast(err.message); }
+  finally { drop.innerHTML = '<b>Drop your Excel or CSV file here</b><span class="sub">or tap to choose · .xlsx or .csv · any column names</span>'; }
+}
+async function useSample(name, label){
+  const r = await fetch('/sample/'+name,{credentials:'same-origin'});
+  if (!$('#batchName').value) $('#batchName').value = label;
+  upload(new File([await r.blob()], name));
+}
+async function runChaos(){
+  $('#chaosBtn').disabled = true;
+  try { const r = await post('/api/chaos'); tab='chaos'; await openBatch(r.batch_id); toast('Chaos Test running in a sandbox (no real emails)'); }
+  catch(e){ toast(e.message); } finally { $('#chaosBtn').disabled = false; }
+}
+
+// ---------- event view
+const TABS = [['students','Students',1],['certs','Certificates',2],['email','Email',3],['review','Review & Send',4],['proof','Proof',0]];
+async function openBatch(id){
+  const same = batch && batch.id === id;
+  batch = await api(`/api/batches/${id}`); cfg = batch.config;
+  if (!same && tab !== 'chaos') tab = batch.is_chaos ? 'chaos' : ((batch.counts.Sent||0) ? 'review' : 'students');
+  if (tab === 'chaos' && !batch.is_chaos) tab = 'students';
+  $('#home').classList.add('hidden'); $('#batch').classList.remove('hidden');
+  $('#bTitle').textContent = batch.name;
+  $('#zipBtn').href = `/api/batches/${id}/certificates.zip`; $('#csvBtn').href = `/api/batches/${id}/report.csv`;
+  filter = ''; $('#search').value = ''; proposal = null; pvIndex = 0; thumbV = Date.now();
+  renderHeader(); loadBatches();
+  await showTab(tab);
+}
+function renderHeader(){
+  const c = batch.counts;
+  $('#bSub').textContent = `${batch.filename}${batch.sheet?` · sheet “${batch.sheet}”`:''} · ${c.Total} students`;
+  $('#pauseBanner').innerHTML = batch.pause_reason ? `<div class="banner dark"><span class="ico">!</span><div class="grow"><b>Sending paused</b><div class="sm" style="opacity:.85">${esc(batch.pause_reason)}</div></div><button class="btn sm" onclick="showTab('review')">Review</button></div>` : '';
+  const t = batch.is_chaos ? [['chaos','Chaos Report',0], ...TABS] : TABS;
+  const doneUpTo = {students:1, certs:2, email:3, review:4}[tab] || 0;
+  $('#tabs').innerHTML = t.map(([k,l,n]) => `<button role="tab" class="${k===tab?'on':''} ${n && n<doneUpTo?'done':''}" onclick="showTab('${k}')">${n?`<span class="n">${n<doneUpTo?'✓':n}</span>`:''}${l}</button>`).join('');
+}
+async function showTab(k){
+  tab = k; renderHeader();
+  document.querySelectorAll('.tab').forEach(el => el.classList.toggle('hidden', el.id !== 'tab-'+k));
+  window.scrollTo({top:0, behavior:'smooth'});
+  if (k==='students') await loadStudents();
+  if (k==='certs') await loadCerts();
+  if (k==='email') loadEmail();
+  if (k==='review') await loadReview();
+  if (k==='proof') await loadProof();
+  if (k==='chaos') await loadChaos();
+  await syncPoll();
+}
+async function refreshBatch(){ const b = await api(`/api/batches/${batch.id}`); Object.assign(batch, b); cfg = b.config; renderHeader(); return b; }
+
+// ---------- 1 students
+const FIELDS = [['NAME','Student name',true],['email','Email',true],['fallback','Backup email',false],['ID','Student ID',false],['category','Category',false],['EVENT','Event name',true],['DATE','Event date',false],['ACHIEVEMENT','Achievement / position',false],['CERT_TYPE','Certificate type',false],['DEPARTMENT','Department',false],['COLLEGE','College / institution',false],['TEAM','Team',false]];
+function colOpts(sel, none){ return (none!==undefined?`<option value="">${none}</option>`:'') + batch.columns.map(c=>`<option ${c===sel?'selected':''} value="${esc(c)}">${esc(c)}</option>`).join(''); }
+async function loadStudents(){
+  const b = await refreshBatch();
+  const sheets = cfg.sheets || [];
+  $('#sheetBox').innerHTML = sheets.length > 1 ? `<div class="cap">Sheet</div><div class="group"><div class="item"><div class="grow"><div class="lbl">Reading sheet</div><div class="desc">Header found on row ${cfg.header_row} · ${batch.counts.Total} students</div></div><select onchange="switchSheet(this.value)">${sheets.map(s=>`<option ${s.name===batch.sheet?'selected':''} value="${esc(s.name)}">${esc(s.name)}${s.name===batch.sheet?'':` (${s.rows} rows)`}</option>`).join('')}</select></div></div>`
+    : (cfg.header_row > 1 ? `<p class="foot" style="margin-top:14px">Skipped ${cfg.header_row-1} title row${cfg.header_row>2?'s':''} above the header (row ${cfg.header_row}).</p>` : '');
+  const m = cfg.mapping, s = b.sample_rows[0] || {};
+  const sample = col => col ? esc((s[col]||'').slice(0,40)) : '';
+  $('#colMap').innerHTML = FIELDS.map(([key,label,req]) => {
+    let sel = '', kind = 'column', fixed = '';
+    if (key==='email') sel = cfg.email_column; else if (key==='fallback') sel = cfg.fallback_column; else if (key==='category') sel = cfg.category_column;
+    else if (m[key]) { kind = m[key].type; if (kind==='column') sel = m[key].value; if (kind==='text') fixed = m[key].value; if (kind==='combine') sel = '__combine'; }
+    const advanced = ['ACHIEVEMENT','CERT_TYPE','DEPARTMENT','COLLEGE','TEAM'].includes(key) && !sel;
+    const opts = colOpts(sel, req && key!=='EVENT' ? 'Choose…' : 'Not used') + (key==='NAME'&&kind==='combine'?`<option value="__combine" selected>${esc(m.NAME.value.join(' + '))}</option>`:'') + (key==='EVENT'?`<option value="__text" ${kind==='text'?'selected':''}>Type it in…</option>`:'');
+    const example = kind==='combine' ? esc(m.NAME.value.map(c=>s[c]||'').join(' ')) : (kind==='text' ? '' : sample(sel));
+    const missing = req && key!=='EVENT' && !sel;
+    return `<div class="item ${advanced?'adv hidden':''}" data-key="${key}"><div class="grow"><div class="lbl">${missing?'✕ ':''}${label}${req?'':' <span class="ter sm">optional</span>'}</div><div class="desc">${example?`e.g. ${example}`:(missing?'Choose the column that holds this':'&nbsp;')}</div></div>
+      ${key==='EVENT'&&kind==='text'?`<input class="inl" type="text" value="${esc(fixed)}" onchange="setEventText(this.value)" style="max-width:40%" aria-label="Event name">`:''}
+      <select onchange="mapField('${key}', this.value)" aria-label="${label}">${opts}</select></div>`;
+  }).join('') + `<div class="item tap" onclick="toggleExtra(this)"><span class="grow lbl" style="font-weight:400">Show extra fields</span><span class="ter">›</span></div>`;
+  $('#autoFix').checked = cfg.auto_fix_emails !== false; $('#claimLinks').checked = cfg.claim_links !== false; $('#fixCaps').checked = !!cfg.fix_caps;
+  await loadStats();
+}
+function toggleExtra(el){ document.querySelectorAll('#colMap .adv').forEach(e=>e.classList.toggle('hidden')); const l = el.querySelector('.lbl'); l.textContent = l.textContent.startsWith('Show') ? 'Hide extra fields' : 'Show extra fields'; }
+async function switchSheet(name){ try { await post(`/api/batches/${batch.id}/sheet`, {sheet:name}); await openBatch(batch.id); toast(`Now reading “${name}”`); } catch(e){ toast(e.message); } }
+async function mapField(key, val){
+  if (key==='email') cfg.email_column = val; else if (key==='fallback') cfg.fallback_column = val;
+  else if (key==='category') { return changeCategoryColumn(val); }
+  else if (val==='__combine') return;
+  else if (val==='__text') cfg.mapping[key] = {type:'text', value: batch.name};
+  else if (!val) delete cfg.mapping[key];
+  else cfg.mapping[key] = {type:'column', value:val};
+  await saveConfig(); loadStudents();
+}
+function setEventText(v){ cfg.mapping.EVENT = {type:'text', value:v}; saveConfig(); }
+async function loadStats(){
+  const c = batch.counts;
+  const issues = await api(`/api/batches/${batch.id}/records?status=Issues&limit=1`);
+  const stats = [['', c.Total||0, 'Students'], ['Ready', (c.Pending||0)+(c.Generated||0), 'Ready'], ['Invalid', c.Invalid||0, 'Need fixing'],
+    ['Issues', issues.total, 'Worth a look'], ['Sent', c.Sent||0, 'Delivered'], ['Claims', (c.Claim||0)+(c.Claimed||0), 'Claim links']];
+  $('#dataStats').innerHTML = stats.map(([f,n,l]) => `<div class="stat ${filter===f?'on':''}" onclick="setFilter('${f}')"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  await loadRecords();
+}
+function setFilter(f){ filter = f; loadStats(); }
+let searchT; $('#search').oninput = () => { clearTimeout(searchT); searchT = setTimeout(loadRecords, 220); };
+async function loadRecords(){
+  const r = await api(`/api/batches/${batch.id}/records?status=${encodeURIComponent(filter)}&q=${encodeURIComponent($('#search').value)}&limit=500`);
+  $('#recCount').textContent = `${r.total} shown${r.total>500?' (first 500)':''}`;
+  $('#recs').innerHTML = r.records.map(x => {
+    const errs = x.errors ? x.errors.split('; ').map(e=>`<div class="issue e">${esc(e)}</div>`).join('') : '';
+    const warns = x.warnings ? x.warnings.split('; ').map(e=>`<div class="issue w">${esc(e)}</div>`).join('') : '';
+    const fail = x.last_error && !['Sent','Claim','Claimed'].includes(x.status) ? `<div class="issue e">${esc(x.last_error)}</div>` : '';
+    const deliv = x.delivery==='claim' ? '<span class="tagc">Claim link</span>' : (x.email ? `${esc(x.email)}<div class="sub" style="font-size:12px">${esc(x.email_source)}</div>` : '<span class="sub">—</span>');
+    return `<tr class="tap" onclick="openRecord(${x.id})"><td class="sub">${x.row_no}</td>
+      <td><b>${esc(x.name)||'<span class="sub">(no name)</span>'}</b><div class="sub mono" style="font-size:11.5px">${esc(x.student_id)}</div>${errs}${warns}${fail}</td>
+      <td>${deliv}</td><td>${x.status!=='Invalid'?`${x.rule_label?`<span class="tagc">${esc(x.rule_label)}</span>`:''}<div class="sub" style="font-size:12px;margin-top:3px">${esc(tplName(x.theme))}</div>`:''}</td>
+      <td>${chip(x.status)}</td></tr>`; }).join('') || '<tr><td colspan="5" class="empty">No students here.</td></tr>';
+}
+
+// ---------- 2 certificates
+async function loadCerts(){
+  await refreshBatch();
+  $('#catCol').innerHTML = colOpts(cfg.category_column, 'No categories (one design for everyone)');
+  const cc = await api(`/api/batches/${batch.id}/category-counts`);
+  const rules = cfg.rules || [];
+  const emailOpts = sel => Object.entries(me.presets).map(([k,l])=>`<option value="${k}" ${k===sel?'selected':''}>${esc(l)}</option>`).join('') + (sel==='custom'?'<option value="custom" selected>Custom</option>':'');
+  $('#catCap').textContent = cfg.category_column ? `Certificate for each “${cfg.category_column}”` : 'Certificate design';
+  $('#cats').innerHTML = `<div class="catrow head"><div>Category</div><div>Students</div><div>Design</div><div>Certificate title</div><div>Email</div></div>` +
+    rules.map((r,i) => `<div class="catrow"><div><b>${esc(r.label)}</b></div><div class="sub">${cc.counts[i]||0}</div>
+      <button class="thumbbtn" onclick="pickTemplate(${i})"><img src="${thumb(r.template)}" alt=""><span><b class="sm">${esc(tplName(r.template))}</b><br><span class="sub sm">Change ›</span></span></button>
+      <input type="text" value="${esc(r.title||'')}" onchange="cfg.rules[${i}].title=this.value;saveConfig(false,'Title saved')" aria-label="Certificate title for ${esc(r.label)}">
+      <select onchange="cfg.rules[${i}].email=this.value;saveConfig(false,'Email choice saved')" aria-label="Email for ${esc(r.label)}">${emailOpts(r.email)}</select></div>`).join('') +
+    `<div class="catrow"><div><b>${rules.length?'Everyone else':'All students'}</b><div class="sub sm">${rules.length?'not in a category above':''}</div></div><div class="sub">${cc.unmatched}</div>
+      <button class="thumbbtn" onclick="pickTemplate(-1)"><img src="${thumb(cfg.template_id)}" alt=""><span><b class="sm">${esc(tplName(cfg.template_id))}</b><br><span class="sub sm">Change ›</span></span></button>
+      <div class="sub sm">Title from the sheet or design</div><div class="sub sm">Default message (step 3)</div></div>`;
+  $('#catFoot').textContent = rules.length ? 'We guessed a design, title and email for each category from its name. Change anything you like.' : 'Tip: pick a category column above to give winners, participants and volunteers different certificates.';
+  renderBrand();
+  $('#engine').textContent = `Engine: ${me.copilot}`;
+}
+async function changeCategoryColumn(v){
+  const col = v !== undefined ? v : $('#catCol').value;
+  const r = await post(`/api/batches/${batch.id}/categories`, {column: col});
+  cfg.category_column = col; cfg.rules = r.rules;
+  await saveConfig(false, col ? `Grouped into ${r.rules.length} categories` : 'One design for everyone');
+  if (tab==='certs') loadCerts(); else loadStudents();
+}
+function renderBrand(){
+  const b = cfg.branding || {};
+  const img = (k, label) => `<div class="item"><span class="grow lbl">${label}</span>${b[k]?`<img src="/api/branding/${esc(b[k])}" alt="" style="height:30px;max-width:110px;object-fit:contain;background:#fff;border-radius:4px">`:''}<label class="btn sm" style="cursor:pointer">${b[k]?'Replace':'Upload'}<input type="file" accept=".png,.jpg,.jpeg,.webp" hidden onchange="uploadBrand('${k}', this)"></label>${b[k]?`<button class="btn sm plain" onclick="cfg.branding['${k}']='';saveConfig(false,'Removed').then(renderBrand)">Remove</button>`:''}</div>`;
+  const txt = (k, label, ph) => `<div class="item"><span class="grow lbl">${label}</span><input class="inl" type="text" value="${esc(b[k]||'')}" placeholder="${esc(ph)}" onchange="cfg.branding['${k}']=this.value;saveConfig(false,'Saved')" aria-label="${label}"></div>`;
+  $('#brand').innerHTML = txt('org_name','Organization name','e.g. Department of CSE, ABC College') + img('logo','Logo') +
+    txt('signer1_name','Signatory 1 name','e.g. Dr. Priya Sharma') + txt('signer1_title','Signatory 1 title','Event Coordinator') + img('signer1_sig','Signatory 1 signature') +
+    txt('signer2_name','Signatory 2 name','e.g. Prof. Daniel Okafor') + txt('signer2_title','Signatory 2 title','Head of Department') + img('signer2_sig','Signatory 2 signature') +
+    `<div class="item"><div class="grow"><div class="lbl">Verification QR code</div><div class="desc">Lets anyone check the certificate is genuine</div></div><label class="switch"><input type="checkbox" ${cfg.qr!==false?'checked':''} onchange="cfg.qr=this.checked;saveConfig(false,'Saved')"><span></span></label></div>
+     <div class="item"><span class="grow"></span><button class="btn sm" onclick="saveOrgDefaults()">Save as my defaults</button></div>`;
+}
+async function uploadBrand(kind, input){
+  const f = input.files[0]; if (!f) return; const fd = new FormData(); fd.append('file', f); fd.append('kind', kind);
+  try { const r = await api('/api/branding/upload',{method:'POST',body:fd}); cfg.branding[kind] = r.file; thumbV = Date.now(); await saveConfig(false,'Image added'); loadCerts(); } catch(e){ toast(e.message); }
+}
+async function saveOrgDefaults(){ await put('/api/settings/org', cfg.branding); await refreshMe(); toast('Saved. New events will start with these details'); }
+
+// ---------- template gallery
+let galleryCb = null, galleryNiche = 'All';
+function pickTemplate(i){ openGallery(i < 0 ? cfg.template_id : cfg.rules[i].template, id => { if (i < 0) cfg.template_id = id; else cfg.rules[i].template = id; saveConfig(false, `Design set to ${tplName(id)}`).then(loadCerts); }); }
+function openTemplates(){ openGallery(null, null); }
+async function openGallery(current, cb){
+  galleryCb = cb; catalog = await api('/api/templates');
+  const niches = ['All', ...me.niches];
+  const render = () => {
+    const list = catalog.filter(t => galleryNiche==='All' || t.niche===galleryNiche);
+    $('#sheet').className = 'sheet wide';
+    $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>${cb?'Choose a design':'Certificate templates'}</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
+      <p class="sub" style="margin:0 0 12px">14 original designs for different kinds of events, plus your own designs from Canva.</p>
+      <div class="chips" style="margin-bottom:14px">${niches.map(n=>`<button class="chipb ${n===galleryNiche?'on':''}" data-n="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+      <div class="gal">${(galleryNiche==='All'||galleryNiche==='My templates') ? `<div class="galc" id="importCard" style="display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;min-height:190px;border:1.5px dashed var(--ter)"><div style="font-size:30px">＋</div><b>Import from Canva</b><small>Use any certificate you designed in Canva (or Word, PowerPoint, Photoshop)</small></div>` : ''}
+      ${list.map(t => `<div class="galc ${t.id===current?'on':''}" data-id="${esc(t.id)}"><img loading="lazy" src="${thumb(t.id, 48)}" alt=""><b>${esc(t.name)}${t.id===current?' ✓':''}</b><small>${esc(t.niche)} · ${esc(t.description)}</small>
+        ${t.custom?`<div class="row" style="margin-top:8px"><button class="btn sm" data-edit="${esc(t.id)}">Edit layout</button><button class="btn sm plain" data-del="${esc(t.id)}">Delete</button></div>`:''}</div>`).join('')}</div>`;
+    document.querySelectorAll('#sheet [data-n]').forEach(b => b.onclick = () => { galleryNiche = b.dataset.n; render(); });
+    const ic = $('#importCard'); if (ic) ic.onclick = canvaImport;
+    document.querySelectorAll('#sheet .galc[data-id]').forEach(c => c.onclick = e => {
+      if (e.target.dataset.edit) { e.stopPropagation(); return openEditor(e.target.dataset.edit); }
+      if (e.target.dataset.del) { e.stopPropagation(); return deleteTemplate(e.target.dataset.del); }
+      if (galleryCb){ const cbx = galleryCb; closeSheet(); cbx(c.dataset.id); } else previewTemplate(c.dataset.id);
+    });
+  };
+  render(); openSheet();
+}
+function previewTemplate(id){
+  const t = catalog.find(x=>x.id===id);
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>${esc(t.name)}</h2><button class="btn sm plain" onclick="openTemplates()">‹ Back</button></div>
+    <p class="sub">${esc(t.niche)} · ${esc(t.description)}</p><img class="certimg" src="${thumb(id, 100)}" alt="">`;
+}
+async function deleteTemplate(id){
+  if (!confirm('Delete this imported design?')) return;
+  try { await api(`/api/templates/${id}`, {method:'DELETE'}); toast('Deleted'); openGallery(null, galleryCb); } catch(e){ toast(e.message); }
+}
+function canvaImport(){
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Import from Canva</h2><button class="btn sm plain" onclick="openGallery(null, galleryCb)">‹ Back</button></div>
+    <div class="group"><div class="check"><span class="ck y">1</span><div><b>Design it in Canva</b><div class="desc">Open <a href="https://www.canva.com/certificates/templates/" target="_blank">Canva certificate templates ↗</a>, pick one, and add your logo and colours.</div></div></div>
+      <div class="check"><span class="ck y">2</span><div><b>Delete the sample name</b><div class="desc">Remove the placeholder student name (and any line you want filled in per student). Keep the title, borders and signatures.</div></div></div>
+      <div class="check"><span class="ck y">3</span><div><b>Download it</b><div class="desc">Share → Download → <b>PDF Standard</b> (best quality) or <b>PNG</b>. One page only.</div></div></div>
+      <div class="check"><span class="ck y">4</span><div><b>Drop it here</b><div class="desc">Then drag the name and other fields to where they belong.</div></div></div></div>
+    <div class="cap">Your design</div>
+    <div class="group"><div class="item"><input type="text" id="impName" placeholder="Name, e.g. Annual Day 2026" style="background:transparent;padding:0"></div>
+      <div class="item"><label class="btn fill" style="cursor:pointer" id="impBtn">Choose PDF or PNG<input type="file" accept=".pdf,.png,.jpg,.jpeg,.webp" hidden onchange="doImport(this)"></label><span class="sub sm">Up to 20 MB</span></div></div>`;
+}
+async function doImport(input){
+  const f = input.files[0]; if (!f) return;
+  const fd = new FormData(); fd.append('file', f); fd.append('name', $('#impName').value || f.name.replace(/\.[^.]+$/,''));
+  $('#impBtn').innerHTML = '<span class="spin"></span> Importing…';
+  try { const t = await api('/api/templates/import', {method:'POST', body: fd}); catalog = await api('/api/templates'); toast('Imported. Now place the fields'); openEditor(t.id); }
+  catch(e){ toast(e.message); canvaImport(); }
+}
+
+// ---------- field editor (imported templates): drag with mouse, pen or finger
+let ed = null;
+const ED_LABEL = {name:'Student name', description:'Description line', title:'Certificate title', date:'Date', cert_id:'Certificate ID', qr:'QR code', org:'Organization', presented:'Presented to'};
+const ED_SAMPLE = {name:'Aisha Rahman', description:'for securing First Place at National Tech Fest 2026', title:'Certificate of Achievement', date:'04 November 2026', cert_id:'Certificate ID SS-SAMPLE'};
+async function openEditor(id){
+  const t = await api(`/api/templates/${id}`);
+  ed = {id, t, fields: JSON.parse(JSON.stringify(t.fields)), sel: 0};
+  $('#sheet').className = 'sheet wide';
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Place the fields</h2><button class="btn sm" onclick="edPreview()">Preview</button><button class="btn sm fill" onclick="edSave()">Save</button><button class="btn sm plain" onclick="closeSheet()">Close</button></div>
+    <p class="sub" style="margin:0 0 12px">Drag each box to where it should print. The sample text shows the size; long names shrink automatically.</p>
+    <div class="editor"><div><div class="canvas" id="edCanvas"><img id="edBg" src="/api/templates/${id}/background.png?v=${Date.now()}" alt=""></div><img id="edPrev" class="certimg hidden" style="margin-top:12px" alt=""></div>
+      <div><div class="group" id="edList"></div><div class="cap">Selected field</div><div class="group" id="edProps"></div>
+        <div class="cap">Name</div><div class="group"><div class="item"><input type="text" id="edName" value="${esc(t.name)}" style="background:transparent;padding:0"></div></div></div></div>`;
+  openSheet();
+  $('#edBg').onload = edRender;
+}
+function edPlace(box, f){
+  const tx = f.type==='qr' ? '-50%' : ({left:'0', right:'-100%'}[f.align] || '-50%');
+  box.style.left = (f.x*100)+'%'; box.style.top = ((1-f.y)*100)+'%'; box.style.transform = `translate(${tx},-50%)`;
+}
+function edRender(){
+  const cv = $('#edCanvas'), W = cv.clientWidth, scale = W / ed.t.width;
+  cv.querySelectorAll('.fbox').forEach(b => b.remove());
+  ed.fields.forEach((f, i) => {
+    if (f.enabled === false) return;
+    const box = document.createElement('div');
+    box.className = 'fbox' + (i===ed.sel?' sel':'') + (f.type==='qr'?' qr':'');
+    if (f.type==='qr'){ const s = (f.size||0.1) * ed.t.height * scale; box.style.width = s+'px'; box.style.height = s+'px'; }
+    else { box.textContent = ED_SAMPLE[f.key] || (f.text||'').replace(/\{\{|\}\}/g,''); box.style.fontSize = Math.max(8, (f.size||14) * scale) + 'px';
+      box.style.fontFamily = /script/.test(f.font)?'cursive':(/display|formal|elegant|italic/.test(f.font)?'Georgia,serif':'inherit'); box.style.color = f.color||'#111'; }
+    edPlace(box, f);
+    box.onpointerdown = e => {
+      e.preventDefault();
+      if (ed.sel !== i){ ed.sel = i; cv.querySelectorAll('.fbox').forEach(b=>b.classList.remove('sel')); box.classList.add('sel'); edList(); edProps(); }
+      const rect = cv.getBoundingClientRect();
+      const move = ev => { f.x = Math.min(1, Math.max(0, (ev.clientX-rect.left)/rect.width)); f.y = Math.min(1, Math.max(0, 1-(ev.clientY-rect.top)/rect.height)); edPlace(box, f); };
+      const up = () => { window.removeEventListener('pointermove', move); window.removeEventListener('pointerup', up); };
+      window.addEventListener('pointermove', move); window.addEventListener('pointerup', up);
+    };
+    cv.appendChild(box);
+  });
+  edList(); edProps();
+}
+function edList(){
+  $('#edList').innerHTML = ed.fields.map((f,i)=>`<div class="item tap" onclick="ed.sel=${i};edRender()"><span class="grow lbl" style="font-weight:${i===ed.sel?700:500}">${esc(ED_LABEL[f.key]||f.key||f.type)}</span><label class="switch" onclick="event.stopPropagation()"><input type="checkbox" ${f.enabled!==false?'checked':''} onchange="ed.fields[${i}].enabled=this.checked;edRender()"><span></span></label></div>`).join('');
+}
+function edProps(){
+  const f = ed.fields[ed.sel]; if (!f) return;
+  if (f.type==='qr'){ $('#edProps').innerHTML = `<div class="item"><span class="grow lbl">Size</span><input type="range" min="0.06" max="0.25" step="0.01" value="${f.size||0.1}" oninput="ed.fields[ed.sel].size=+this.value;edRender()"></div>`; return; }
+  const fonts = Object.entries(me.fonts).map(([k,l])=>`<option value="${k}" ${k===f.font?'selected':''}>${esc(l)}</option>`).join('');
+  $('#edProps').innerHTML = `<div class="item" style="display:block"><div class="desc" style="margin-bottom:4px">Text (placeholders like {{NAME}} are filled per student)</div><input type="text" value="${esc(f.text)}" onchange="ed.fields[ed.sel].text=this.value;edRender()"></div>
+    <div class="item"><span class="grow lbl">Font</span><select onchange="ed.fields[ed.sel].font=this.value;edRender()">${fonts}</select></div>
+    <div class="item"><span class="grow lbl">Size</span><input type="number" min="6" max="100" value="${f.size}" style="width:80px" onchange="ed.fields[ed.sel].size=+this.value;edRender()"></div>
+    <div class="item"><span class="grow lbl">Colour</span><input type="color" value="${esc(f.color||'#111111')}" onchange="ed.fields[ed.sel].color=this.value;edRender()"></div>
+    <div class="item"><span class="grow lbl">Align</span><select onchange="ed.fields[ed.sel].align=this.value;edRender()">${['left','center','right'].map(a=>`<option ${a===f.align?'selected':''}>${a}</option>`).join('')}</select></div>`;
+}
+async function edPreview(){
+  const r = await fetch(`/api/templates/${ed.id}/preview${batch?`?batch=${batch.id}`:''}`, {method:'POST', credentials:'same-origin', headers:{'Content-Type':'application/json'}, body: JSON.stringify({fields: ed.fields})});
+  $('#edPrev').src = URL.createObjectURL(await r.blob()); $('#edPrev').classList.remove('hidden'); $('#edPrev').scrollIntoView({behavior:'smooth'});
+}
+async function edSave(){
+  try { await put(`/api/templates/${ed.id}`, {fields: ed.fields, name: $('#edName').value}); catalog = await api('/api/templates'); thumbV = Date.now(); toast('Design saved');
+    if (galleryCb) openGallery(ed.id, galleryCb); else openTemplates(); if (batch && tab==='certs') loadCerts(); } catch(e){ toast(e.message); }
+}
+
+// ---------- copilot
+async function askCopilot(){
+  const text = $('#copilotText').value.trim(); if (!text) return toast('Describe who gets which design');
+  $('#copilotBtn').disabled = true;
+  try {
+    proposal = await post(`/api/batches/${batch.id}/copilot`, {text});
+    $('#proposal').innerHTML = (proposal.rules.length ? `<div class="group" style="background:var(--tint2);margin-top:12px">${proposal.rules.map((r,i)=>`<div class="item"><div class="grow"><b>${esc(r.label)}</b> <span class="sub sm">→ ${esc(tplName(r.template))} · ${esc(me.presets[r.email]||'Custom')} · ${proposal.counts[i]} students</span></div></div>`).join('')}</div>` : '') +
+      (proposal.notes.length ? `<p class="foot" style="margin:8px 0 0">${proposal.notes.map(esc).join('<br>')}</p>` : '') +
+      (proposal.rules.length ? `<div class="row" style="margin-top:10px"><button class="btn fill sm" onclick="applyProposal()">Apply</button><button class="btn sm" onclick="$('#proposal').innerHTML=''">Discard</button></div>` : '');
+  } catch(e){ toast(e.message); } finally { $('#copilotBtn').disabled = false; }
+}
+async function applyProposal(){ cfg.rules = proposal.rules; cfg.category_column = ''; await saveConfig(false,'Rules applied'); loadCerts(); }
+
+// ---------- 3 email
+function loadEmail(){
+  const m = me.mail, q = me.quota;
+  $('#acctBox').innerHTML = me.mail_mode === 'sandbox'
+    ? `<div class="banner light" style="margin-top:0"><span class="ico">!</span><div class="grow"><b>No email account connected</b><div class="desc">Certificates will be saved on this computer instead of emailed. Connect Gmail to send them for real.</div></div><button class="btn sm fill" onclick="openSettings()">Connect Gmail</button></div>`
+    : `<div class="group"><div class="item"><span class="ck y">✓</span><div class="grow"><b>${esc(m.address)}</b><div class="desc">${esc(me.providers[m.provider]||'SMTP')}${m.verified_at?` · connection tested ${when(m.verified_at)}`:' · not tested yet'}${q.cap?` · ${q.left} of ${q.cap} emails left today`:''}</div></div><button class="btn sm" onclick="openSettings()">Change</button></div></div>`;
+  const rules = cfg.rules || [];
+  $('#emailCats').innerHTML = (rules.length ? rules : [{label:'All students', email:'standard'}]).map(r => `<div class="item"><span class="grow lbl">${esc(r.label)}</span><span class="val">${esc(me.presets[r.email]||'Custom')}</span></div>`).join('');
+  $('#subj').value = cfg.email_subject; $('#body').value = cfg.email_body; $('#fnPattern').value = cfg.filename_pattern;
+  const ph = ['NAME','EVENT','CATEGORY','TITLE','DATE','ID','ORG_NAME','CERT_ID','VERIFY_URL'];
+  $('#chips').innerHTML = ph.map(p=>`<span class="phchip" onclick="insertPh('${p}')">{{${p}}}</span>`).join('');
+  $('#fnExample').textContent = '…';
+  api(`/api/batches/${batch.id}/preview/email`).then(e => $('#fnExample').textContent = e.attachment).catch(()=>{});
+}
+document.addEventListener('focusin', e => { if (e.target.matches('[data-ins]')) lastFocus = e.target; });
+function insertPh(p){ const el = lastFocus || $('#body'); const s = el.selectionStart ?? el.value.length, t = `{{${p}}}`;
+  el.value = el.value.slice(0,s)+t+el.value.slice(el.selectionEnd ?? s); el.focus(); el.selectionStart = el.selectionEnd = s+t.length; }
+
+// ---------- save
+async function saveConfig(_, msg){
+  if (tab==='email') { cfg.email_subject = $('#subj').value; cfg.email_body = $('#body').value; cfg.filename_pattern = $('#fnPattern').value; }
+  if (tab==='students') { cfg.auto_fix_emails = $('#autoFix').checked; cfg.claim_links = $('#claimLinks').checked; cfg.fix_caps = $('#fixCaps').checked; }
+  try {
+    const res = await put(`/api/batches/${batch.id}/config`, cfg);
+    cfg.rules = res.rules; batch.placeholders = res.placeholders; batch.counts = res.counts;
+    thumbV = Date.now();
+    toast(msg || `Updated · ${(res.counts.Pending||0)} ready, ${(res.counts.Invalid||0)} need fixing`);
+    res.notes.forEach(n => toast(n));
+    if (tab==='students') loadStats();
+    loadBatches();
+  } catch(e){ toast(e.message); }
+}
+
+// ---------- 4 review & send
+async function loadReview(){
+  const b = await refreshBatch(), c = b.counts; await refreshMe();
+  const ready = (c.Pending||0)+(c.Generated||0)+(c.Failed||0);
+  const claimsPending = (await api(`/api/batches/${batch.id}/records?status=Ready&limit=1000`)).records.filter(r=>r.delivery==='claim').length;
+  const toEmail = Math.max(ready - claimsPending, 0);
+  const q = me.quota, sandbox = me.mail_mode==='sandbox';
+  const items = [
+    [c.Invalid ? 'w':'y', `${ready} student${ready===1?'':'s'} ready`, c.Invalid ? `${c.Invalid} row${c.Invalid===1?'':'s'} with problems will be skipped. <a href="#" onclick="filter='Invalid';showTab('students');return false">See them</a>` : 'Every row passed the checks'],
+    ['y', `${(cfg.rules||[]).length || 1} design${(cfg.rules||[]).length>1?'s':''} assigned`, (cfg.rules||[]).map(r=>`${esc(r.label)} → ${esc(tplName(r.template))}`).join(' · ') || esc(tplName(cfg.template_id))],
+    [sandbox ? 'n':'y', sandbox ? 'Email not connected' : `Sending from ${esc(me.mail.address)}`, sandbox ? 'Certificates will only be saved on this computer. <a href="#" onclick="openSettings();return false">Connect Gmail</a>' : (me.mail.verified_at ? 'Connection tested' : 'Tip: test the connection in Settings first')],
+    [q.cap && toEmail > q.left ? 'w':'y', q.cap ? `${q.left} of ${q.cap} emails left today` : 'No daily limit in test mode', q.cap && toEmail > q.left ? `${toEmail} emails needed: the first ${q.left} go now, then sending pauses safely. Press Send again tomorrow for the rest.` : 'Enough for this batch'],
+    [claimsPending ? 'w':'y', claimsPending ? `${claimsPending} will get a claim link` : 'Everyone has an email', claimsPending ? 'Copy their links from the student list after sending' : ''],
+  ];
+  $('#checklist').innerHTML = items.map(([k,t,d]) => `<div class="check"><span class="ck ${k}">${k==='y'?'✓':(k==='n'?'✕':'!')}</span><div><b>${t}</b>${d?`<div class="desc">${d}</div>`:''}</div></div>`).join('');
+  const labels = [...new Set((cfg.rules||[]).map(r=>r.label))], cur = $('#pvCat').value;
+  $('#pvCat').innerHTML = `<option value="">All categories</option>` + labels.map(l=>`<option ${l===cur?'selected':''} value="${esc(l)}">${esc(l)}</option>`).join('');
+  await loadPreview(); await loadSend();
+}
+async function loadPreview(){
+  const cat = $('#pvCat').value;
+  const r = await api(`/api/batches/${batch.id}/records?limit=1000${cat?`&category=${encodeURIComponent(cat)}`:''}`);
+  pvList = r.records.filter(x => x.status !== 'Invalid'); if (!pvList.length) pvList = r.records;
+  pvIndex = Math.max(0, Math.min(pvIndex, pvList.length-1)); await showPreview();
+}
+function stepPreview(d){ if (!pvList.length) return; pvIndex = (pvIndex + d + pvList.length) % pvList.length; showPreview(); }
+async function showPreview(){
+  const rec = pvList[pvIndex]; if (!rec) { $('#pvInfo').textContent='No students'; return; }
+  $('#pvInfo').textContent = `${pvIndex+1} of ${pvList.length} · row ${rec.row_no}`;
+  const base = `/api/batches/${batch.id}/preview/certificate?record_id=${rec.id}&t=${Date.now()}`;
+  $('#pvOpen').href = base + '&format=pdf'; $('#pvImg').src = base;
+  const e = await api(`/api/batches/${batch.id}/preview/email?record_id=${rec.id}`);
+  $('#pvMail').innerHTML = `${e.errors?`<div class="item"><span class="issue e">${esc(e.errors)}</span></div>`:''}
+    <div class="hdr"><div><span>From</span><span>${esc(e.from)}</span></div><div><span>To</span><b>${esc(e.to)}</b></div><div><span>Subject</span><b>${esc(e.subject)}</b></div></div>
+    <pre>${esc(e.body)}</pre><div class="attach"><span class="pdf">PDF</span><div style="min-width:0"><b title="${esc(e.attachment)}" style="display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(e.attachment)}</b><div class="sub" style="font-size:12px">${esc(e.template)} · signed · locked to this student</div></div></div>`;
+}
+async function loadSend(){
+  const c = batch.counts;
+  const order = [['Pending','Ready'],['Sent','Delivered'],['Claim','Claim links'],['Failed','Need a retry'],['Skipped','Duplicates prevented'],['Invalid','Skipped (problems)']];
+  $('#sendStats').innerHTML = order.map(([s,l]) => `<div class="stat" onclick="filter='${({Pending:'Ready',Claim:'Claims'})[s]||s}';showTab('students')"><div class="n">${s==='Pending'?(c.Pending||0)+(c.Generated||0):(c[s]||0)+(s==='Claim'?(c.Claimed||0):0)}</div><div style="margin:4px 0 2px">${chip(s)}</div><div class="l">${l}</div></div>`).join('');
+  const running = !!batch.job;
+  const n = (c.Pending||0)+(c.Generated||0)+(c.Failed||0);
+  $('#sendBtn').disabled = running || !n;
+  $('#sendBtn').textContent = n ? `Send ${n} Certificate${n===1?'':'s'}` : 'All sent ✓';
+  $('#retryBtn').disabled = running || !c.Failed;
+  $('#jobBox').classList.toggle('hidden', !running);
+  if (running){
+    const valid = (c.Total||0) - (c.Invalid||0);
+    const done = (c.Sent||0)+(c.Failed||0)+(c.Skipped||0)+(c.Claim||0)+(c.Claimed||0);
+    const pct = valid ? Math.min(100, Math.round(100*done/valid)) : 0;
+    $('#jobLabel').textContent = {generating:'Creating and signing certificates…', sending:'Checking and sending…', chaos:'Chaos Test running…'}[batch.job] || batch.job;
+    $('#jobPct').textContent = `${done} of ${valid}`; $('#jobProg').style.width = pct + '%';
+  }
+  await loadFeed('#feed', 60);
+}
+async function loadFeed(sel, limit){
+  const ev = await api(`/api/batches/${batch.id}/events?limit=${limit}`);
+  $(sel).innerHTML = ev.map(e => `<div class="item ${e.record_id?'tap':''}" ${e.record_id?`onclick="openRecord(${e.record_id})"`:''}>
+    <span class="lv lv-${e.level}">${LV[e.level]||'·'}</span><div class="grow"><div class="msg">${e.name?`<b>${esc(e.name)}</b> · `:''}${esc(e.message)}</div><div class="when">${when(e.at)}</div></div></div>`).join('')
+    || '<div class="empty">Nothing has happened yet.</div>';
+}
+async function sendAll(){
+  const c = (await refreshBatch()).counts;
+  const n = (c.Pending||0)+(c.Generated||0)+(c.Failed||0);
+  const how = batch.is_chaos || me.mail_mode==='sandbox' ? 'save them on this computer (email not connected)' : `email them from ${me.mail.address}`;
+  if (!confirm(`Create ${n} certificates and ${how}?\n\nEach attachment is checked against its student right before sending. Students who already received this certificate are skipped automatically.`)) return;
+  try { await post(`/api/batches/${batch.id}/send`, {confirm:true}); await refreshBatch(); await loadSend(); syncPoll(); toast('Sending started. You can keep using the app'); } catch(e){ toast(e.message); }
+}
+async function retry(){ try { const r = await post(`/api/batches/${batch.id}/retry`); toast(r.started?`Retrying ${r.count}`:r.message); await refreshBatch(); await loadSend(); syncPoll(); } catch(e){ toast(e.message); } }
+
+// ---------- proof
+async function loadProof(){
+  const b = await refreshBatch(), s = b.seal;
+  $('#sealBox').innerHTML = s ? `
+    <div class="item"><span class="ck y">✓</span><div class="grow"><b>Sealed</b><div class="desc">${s.count} certificates · ${when(s.sealed_at)}</div></div></div>
+    <div class="item" style="display:block"><div class="desc" style="margin-bottom:5px">Merkle root (SHA-256)</div><div class="hash">${esc(s.root)}</div></div>
+    <div class="item" style="display:block"><div class="desc" style="margin-bottom:5px">Issuer signature (Ed25519)</div><div class="hash">${esc(s.signature)}</div></div>
+    <div class="item"><span class="grow lbl">Signing key</span><span class="val mono">${esc(s.key)}</span></div>`
+    : '<div class="empty">Not sealed yet. The batch is sealed automatically when certificates are created.</div>';
+  $('#verifySealBtn').disabled = !s;
+  const any = (await api(`/api/batches/${batch.id}/records?status=Sent&limit=1`)).records[0];
+  $('#sampleVerify').classList.toggle('hidden', !any); if (any) $('#sampleVerify').href = `/verify/${any.cert_code}`;
+  await loadFeed('#ledger', 400);
+}
+async function verifySeal(){
+  $('#verifySealBtn').disabled = true;
+  try {
+    const r = await post(`/api/batches/${batch.id}/verify-seal`);
+    $('#sealResult').innerHTML = `<div class="cap">Result</div><div class="group">
+      <div class="check"><span class="ck ${r.intact?'y':'n'}">${r.intact?'✓':'✕'}</span><div><b>${r.intact?'Batch intact':'Tampering detected'}</b><div class="desc">${r.checked} certificates re-checked from disk</div></div></div>
+      <div class="check"><span class="ck ${r.signature_valid?'y':'n'}">${r.signature_valid?'✓':'✕'}</span><div>Seal signature ${r.signature_valid?'valid':'invalid'}</div></div>
+      <div class="check"><span class="ck ${r.root_matches?'y':'n'}">${r.root_matches?'✓':'✕'}</span><div>Recomputed Merkle root ${r.root_matches?'matches':'differs'}</div></div>
+      ${r.problems.map(p=>`<div class="check" onclick="openRecord(${p.record_id})" style="cursor:pointer"><span class="ck n">✕</span><div><b>${esc(p.who)}</b><div class="desc">${esc(p.reason)}</div></div></div>`).join('')}</div>`;
+    loadFeed('#ledger', 400);
+  } catch(e){ toast(e.message); } finally { $('#verifySealBtn').disabled = false; }
+}
+
+// ---------- chaos
+async function loadChaos(){
+  const b = await refreshBatch(), ch = b.chaos || {}, rep = ch.report;
+  const phases = ['ready','generating','injecting','sending','double-send','auditing','done'];
+  const names = {ready:'Preparing',generating:'Creating, signing and sealing',injecting:'Injecting faults',sending:'Delivering with defences on','double-send':'Clicking Send again',auditing:'Opening every delivered email',done:'Done'};
+  if (!rep){
+    const i = Math.max(0, phases.indexOf(ch.phase));
+    $('#chaosBox').innerHTML = `<div class="card" style="margin-top:18px"><div class="row"><span class="spin"></span><b>${esc(names[ch.phase]||'Running')}…</b><span class="spacer"></span><span class="sub">${i}/${phases.length-1}</span></div>
+      <div class="progress" style="margin-top:10px"><div style="width:${Math.round(100*i/(phases.length-1))}%"></div></div>
+      <p class="foot" style="margin:10px 0 0">A sandbox batch of 16 students with broken names, a duplicate row, email typos and missing emails. After signing, two PDFs are swapped and one is edited, and the mail server is set to stall once and bounce once.</p></div>
+      <div class="cap">Live ledger</div><div class="group feed" id="chaosFeed"></div>`;
+    return loadFeed('#chaosFeed', 40);
+  }
+  $('#chaosBox').innerHTML = `
+    <div class="card" style="margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:18px">
+      <div><div class="big">${rep.passed}/${rep.total}</div><div class="sub">faults contained</div></div>
+      <div><div class="big">${rep.wrong_attachments_delivered}</div><div class="sub">wrong attachments delivered</div></div>
+      <div><div class="big">${rep.audit.emails_checked}</div><div class="sub">delivered emails opened and audited</div></div>
+      <div><div class="big">${rep.batch_finished?'✓':'✕'}</div><div class="sub">batch ${rep.batch_finished?'finished':'did not finish'} despite the faults</div></div></div>
+    <div class="cap">Injected fault → defence → outcome</div>
+    <div class="group">${rep.items.map(it => `<div class="check"><span class="ck ${it.passed?'y':'n'}">${it.passed?'✓':'✕'}</span><div class="grow"><b>${esc(it.fault)}</b>
+      <div style="font-size:13px"><span class="tagc">${esc(it.defense)}</span></div><div class="desc" style="margin-top:3px">${esc(it.observed)}</div></div></div>`).join('')}</div>
+    <div class="cap">Live demo</div>
+    <div class="group">
+      <div class="check"><span class="ck y">1</span><div class="grow"><b>Scan to verify</b><div class="desc">Open a delivered certificate and scan its QR, or open its public page.</div><div class="row" style="margin-top:8px"><a class="btn sm" target="_blank" href="/verify/${esc(rep.verify_code)}">Open verify page ↗</a></div></div></div>
+      <div class="check"><span class="ck y">2</span><div class="grow"><b>Try a forgery</b><div class="desc">Download the forged copy (name changed to “Mallory Impostor”) and upload it to the verifier. It fails.</div><div class="row" style="margin-top:8px"><a class="btn sm fill" href="/api/batches/${batch.id}/chaos/forged.pdf">Download forged PDF</a><a class="btn sm" target="_blank" href="/verify">Open verifier ↗</a></div></div></div>
+    </div>`;
+}
+
+// ---------- record sheet
+async function openRecord(id){
+  const r = await api(`/api/records/${id}`);
+  const p = r.proof, lock = p && p.lock_check;
+  const kv = (k,v) => `<div class="item"><span class="grow lbl">${k}</span><span class="val">${v}</span></div>`;
+  const ck = (ok,label,sub) => `<div class="check"><span class="ck ${ok?'y':'n'}">${ok?'✓':'✕'}</span><div><div>${label}</div>${sub?`<div class="desc">${sub}</div>`:''}</div></div>`;
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<div class="grabber"></div>
+    <div class="row" style="align-items:flex-start"><div style="flex:1;min-width:0"><div class="title" style="font-size:26px">${esc(r.name)||'(no name)'}</div>
+      <div class="sub">Row ${r.row_no} · ${esc(r.student_id)||'no ID'} · <span class="mono">${esc(r.cert_code)}</span></div></div>
+      <div>${chip(r.status)}</div><button class="btn sm plain" onclick="closeSheet()" aria-label="Close">✕</button></div>
+    ${(r.errors||r.warnings||r.last_error)?`<div class="cap">Issues</div><div class="group">${[...(r.errors?r.errors.split('; ').map(e=>`<div class="item"><span class="issue e">${esc(e)}</span></div>`):[]),...(r.warnings?r.warnings.split('; ').map(e=>`<div class="item"><span class="issue w">${esc(e)}</span></div>`):[]),...(r.last_error&&!['Sent','Claim','Claimed'].includes(r.status)?[`<div class="item"><span class="issue e">${esc(r.last_error)}</span></div>`]:[])].join('')}</div>`:''}
+    <div class="cap">Delivery</div><div class="group">
+      ${kv('Method', r.delivery==='claim'?'Claim link':'Email')}${kv('Address', esc(r.email)||'—')}${kv('From column', esc(r.email_source)||'—')}${r.email_fix?kv('Auto-fix', esc(r.email_fix)):''}
+      ${kv('Attempts', r.attempts)}${r.sent_at?kv('Sent', when(r.sent_at)):''}${r.claimed_at?kv('Claimed', when(r.claimed_at)):''}
+      ${r.claim_url?`<div class="item"><div class="grow"><div class="lbl">Claim link</div><div class="desc">Share it by WhatsApp or message; the student confirms their ID to download</div></div><button class="btn sm" onclick="copyText('${esc(r.claim_url)}')">Copy</button></div>`:''}</div>
+    <div class="cap">Certificate</div><div class="group">
+      ${kv('Category', esc(r.rule_label)||'—')}${kv('Design', esc(r.template_name))}${kv('Title', esc(r.values.TITLE||''))}${kv('Wording', esc(r.values.DESCRIPTION||''))}
+      ${r.cert_file?`<div class="item"><span class="grow"></span><a class="btn sm" target="_blank" href="/api/records/${r.id}/certificate">Open PDF</a>${r.verify_url?`<a class="btn sm" target="_blank" href="${esc(r.verify_url)}">Verify page ↗</a>`:''}</div>`:''}</div>
+    ${p?`<div class="cap">Proof</div><div class="group">
+      ${ck(lock && lock.length===0, 'Mapping Lock: this file belongs to this student', lock && lock.length ? lock.map(esc).join('<br>') : '')}
+      ${ck(p.signature_valid && p.record_consistent, 'Digital signature valid')}
+      ${ck(p.in_seal, p.in_seal?`In the batch seal (${p.leaf_index+1} of ${p.leaf_count})`:'Not in the current seal')}</div>`:''}
+    <div class="cap">From the spreadsheet</div><div class="group">${Object.entries(r.source_row).map(([k,v])=>kv(esc(k), esc(v)||'<span class="ter">empty</span>')).join('')}</div>
+    <div class="cap">Timeline</div><div class="group feed">${r.events.map(e=>`<div class="item"><span class="lv lv-${e.level}">${LV[e.level]||'·'}</span><div class="grow"><div class="msg">${esc(e.message)}</div><div class="when">${when(e.at)}</div></div></div>`).join('')||'<div class="empty">Nothing yet.</div>'}</div>
+    <div class="row" style="margin-top:18px">${r.status!=='Invalid'?`<button class="btn" onclick="closeSheet();previewRec(${r.id})">Preview</button>`:''}
+      ${['Sent','Skipped'].includes(r.status)&&r.delivery!=='claim'?`<button class="btn fill" onclick="resend(${r.id})">Send Again</button>`:''}</div>`;
+  openSheet();
+}
+function openSheet(){ $('#sheetWrap').classList.add('open'); document.body.style.overflow='hidden'; }
+function closeSheet(){ $('#sheetWrap').classList.remove('open'); document.body.style.overflow=''; galleryCb = null; }
+document.addEventListener('keydown', e => { if (e.key==='Escape') closeSheet(); });
+async function copyText(t){ try { await navigator.clipboard.writeText(t); toast('Copied'); } catch { prompt('Copy this link', t); } }
+async function previewRec(id){ $('#pvCat').value=''; await showTab('review'); const i = pvList.findIndex(x=>x.id===id); if (i>=0){ pvIndex=i; showPreview(); } }
+async function resend(id){
+  if (!confirm('This student already has this certificate. Send it again?')) return;
+  try { await post(`/api/records/${id}/resend`); closeSheet(); toast('Sending again'); showTab('review'); } catch(e){ toast(e.message); }
+}
+async function deleteBatch(){
+  if (!confirm(`Delete “${batch.name}” and its certificates? The send history is kept so students are never emailed twice.`)) return;
+  await api(`/api/batches/${batch.id}`,{method:'DELETE'}); showHome();
+}
+
+// ---------- settings
+async function openSettings(){
+  const s = await api('/api/settings');
+  const prov = s.mail.provider || 'gmail';
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Settings</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
+    <div class="cap">Email account</div>
+    <div class="chips" style="margin:0 0 10px" id="provChips">${['gmail','outlook','smtp','sandbox'].map(k=>`<button class="chipb ${k===prov?'on':''}" data-p="${k}">${esc({gmail:'Gmail',outlook:'Outlook / Microsoft 365',smtp:'Other',sandbox:'Test mode'}[k])}</button>`).join('')}</div>
+    <div id="mailForm"></div>
+    <div class="cap">Organization defaults</div>
+    <div class="group">
+      <div class="item"><span class="grow lbl">Organization name</span><input class="inl" id="orgName" type="text" value="${esc(s.org.org_name)}" placeholder="e.g. ABC College"></div>
+      <div class="item"><span class="grow lbl">Signatory 1</span><input class="inl" id="s1n" type="text" value="${esc(s.org.signer1_name)}" placeholder="Name" style="max-width:30%"><input class="inl" id="s1t" type="text" value="${esc(s.org.signer1_title)}" placeholder="Title" style="max-width:30%"></div>
+      <div class="item"><span class="grow lbl">Signatory 2</span><input class="inl" id="s2n" type="text" value="${esc(s.org.signer2_name)}" placeholder="Name" style="max-width:30%"><input class="inl" id="s2t" type="text" value="${esc(s.org.signer2_title)}" placeholder="Title" style="max-width:30%"></div>
+      <div class="item"><span class="grow"></span><button class="btn sm fill" onclick="saveOrg()">Save</button></div></div>
+    <p class="foot">New events start with these. Logos and signature images are added per event in step 2.</p>
+    <div class="cap">Verification link (QR codes)</div>
+    <div class="group"><div class="item" style="display:block"><div class="desc" style="margin-bottom:6px">QR codes on certificates open <b class="mono">${esc(s.public_base_url)}</b>${s.temporary_url&&!s.public_base_url_custom?'. <b>This free link changes every time SendEZ restarts</b>, so QR codes on certificates made now only verify while this session is running. For permanent verification, use a permanent address (see the README).':s.public_base_url_custom||s.hosted?'. Anyone can open it from anywhere.':': this computer on your Wi-Fi, so it works for phones on the same Wi-Fi. So that anyone can verify from anywhere, host SendEZ online and enter its address here <b>before</b> creating certificates.'}</div>
+      <div class="row"><input type="url" id="pubUrl" value="${esc(s.public_base_url_custom)}" placeholder="https://certificates.your-college.edu" style="flex:1"><button class="btn sm" onclick="savePubUrl()">Save</button></div></div></div>
+    <div class="cap">Security</div>
+    <div class="group">${s.admin_from_env?'<div class="item"><span class="desc">Password is set in the .env file.</span></div>':`<div class="item"><input type="password" id="pwOld" placeholder="Current password" style="background:transparent;padding:0"></div><div class="item"><input type="password" id="pwNew" placeholder="New password (8+ characters)" style="background:transparent;padding:0"></div><div class="item"><span class="grow"></span><button class="btn sm" onclick="changePw()">Change password</button></div>`}
+      <div class="item"><span class="grow lbl">Signing key</span><span class="val mono">${esc(me.key_fingerprint)}</span></div></div>`;
+  window._settings = s;
+  document.querySelectorAll('#provChips .chipb').forEach(b => b.onclick = () => setProvider(b.dataset.p));
+  setProvider(prov); openSheet();
+}
+function setProvider(k){
+  const s = window._settings, m = s.mail, same = m.provider === k;
+  document.querySelectorAll('#provChips .chipb').forEach(b => b.classList.toggle('on', b.dataset.p === k));
+  const cap = (same && m.daily_cap) || s.providers[k].daily_cap;
+  const pwd = same && m.has_password ? 'Saved. Leave empty to keep it' : (k==='gmail' ? '16-letter App Password' : 'Password');
+  const help = k==='gmail' ? `<div class="card" style="margin-top:10px"><b>How to get a Gmail App Password (2 minutes)</b><ol class="steplist sm">
+      <li>Turn on <b>2-Step Verification</b> for the Gmail account (<a href="https://myaccount.google.com/signinoptions/twosv" target="_blank">open ↗</a>).</li>
+      <li>Open <a href="https://myaccount.google.com/apppasswords" target="_blank"><b>App passwords</b> ↗</a>, type “SendEZ”, press Create.</li>
+      <li>Copy the 16 letters it shows and paste them above. Your normal Gmail password will not work here.</li></ol>
+      <div class="desc">Gmail allows about 500 emails a day (about 2,000 for Google Workspace). SendEZ stops safely at the limit you set and continues when you press Send again.</div></div>` : '';
+  $('#mailForm').innerHTML = k==='sandbox' ? `<div class="group"><div class="item"><div class="desc">Test mode: certificates and emails are saved on this computer (data/outbox) and not delivered. Good for trying things out.</div></div><div class="item"><span class="grow"></span><button class="btn sm fill" onclick="saveMail('sandbox')">Use test mode</button></div></div>` :
+    `<div class="group">
+      <div class="item"><span class="grow lbl">${k==='gmail'?'Gmail address':'Email address'}</span><input class="inl" type="email" id="mAddr" value="${esc(same?m.address:'')}" placeholder="${k==='gmail'?'you@gmail.com':'you@college.edu'}"></div>
+      <div class="item"><span class="grow lbl">${k==='gmail'?'App Password':'Password'}</span><input class="inl" type="password" id="mPass" placeholder="${esc(pwd)}" autocomplete="new-password"></div>
+      <div class="item"><span class="grow lbl">Sender name</span><input class="inl" type="text" id="mName" value="${esc(same?m.from_name:'')}" placeholder="e.g. Tech Fest Team"></div>
+      <div class="item"><span class="grow lbl">Replies go to <span class="ter sm">optional</span></span><input class="inl" type="email" id="mReply" value="${esc(same?m.reply_to:'')}" placeholder="coordinator@college.edu"></div>
+      ${k==='smtp'?`<div class="item"><span class="grow lbl">SMTP server</span><input class="inl" type="text" id="mHost" value="${esc(same?m.host:'')}" placeholder="smtp.example.com"></div><div class="item"><span class="grow lbl">Port</span><input class="inl" type="number" id="mPort" value="${same?m.port:587}"></div><div class="item"><span class="grow lbl">Security</span><select id="mSec">${['starttls','ssl','none'].map(x=>`<option ${x===(same?m.security:'starttls')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}
+      <div class="item"><div class="grow"><div class="lbl">Daily limit</div><div class="desc">Sending pauses here and continues later</div></div><input class="inl" type="number" id="mCap" value="${cap}" style="max-width:90px"></div>
+      <div class="item"><div class="grow"><div class="lbl">Pause between emails</div><div class="desc">Seconds; 1 is gentle on Gmail</div></div><input class="inl" type="number" step="0.5" id="mDelay" value="${same?m.delay_seconds:1}" style="max-width:90px"></div>
+      <div class="item"><span class="grow" id="mStatus">${same&&m.verified_at?`<span class="sub sm">✓ Tested ${when(m.verified_at)}</span>`:''}</span><button class="btn sm fill" onclick="saveMail('${k}')">Save &amp; Test</button></div>
+      <div class="item"><input type="email" id="mTestTo" placeholder="Send a test email to…" style="flex:1"><button class="btn sm" onclick="sendTest()">Send test</button></div>
+    </div>${help}`;
+}
+async function saveMail(k){
+  try {
+    const body = k==='sandbox' ? {provider:'sandbox'} : {provider:k, address:$('#mAddr').value.trim(), password:$('#mPass').value, from_name:$('#mName').value, reply_to:$('#mReply').value.trim(),
+      host: k==='smtp'?$('#mHost').value:'', port: k==='smtp'?+$('#mPort').value:587, security: k==='smtp'?$('#mSec').value:'starttls', daily_cap:+$('#mCap').value||0, delay_seconds:+$('#mDelay').value||0};
+    await put('/api/settings/mail', body);
+    await refreshMe();
+    if (k==='sandbox'){ toast('Test mode on'); return openSettings(); }
+    $('#mStatus').innerHTML = '<span class="spin"></span> <span class="sub sm">Testing the connection…</span>';
+    const r = await post('/api/settings/test-connection');
+    $('#mStatus').innerHTML = r.ok ? '<b>✓ Connected</b>' : `<span class="issue e">${esc(r.message)}</span>`;
+    toast(r.ok ? 'Connected. You can send certificates now' : 'Saved, but the connection failed. See the message');
+    await refreshMe(); if (batch && tab==='email') loadEmail();
+  } catch(e){ toast(e.message); }
+}
+async function sendTest(){
+  const to = $('#mTestTo').value.trim(); if (!to) return toast('Type an address to send the test to');
+  $('#mStatus').innerHTML = '<span class="spin"></span> <span class="sub sm">Sending…</span>';
+  try { const r = await post('/api/settings/test-email', {to}); $('#mStatus').innerHTML = r.ok ? '<b>✓ Test email sent</b>' : `<span class="issue e">${esc(r.message)}</span>`; }
+  catch(e){ $('#mStatus').innerHTML = `<span class="issue e">${esc(e.message)}</span>`; }
+}
+async function saveOrg(){ await put('/api/settings/org', {...window._settings.org, org_name:$('#orgName').value, signer1_name:$('#s1n').value, signer1_title:$('#s1t').value, signer2_name:$('#s2n').value, signer2_title:$('#s2t').value}); await refreshMe(); toast('Saved'); }
+async function savePubUrl(){ try { const r = await put('/api/settings/public-url', {url: $('#pubUrl').value}); toast(`QR codes will open ${r.public_base_url}`); openSettings(); } catch(e){ toast(e.message); } }
+async function changePw(){ try { await put('/api/settings/password', {current:$('#pwOld').value, new:$('#pwNew').value}); toast('Password changed'); } catch(e){ toast(e.message); } }
+let sharePoll = null;
+async function openPhone(){
+  clearTimeout(sharePoll);
+  let st;
+  try { st = await api('/api/share'); } catch(e){ return toast(e.message); }
+  const qr = url => `<div style="text-align:center;margin:10px 0"><img src="/api/qr.png?data=${encodeURIComponent(url)}" alt="QR code" style="width:200px;background:#fff;border-radius:12px;padding:6px"></div>`;
+  const linkRow = url => `<div class="group"><div class="item"><span class="grow mono" style="overflow-wrap:anywhere">${esc(url)}</span><button class="btn sm fill" onclick="copyText('${esc(url)}')">Copy</button></div></div>`;
+  let body = '';
+  if (!st.available){
+    body = `<p class="sub">SendEZ is online. Open this link on any phone, tablet or computer:</p>${linkRow(st.external_url)}${qr(st.external_url)}
+      <p class="foot">People sign in with your SendEZ password.</p>`;
+  } else if (st.state === 'on'){
+    body = `<p class="sub"><b>You're online.</b> Send this link to your operator or open it on your phone:</p>${linkRow(st.url)}${qr(st.url)}
+      <div class="group">
+        <div class="check"><span class="ck y">1</span><div>They open the link and sign in with <b>your SendEZ password</b>. Only share it with people you trust: they can send email from your account.</div></div>
+        <div class="check"><span class="ck w">!</span><div><b>Keep this computer on and SendEZ open.</b> The link stops when SendEZ closes or the computer sleeps.</div></div>
+        <div class="check"><span class="ck w">!</span><div><b>You get a new link each time</b> you start sharing. QR codes on certificates made now only verify while this link works.</div></div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn" onclick="shareStop()">Stop sharing</button></div>`;
+  } else if (st.state === 'starting'){
+    body = `<div class="card"><div class="row"><span class="spin"></span><b>Opening your public link…</b></div>
+      <p class="foot" style="margin:8px 0 0">This takes a few seconds. The very first time it also downloads Cloudflare’s free tunnel tool (20–55 MB).</p></div>`;
+    sharePoll = setTimeout(() => { if ($('#sheetWrap').classList.contains('open') && $('#shareSheet')) openPhone(); }, 1500);
+  } else {
+    body = `${st.state==='error'?`<div class="banner light" style="margin-top:0"><span class="ico">!</span><div class="grow">${esc(st.error)}</div></div>`:''}
+      <p class="sub">Get a free public link so your operator, or you on your phone, can use SendEZ from anywhere. Nothing to install for them, and no account needed.</p>
+      <button class="btn fill block lg" style="margin-top:6px" onclick="shareStart()">${st.state==='error'?'Try again':'Start sharing'}</button>
+      <p class="foot" style="margin-top:12px">Free link by Cloudflare. It works while this computer is on and SendEZ is open, and changes each time you start sharing.</p>
+      ${me.lan_available?`<div class="cap">Or on the same Wi-Fi</div>${linkRow(me.lan_url)}`:''}`;
+  }
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead" id="shareSheet"><h2>Share online</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>${body}`;
+  openSheet();
+}
+async function shareStart(){ try { await post('/api/share/start'); openPhone(); } catch(e){ toast(e.message); } }
+async function shareStop(){ try { await post('/api/share/stop'); await refreshMe(); toast('Sharing stopped'); openPhone(); } catch(e){ toast(e.message); } }
+
+// ---------- live updates
+async function syncPoll(){
+  if (!batch) return stopPoll();
+  const busy = !!batch.job || (batch.is_chaos && (batch.chaos||{}).phase !== 'done');
+  if (busy && !pollTimer) pollTimer = setInterval(tick, 1200);
+  if (!busy && pollTimer) stopPoll();
+}
+async function tick(){
+  if (!batch) return stopPoll();
+  const was = batch.job;
+  await refreshBatch();
+  if (tab==='review') await loadSend(); else if (tab==='chaos') await loadChaos(); else if (tab==='students') await loadStats(); else if (tab==='proof') await loadProof();
+  loadBatches();
+  const busy = !!batch.job || (batch.is_chaos && (batch.chaos||{}).phase !== 'done');
+  if (!busy){ stopPoll(); refreshMe(); if (was) toast(batch.pause_reason ? 'Sending paused. See the message at the top' : 'All done'); if (tab==='review') loadReview(); if (tab==='chaos') loadChaos(); }
+}
+function stopPoll(){ clearInterval(pollTimer); pollTimer = null; }
+
+start().catch(showLogin);
+</script>
+</body>
+</html>

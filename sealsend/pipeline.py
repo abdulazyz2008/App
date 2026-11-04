@@ -33,11 +33,13 @@ def new_cert_code() -> str:
 
 
 # ---------------------------------------------------------------- configuration
-def default_config(columns: list[str], rows: list[dict], event_name: str, filename: str = "") -> dict:
+def default_config(columns: list[str], rows: list[dict], event_name: str, filename: str = "", club: str = "") -> dict:
+    from . import clubs
+    club = club if club in clubs.CLUB_BY_ID else ""
     cfg = suggest_config(columns, rows)
     if "EVENT" not in cfg["mapping"]:
         cfg["mapping"]["EVENT"] = {"type": "text", "value": event_name or Path(filename).stem.replace("_", " ")}
-    base = guess_event_template(" ".join([event_name or "", filename or ""]
+    base = clubs.CLUB_BY_ID[club]["template"] if club else guess_event_template(" ".join([event_name or "", filename or ""]
                                          + [r.get(cfg["mapping"]["EVENT"].get("value", ""), "") for r in rows[:3]
                                             if cfg["mapping"]["EVENT"]["type"] == "column"]))
     name_map = {"NAME": cfg["mapping"]["NAME"]} if cfg["mapping"].get("NAME") else {}
@@ -54,7 +56,8 @@ def default_config(columns: list[str], rows: list[dict], event_name: str, filena
         "auto_fix_emails": True,
         "claim_links": True,
         "fix_caps": caps > len(rows) * 0.3,
-        "branding": {k: org.get(k, "") for k in settings.DEFAULT["org"]},
+        "branding": clubs.branding_for(club) if club else {k: org.get(k, "") for k in settings.DEFAULT["org"]},
+        "club": club,
     })
     return cfg
 
@@ -100,9 +103,9 @@ def all_placeholders(cfg: dict) -> dict:
 
 
 def create_batch(src: Path, original_name: str, batch_name: str, cfg_overrides: dict | None = None,
-                 chaos: dict | None = None, sheet: str | None = None) -> int:
+                 chaos: dict | None = None, sheet: str | None = None, club: str = "") -> int:
     table = read_table(src, sheet)
-    cfg = default_config(table["columns"], table["rows"], batch_name, original_name)
+    cfg = default_config(table["columns"], table["rows"], batch_name, original_name, club)
     cfg.update({"source_file": src.name, "sheets": table["sheets"], "header_row": table["header_row"]})
     cfg.update(cfg_overrides or {})
     with db.tx() as c:
@@ -132,7 +135,7 @@ def reload_sheet(batch_id: int, sheet: str) -> None:
         raise ValueError("Certificates were already issued from this batch; upload the file again as a new batch")
     src = config.UPLOAD_DIR / b["config"]["source_file"]
     table = read_table(src, sheet)
-    cfg = default_config(table["columns"], table["rows"], b["name"], b["filename"])
+    cfg = default_config(table["columns"], table["rows"], b["name"], b["filename"], b["config"].get("club", ""))
     cfg.update({"source_file": src.name, "sheets": table["sheets"], "header_row": table["header_row"]})
     shutil.rmtree(config.CERT_DIR / f"batch_{batch_id}", ignore_errors=True)
     with db.tx() as c:

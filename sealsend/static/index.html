@@ -114,6 +114,12 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
 .drop{border:1.5px dashed var(--ter);border-radius:var(--r);padding:44px 20px;text-align:center;cursor:pointer;background:var(--card);transition:.15s}
 .drop.over{border-color:var(--ink);background:var(--tint2)}
 .drop b{display:block;font-size:18px;margin-bottom:4px}
+.clubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.club{background:var(--card);border:2px solid transparent;border-radius:var(--r);padding:12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:44px;transition:transform .1s}
+.club:active{transform:scale(.98)}
+.club.on{border-color:var(--accent,var(--ink))}
+.club img{width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff}
+.club b{font-size:14px;line-height:1.2}.club small{font-size:12px;color:var(--sub);line-height:1.3}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
 .howc{background:var(--card);border-radius:var(--r);padding:15px}
 .howc .k{font-size:12px;color:var(--sub);font-weight:600;letter-spacing:.04em}
@@ -245,6 +251,9 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
       <h1 class="title">New Event</h1>
       <p class="subtitle">Upload your student list. SendEZ reads it, picks the right certificate for each category, and emails every student their own signed certificate.</p>
       <div id="setupNudge"></div>
+      <div class="cap">Club · Mahindra University</div>
+      <div class="clubs" id="clubPick"></div>
+      <p class="foot">Certificates show Mahindra University and the club’s logo. Logos are managed in Settings.</p>
       <div class="cap">Event name</div>
       <div class="group"><div class="item"><input type="text" id="batchName" placeholder="e.g. National Tech Fest 2026" style="background:transparent;padding:0"></div></div>
       <p class="foot">Used on the certificates and in the emails. It also helps choose a matching design.</p>
@@ -469,7 +478,16 @@ async function loadBatches(){
     || '<p class="foot" style="margin:0 6px">No events yet.</p>';
   return list;
 }
-function showHome(){ batch=null; cfg=null; stopPoll(); $('#batch').classList.add('hidden'); $('#home').classList.remove('hidden'); loadBatches(); }
+let selectedClub = '', clubData = null, logoV = Date.now();
+const clubLogo = key => `/api/clubs/${key}/logo.png?v=${logoV}`;
+async function renderClubs(){
+  try { clubData = await api('/api/clubs'); } catch { return; }
+  $('#clubPick').innerHTML = clubData.clubs.map(c => `<button class="club ${c.id===selectedClub?'on':''}" onclick="pickClub('${c.id}')" aria-pressed="${c.id===selectedClub}">
+      <img src="${clubLogo(c.id)}" alt=""><b>${esc(c.name)}</b><small>${esc(c.about)}</small></button>`).join('') +
+    `<button class="club ${selectedClub===''?'on':''}" onclick="pickClub('')" aria-pressed="${selectedClub===''}"><span style="width:44px;height:44px;border-radius:10px;background:var(--tint);display:flex;align-items:center;justify-content:center;font-size:20px">＋</span><b>Other</b><small>Not a club event</small></button>`;
+}
+function pickClub(id){ selectedClub = id; renderClubs(); }
+function showHome(){ batch=null; cfg=null; stopPoll(); $('#batch').classList.add('hidden'); $('#home').classList.remove('hidden'); loadBatches(); renderClubs(); }
 
 // ---------- upload
 const drop = $('#drop');
@@ -480,7 +498,7 @@ drop.ondragleave = () => drop.classList.remove('over');
 drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); };
 $('#file').onchange = e => { if (e.target.files[0]) upload(e.target.files[0]); e.target.value=''; };
 async function upload(file){
-  const fd = new FormData(); fd.append('file', file); fd.append('name', $('#batchName').value);
+  const fd = new FormData(); fd.append('file', file); fd.append('name', $('#batchName').value); fd.append('club', selectedClub);
   drop.innerHTML = '<span class="spin"></span> <span class="sub">Reading your sheet…</span>';
   try { const b = await api('/api/batches',{method:'POST',body:fd}); $('#batchName').value=''; tab='students'; await openBatch(b.id); toast('Sheet read. Check what we found, then press Next.'); }
   catch(err){ toast(err.message); }
@@ -979,6 +997,9 @@ async function openSettings(){
     <div class="cap">Email account</div>
     <div class="chips" style="margin:0 0 10px" id="provChips">${['gmail','outlook','smtp','sandbox'].map(k=>`<button class="chipb ${k===prov?'on':''}" data-p="${k}">${esc({gmail:'Gmail',outlook:'Outlook / Microsoft 365',smtp:'Other',sandbox:'Test mode'}[k])}</button>`).join('')}</div>
     <div id="mailForm"></div>
+    <div class="cap">Mahindra University logos</div>
+    <div class="group" id="muLogos"></div>
+    <p class="foot">Upload once. Every club event then shows Mahindra University’s logo next to the club’s logo. PNG with a transparent background looks best.</p>
     <div class="cap">Organization defaults</div>
     <div class="group">
       <div class="item"><span class="grow lbl">Organization name</span><input class="inl" id="orgName" type="text" value="${esc(s.org.org_name)}" placeholder="e.g. ABC College"></div>
@@ -993,6 +1014,7 @@ async function openSettings(){
     <div class="group">${s.admin_from_env?'<div class="item"><span class="desc">Password is set in the .env file.</span></div>':`<div class="item"><input type="password" id="pwOld" placeholder="Current password" style="background:transparent;padding:0"></div><div class="item"><input type="password" id="pwNew" placeholder="New password (8+ characters)" style="background:transparent;padding:0"></div><div class="item"><span class="grow"></span><button class="btn sm" onclick="changePw()">Change password</button></div>`}
       <div class="item"><span class="grow lbl">Signing key</span><span class="val mono">${esc(me.key_fingerprint)}</span></div></div>`;
   window._settings = s;
+  renderMuLogos();
   document.querySelectorAll('#provChips .chipb').forEach(b => b.onclick = () => setProvider(b.dataset.p));
   setProvider(prov); openSheet();
 }
@@ -1038,6 +1060,18 @@ async function sendTest(){
   $('#mStatus').innerHTML = '<span class="spin"></span> <span class="sub sm">Sending…</span>';
   try { const r = await post('/api/settings/test-email', {to}); $('#mStatus').innerHTML = r.ok ? '<b>✓ Test email sent</b>' : `<span class="issue e">${esc(r.message)}</span>`; }
   catch(e){ $('#mStatus').innerHTML = `<span class="issue e">${esc(e.message)}</span>`; }
+}
+async function renderMuLogos(){
+  const c = await api('/api/clubs');
+  const row = (key, name, about, has) => `<div class="item"><img src="${clubLogo(key)}" alt="" style="width:36px;height:36px;object-fit:contain;border-radius:8px;background:#fff;flex:none">
+    <div class="grow"><div class="lbl">${esc(name)}</div><div class="desc">${esc(about)}${has?'':' · no logo yet'}</div></div>
+    <label class="btn sm" style="cursor:pointer">${has?'Replace':'Upload'}<input type="file" accept=".png,.jpg,.jpeg,.webp" hidden onchange="uploadClubLogo('${key}', this)"></label></div>`;
+  $('#muLogos').innerHTML = row('university', c.university.name, 'University logo', c.university.has_logo) + c.clubs.map(x => row(x.id, x.name, x.about, x.has_logo)).join('');
+}
+async function uploadClubLogo(key, input){
+  const f = input.files[0]; if (!f) return; const fd = new FormData(); fd.append('file', f);
+  try { await api(`/api/clubs/${key}/logo`, {method:'POST', body: fd}); logoV = Date.now(); thumbV = Date.now(); toast('Logo saved'); renderMuLogos(); renderClubs(); }
+  catch(e){ toast(e.message); }
 }
 async function saveOrg(){ await put('/api/settings/org', {...window._settings.org, org_name:$('#orgName').value, signer1_name:$('#s1n').value, signer1_title:$('#s1t').value, signer2_name:$('#s2n').value, signer2_title:$('#s2t').value}); await refreshMe(); toast('Saved'); }
 async function savePubUrl(){ try { const r = await put('/api/settings/public-url', {url: $('#pubUrl').value}); toast(`QR codes will open ${r.public_base_url}`); openSettings(); } catch(e){ toast(e.message); } }
