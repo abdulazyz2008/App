@@ -16,7 +16,7 @@ from concurrent.futures.process import BrokenProcessPool
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
-from . import certificate, config, copilot, crypto, db, mailer, settings
+from . import certificate, config, copilot, crypto, db, keepawake, mailer, settings
 from . import templates_lib as T
 from .data import (STYLES, classify, honor_phrase, with_article, fix_email_typo, guess_event_template, normalize_email, placeholders_in, read_table,
                    render, required_in, resolve_values, safe_filename, suggest_categories, suggest_config, valid_email,
@@ -569,6 +569,35 @@ def quota_status() -> dict:
     return {"mode": mode, "cap": cap, "used": used, "left": max(cap - used, 0) if cap else None}
 
 
+def _ts(dt: datetime) -> str:
+    return dt.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def _parse_ts(value: str) -> datetime:
+    return datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+
+
+def quota_reset_at() -> str:
+    """When the whole daily allowance is free again: 24 hours after the newest counted email (+2 min)."""
+    row = db.one("SELECT MAX(at) at FROM send_log WHERE result='sent' AND detail NOT LIKE 'Sandbox%'")
+    now = datetime.now(timezone.utc)
+    base = _parse_ts(row["at"]) if row and row["at"] else now
+    return _ts(max(base + timedelta(hours=24, minutes=2), now + timedelta(minutes=2)))
+
+
+def preflight(batch: dict, check_quota: bool = True) -> tuple[str, str]:
+    """('', '') when a send can start, else (kind, message) with kind 'quota' or 'connection'."""
+    if batch["is_chaos"] or config.mail_mode() == "sandbox":
+        return "", ""
+    q = quota_status()
+    if check_quota and q["cap"] and q["left"] == 0:
+        return "quota", f"The daily sending limit ({q['cap']}) is used up. Try again later or raise it in Settings."
+    res = mailer.check_connection()
+    if not res["ok"]:
+        return "connection", f"Can't send yet: {res['message']}"
+    return "", ""
+
+
 class _Pause(Exception):
     pass
 
@@ -577,7 +606,7 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
     batch = db.get_batch(batch_id)
     cfg = normalize_config(batch["config"])
     chaos = batch["chaos"] or {}
-    db.set_batch(batch_id, pause_reason="")
+    db.set_batch(batch_id, pause_reason="", send_at="", send_kind="")
     statuses = ["Pending", "Generated", "Failed"] + (["Sent", "Skipped", "Claim", "Claimed"] if allow_resend else [])
     sql = f"SELECT * FROM records WHERE batch_id=? AND status IN ({','.join('?' * len(statuses))})"
     params: list = [batch_id, *statuses]
@@ -595,6 +624,7 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
     mode = "sandbox" if batch["is_chaos"] else config.mail_mode()
     real = mode != "sandbox"
     cap = settings.mail()["daily_cap"] if real else 0
+    auto_resume = real and settings.mail().get("auto_resume", True) is not False
     delay = float(settings.mail().get("delay_seconds") or 0) if real else 0.0
     delay = max(delay, config.SEND_DELAY_SECONDS) if real else 0.0
     db.log(batch_id, None, "info", "send", f"Delivery started for {len(targets)} students via {mode}"
@@ -629,8 +659,9 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
                     claim += 1
                     continue
                 if cap and sent_last_24h() >= cap:
-                    raise _Pause(f"Daily sending limit reached ({cap} emails in 24 hours). The rest are queued: press "
-                                 "Send again after the limit resets, or raise the limit in Settings if your account allows it.")
+                    raise _Pause(f"Daily sending limit reached ({cap} emails in 24 hours). The rest are queued"
+                                 + ("; SendEZ continues automatically when the limit resets (keep it open)." if auto_resume else
+                                    ": press Send again after the limit resets, or raise the limit in Settings if your account allows it."))
                 try:
                     rec, pdf, healed = verified_attachment(rec, cfg)
                     reseal |= healed
@@ -650,7 +681,11 @@ def send(batch_id: int, record_ids: list[int] | None = None, allow_resend: bool 
                     time.sleep(delay)
     except (mailer.AuthFailure, mailer.QuotaFailure, _Pause) as e:
         kind = {"AuthFailure": "Email login failed", "QuotaFailure": "Sending limit reached"}.get(type(e).__name__, "Paused")
-        db.set_batch(batch_id, pause_reason=f"{kind}: {e}")
+        resume = ""
+        if auto_resume and not isinstance(e, mailer.AuthFailure):  # a wrong password needs a person; a limit just needs time
+            resume = quota_reset_at() if isinstance(e, _Pause) else _ts(datetime.now(timezone.utc) + timedelta(hours=24, minutes=2))
+            db.log(batch_id, None, "info", "schedule", f"Will continue automatically at {resume[:16].replace('T', ' ')} UTC")
+        db.set_batch(batch_id, pause_reason=f"{kind}: {e}", send_at=resume, send_kind="limit" if resume else "")
         with db.tx() as c:
             c.execute("UPDATE records SET status='Generated' WHERE batch_id=? AND status='Sending'", (batch_id,))
         db.log(batch_id, None, "error" if isinstance(e, mailer.AuthFailure) else "warn", "send",
@@ -711,6 +746,69 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
                 _log_send(rec, fname, "failed", last)
                 return {"ok": False, "rebound": rebound}
     return {"ok": False, "rebound": rebound}
+
+
+# ---------------------------------------------------------------- scheduled and automatic sends
+_sched_lock = threading.Lock()
+_sched_stop: threading.Event | None = None
+MISSED_AFTER = timedelta(hours=12)
+
+
+def scheduler_tick(now: datetime | None = None) -> None:
+    """Start every send whose time has come: scheduled sends, and batches waiting for the daily limit to reset."""
+    now = now or datetime.now(timezone.utc)
+    with _sched_lock:
+        due = db.query("SELECT id FROM batches WHERE send_at!='' AND send_at<=?", (_ts(now),))
+        for row in due:
+            b = db.get_batch(row["id"])
+            if is_running(b["id"]):
+                continue
+            kind, when = b["send_kind"], b["send_at"]
+            db.set_batch(b["id"], send_at="", send_kind="")
+            if kind == "schedule" and now - _parse_ts(when) > MISSED_AFTER:
+                db.set_batch(b["id"], pause_reason="Scheduled send missed: SendEZ was closed at the chosen time. Press Send to send now.")
+                db.log(b["id"], None, "warn", "schedule", "Scheduled send missed because SendEZ was closed; waiting for you")
+                continue
+            problem, message = preflight(b)
+            if problem == "quota" and kind == "limit":  # other events used the allowance meanwhile: wait again
+                db.set_batch(b["id"], send_at=quota_reset_at(), send_kind="limit")
+                continue
+            if problem:
+                db.set_batch(b["id"], pause_reason=f"{'Scheduled send' if kind == 'schedule' else 'Automatic continue'} couldn't start: {message}")
+                db.log(b["id"], None, "error", "schedule", f"Couldn't start automatically: {message}")
+                continue
+            db.log(b["id"], None, "info", "schedule",
+                   "Scheduled send started" if kind == "schedule" else "Daily limit reset: continuing automatically")
+            run_job(b["id"], "sending", send)
+
+
+def _wants_awake() -> bool:
+    return bool(db.one("SELECT COUNT(*) n FROM batches WHERE job!='' OR send_at!=''")["n"])
+
+
+def start_scheduler(interval: float | None = None) -> None:
+    global _sched_stop
+    stop = threading.Event()
+    _sched_stop = stop
+    every = interval if interval is not None else config.SCHEDULER_SECONDS
+
+    def loop():
+        wait = min(3.0, every)  # catch anything that came due while the app was closed
+        while not stop.wait(wait):
+            wait = every
+            try:
+                scheduler_tick()
+                keepawake.set_awake(_wants_awake())
+            except Exception:
+                pass  # never let the timer die; the next tick tries again
+        keepawake.set_awake(False)
+
+    threading.Thread(target=loop, name="sendez-scheduler", daemon=True).start()
+
+
+def stop_scheduler() -> None:
+    if _sched_stop is not None:
+        _sched_stop.set()
 
 
 # ---------------------------------------------------------------- jobs

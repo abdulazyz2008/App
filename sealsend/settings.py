@@ -27,7 +27,7 @@ PROVIDERS = {
 }
 DEFAULT = {
     "mail": {"provider": "", "address": "", "from_name": "", "reply_to": "", "host": "", "port": 587, "security": "starttls",
-             "username": "", "password_enc": "", "daily_cap": 0, "delay_seconds": 1.0, "verified_at": ""},
+             "username": "", "password_enc": "", "daily_cap": 0, "delay_seconds": 1.0, "verified_at": "", "auto_resume": True},
     "org": {"org_name": "", "logo": "", "signer1_name": "", "signer1_title": "Event Coordinator", "signer1_sig": "",
             "signer2_name": "", "signer2_title": "Head of Department", "signer2_sig": ""},
     "admin": {"password_hash": ""},
@@ -119,7 +119,7 @@ def public_mail() -> dict:
 def update_mail(fields: dict) -> None:
     data = load()
     m = data["mail"]
-    for k in ("provider", "address", "from_name", "reply_to", "host", "port", "security", "username", "daily_cap", "delay_seconds"):
+    for k in ("provider", "address", "from_name", "reply_to", "host", "port", "security", "username", "daily_cap", "delay_seconds", "auto_resume"):
         if k in fields and fields[k] is not None:
             m[k] = fields[k]
     if fields.get("password"):

@@ -62,6 +62,7 @@ ISSUER_NAME = os.environ.get("ISSUER_NAME", "Event Organizing Committee")
 SEND_DELAY_SECONDS = float(os.environ.get("SEND_DELAY_SECONDS", "0"))
 MAX_SEND_ATTEMPTS = int(os.environ.get("MAX_SEND_ATTEMPTS", "3"))
 RETRY_BASE_SECONDS = float(os.environ.get("RETRY_BASE_SECONDS", "1"))
+SCHEDULER_SECONDS = float(os.environ.get("SEALSEND_SCHEDULER_SECONDS", "20"))  # how often scheduled sends are checked
 MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", "20"))
 PORT = int(os.environ.get("SEALSEND_PORT", "8000"))
 SETTINGS_PATH = DATA_DIR / "settings.json"

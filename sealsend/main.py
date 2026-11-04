@@ -28,7 +28,9 @@ async def lifespan(_app):
         c.execute("UPDATE records SET status='Generated' WHERE status='Sending'")
         c.execute("UPDATE batches SET job=''")
     crypto.private_key()
+    pipeline.start_scheduler()  # scheduled sends and automatic continue after the daily limit
     yield
+    pipeline.stop_scheduler()
     tunnel.share.stop()  # never leave a public link open after the app quits
 
 
@@ -183,7 +185,8 @@ def batch_summary(b: dict) -> dict:
     return {"id": b["id"], "name": b["name"], "filename": b["filename"], "created_at": b["created_at"],
             "job": b["job"], "counts": db.status_counts(b["id"]), "is_chaos": bool(b["is_chaos"]),
             "sealed": bool(b["seal"]), "chaos_phase": (b["chaos"] or {}).get("phase", ""),
-            "pause_reason": b.get("pause_reason", ""), "sheet": b.get("sheet", "")}
+            "pause_reason": b.get("pause_reason", ""), "sheet": b.get("sheet", ""),
+            "send_at": b.get("send_at", ""), "send_kind": b.get("send_kind", "")}
 
 
 async def _read_upload(upload: UploadFile, allowed: tuple[str, ...]) -> bytes:
@@ -477,15 +480,55 @@ class SendIn(BaseModel):
     allow_resend: bool = False
 
 
-def _preflight(batch: dict) -> None:
-    if batch["is_chaos"] or config.mail_mode() == "sandbox":
-        return
-    q = pipeline.quota_status()
-    if q["cap"] and q["left"] == 0:
-        raise HTTPException(400, f"The daily sending limit ({q['cap']}) is used up. Try again later or raise it in Settings.")
-    res = mailer.check_connection()
-    if not res["ok"]:
-        raise HTTPException(400, f"Can't send yet: {res['message']}")
+def _preflight(batch: dict, check_quota: bool = True) -> None:
+    problem, message = pipeline.preflight(batch, check_quota)
+    if problem:
+        raise HTTPException(400, message)
+
+
+class ScheduleIn(BaseModel):
+    at: str  # ISO 8601 with a time zone, e.g. from the browser's Date.toISOString()
+    confirm: bool = False
+
+
+@app.post("/api/batches/{batch_id}/schedule", dependencies=[Depends(require_auth)])
+def schedule_send(batch_id: int, body: ScheduleIn):
+    from datetime import datetime, timedelta, timezone
+    b = get_batch_or_404(batch_id)
+    if not body.confirm:
+        raise HTTPException(400, "Scheduling requires explicit confirmation")
+    if b["is_chaos"]:
+        raise HTTPException(400, "The Chaos Test can't be scheduled")
+    ensure_idle(batch_id)
+    try:
+        when = datetime.fromisoformat(body.at.strip().replace("Z", "+00:00"))
+    except ValueError:
+        raise HTTPException(400, "Pick a date and time")
+    if when.tzinfo is None:
+        raise HTTPException(400, "The time needs a time zone")
+    now = datetime.now(timezone.utc)
+    if when < now + timedelta(minutes=1):
+        raise HTTPException(400, "Pick a time in the future")
+    if when > now + timedelta(days=60):
+        raise HTTPException(400, "Pick a time within the next 60 days")
+    waiting = db.one("SELECT COUNT(*) n FROM records WHERE batch_id=? AND status IN ('Pending','Generated','Failed')", (batch_id,))["n"]
+    if not waiting:
+        raise HTTPException(400, "Everyone in this event already has their certificate")
+    _preflight(b, check_quota=False)  # a wrong password shows up now, not at 9 AM tomorrow
+    at = pipeline._ts(when)
+    db.set_batch(batch_id, send_at=at, send_kind="schedule", pause_reason="")
+    db.log(batch_id, None, "info", "schedule", f"Sending scheduled for {at[:16].replace('T', ' ')} UTC ({waiting} students)")
+    return batch_summary(db.get_batch(batch_id))
+
+
+@app.delete("/api/batches/{batch_id}/schedule", dependencies=[Depends(require_auth)])
+def cancel_schedule(batch_id: int):
+    b = get_batch_or_404(batch_id)
+    if b["send_at"]:
+        db.set_batch(batch_id, send_at="", send_kind="")
+        db.log(batch_id, None, "info", "schedule",
+               "Scheduled send cancelled" if b["send_kind"] == "schedule" else "Automatic continue turned off; press Send to continue")
+    return batch_summary(db.get_batch(batch_id))
 
 
 @app.post("/api/batches/{batch_id}/generate", dependencies=[Depends(require_auth)])
@@ -716,6 +759,7 @@ class MailIn(BaseModel):
     username: str = ""
     daily_cap: int = 0
     delay_seconds: float = 1.0
+    auto_resume: bool = True
 
 
 @app.put("/api/settings/mail", dependencies=[Depends(require_auth)])

@@ -433,6 +433,70 @@ def test_daily_cap_pauses_and_resumes_without_loss(client, monkeypatch):
     assert len(log["sent"]) == 11 and len({m["To"] for m in log["sent"]}) == 11  # nobody emailed twice
 
 
+def test_scheduled_send(client):
+    from datetime import datetime, timedelta, timezone
+    from sealsend import pipeline
+    now = datetime.now(timezone.utc)
+    iso = lambda dt: dt.strftime("%Y-%m-%dT%H:%M:%S.000Z")
+    assert client.post("/api/batches/1/schedule", json={"at": iso(now), "confirm": True}).status_code == 401
+    login(client)
+    bid = upload(client)["id"]
+    url = f"/api/batches/{bid}/schedule"
+    assert client.post(url, json={"at": iso(now + timedelta(hours=1))}).status_code == 400  # needs confirmation
+    assert client.post(url, json={"at": iso(now - timedelta(hours=1)), "confirm": True}).status_code == 400
+    assert client.post(url, json={"at": "2030-01-01T09:00:00", "confirm": True}).status_code == 400  # no time zone
+    assert client.post(url, json={"at": iso(now + timedelta(days=90)), "confirm": True}).status_code == 400
+    r = client.post(url, json={"at": iso(now + timedelta(hours=1)), "confirm": True})
+    assert r.status_code == 200 and r.json()["send_kind"] == "schedule" and r.json()["send_at"]
+    assert client.delete(url).json()["send_at"] == ""
+    client.post(url, json={"at": iso(now + timedelta(hours=1)), "confirm": True})
+    pipeline.scheduler_tick(now + timedelta(minutes=30))  # not due yet
+    assert client.get(f"/api/batches/{bid}").json()["counts"].get("Sent", 0) == 0
+    pipeline.scheduler_tick(now + timedelta(hours=1, minutes=1))
+    done = wait_idle(client, bid)
+    assert done["counts"]["Sent"] == 11 and done["send_at"] == "" and done["pause_reason"] == ""
+    ev = client.get(f"/api/batches/{bid}/events", params={"limit": 100}).json()
+    assert any("Scheduled send started" in e["message"] for e in ev)
+
+    late = upload(client, event="Missed Event")["id"]
+    client.post(f"/api/batches/{late}/schedule", json={"at": iso(now + timedelta(hours=1)), "confirm": True})
+    pipeline.scheduler_tick(now + timedelta(hours=14))  # SendEZ was closed for half a day: wait for a person
+    b = client.get(f"/api/batches/{late}").json()
+    assert "missed" in b["pause_reason"] and b["counts"].get("Sent", 0) == 0 and b["send_at"] == ""
+
+
+def test_auto_continue_after_daily_limit(client, monkeypatch):
+    from datetime import datetime, timedelta, timezone
+    from sealsend import db, pipeline
+    log = _fake_smtp(monkeypatch, {})
+    login(client)
+    _gmail(client, cap=5)
+    bid = upload(client)["id"]
+    done = send(client, bid)
+    assert len(log["sent"]) == 5 and "continues automatically" in done["pause_reason"] and done["send_kind"] == "limit"
+    at = datetime.strptime(done["send_at"], "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+    assert timedelta(hours=23) < at - datetime.now(timezone.utc) < timedelta(hours=25)
+    pipeline.scheduler_tick(at - timedelta(hours=1))
+    assert not pipeline.is_running(bid) and len(log["sent"]) == 5  # not yet
+    with db.tx() as c:  # a day later the allowance is free again
+        c.execute("UPDATE send_log SET at='2000-01-01T00:00:00Z'")
+    pipeline.scheduler_tick(at + timedelta(minutes=1))
+    done = wait_idle(client, bid)
+    assert done["counts"]["Sent"] == 10 and done["send_kind"] == "limit"  # 5 more, then waits again
+    assert client.delete(f"/api/batches/{bid}/schedule").json()["send_at"] == ""  # "Don't continue"
+    ev = client.get(f"/api/batches/{bid}/events", params={"limit": 200}).json()
+    assert any("continuing automatically" in e["message"] for e in ev)
+
+    # switched off in Settings: pauses and waits for the organizer, as before
+    assert client.put("/api/settings/mail", json={"provider": "gmail", "address": "me@gmail.com", "daily_cap": 5,
+                                                  "delay_seconds": 0, "auto_resume": False}).status_code == 200
+    with db.tx() as c:
+        c.execute("UPDATE send_log SET at='2000-01-01T00:00:00Z'")
+    other = upload(client, name="tech_fest_2026.xlsx", event="Second")["id"]  # different students
+    done = send(client, other)
+    assert done["send_at"] == "" and "press Send again" in done["pause_reason"]
+
+
 def test_provider_quota_error_pauses(client, monkeypatch):
     calls = {"n": 0}
 
@@ -446,6 +510,7 @@ def test_provider_quota_error_pauses(client, monkeypatch):
     bid = upload(client)["id"]
     done = send(client, bid)
     assert done["counts"]["Sent"] == 3 and "limit" in done["pause_reason"].lower() and not done["counts"].get("Failed")
+    assert done["send_kind"] == "limit" and done["send_at"]  # the provider said "tomorrow": try again in 24 hours
 
 
 def test_transient_failure_isolated_then_retried(client, monkeypatch):

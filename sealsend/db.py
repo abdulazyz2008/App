@@ -97,8 +97,10 @@ CREATE TABLE IF NOT EXISTS templates (
 MIGRATIONS = {
     "batches": {"sheet": "TEXT NOT NULL DEFAULT ''", "pause_reason": "TEXT NOT NULL DEFAULT ''",
                 "seal_json": "TEXT NOT NULL DEFAULT ''", "is_chaos": "INTEGER NOT NULL DEFAULT 0",
-                "chaos_json": "TEXT NOT NULL DEFAULT ''"},
+                "chaos_json": "TEXT NOT NULL DEFAULT ''", "send_at": "TEXT NOT NULL DEFAULT ''",
+                "send_kind": "TEXT NOT NULL DEFAULT ''"},
     "records": {"category": "TEXT NOT NULL DEFAULT ''", "title": "TEXT NOT NULL DEFAULT ''"},
+    "send_log": {"account": "TEXT NOT NULL DEFAULT ''"},
 }
 
 
