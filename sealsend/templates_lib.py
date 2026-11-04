@@ -22,7 +22,7 @@ from reportlab.pdfgen import canvas
 
 from . import config
 
-FONT_DIR = Path(__file__).parent / "fonts"
+FONT_DIR = config.PACKAGE_DIR / "fonts"
 FONTS = {
     "display": "PlayfairDisplay-Bold", "display-italic": "PlayfairDisplay-Italic", "formal": "Cinzel-Bold",
     "elegant": "CormorantGaramond-SemiBold", "elegant-italic": "CormorantGaramond-Italic", "script": "GreatVibes-Regular",
@@ -668,7 +668,7 @@ def render(tpl: dict, values: dict, assets: dict, meta: dict, qr_on: bool = True
     c = canvas.Canvas(buf, pagesize=(w, h), invariant=1)
     c.setTitle(meta.get("title", "Certificate"))
     c.setAuthor(meta.get("author", ""))
-    c.setCreator("SealSend")
+    c.setCreator("SendEZ")
     c.setSubject(meta.get("subject", ""))
     c.setKeywords(meta.get("keywords", ""))
     pdf_bg = None
@@ -702,7 +702,7 @@ def _merge_onto_pdf(bg_path: Path, overlay: bytes, meta: dict) -> bytes:
     page = writer.add_page(base)
     page.merge_transformed_page(over, Transformation().scale(bw / ow, bh / oh).translate(
         float(base.mediabox.left), float(base.mediabox.bottom)))
-    writer.add_metadata({"/Title": meta.get("title", ""), "/Author": meta.get("author", ""), "/Creator": "SealSend",
+    writer.add_metadata({"/Title": meta.get("title", ""), "/Author": meta.get("author", ""), "/Creator": "SendEZ",
                          "/Subject": meta.get("subject", ""), "/Keywords": meta.get("keywords", "")})
     writer._ID = None
     out = BytesIO()

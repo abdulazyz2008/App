@@ -1,4 +1,4 @@
-"""End-to-end tests for SealSend. Every promise is exercised against the real pipeline."""
+"""End-to-end tests for SendEZ. Every promise is exercised against the real pipeline."""
 import email
 import importlib
 import json

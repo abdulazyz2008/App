@@ -1,4 +1,4 @@
-# SealSend: Features and How to Use It
+# SendEZ: Features and How to Use It
 
 ## Feature list
 
@@ -59,12 +59,12 @@
 
 ### First time only
 
-1. **Start SealSend.** In the SealSend folder, right-click **start-online-mac.command** (Mac) or double-click **start-online-windows.bat** (Windows) and choose **Open**. Wait a few minutes.
-2. **Create a password** when the window asks (the letters stay hidden while you type). Your browser opens SealSend.
+1. **Start SendEZ.** In the SendEZ folder, right-click **start-online-mac.command** (Mac) or double-click **start-online-windows.bat** (Windows) and choose **Open**. Wait a few minutes.
+2. **Create a password** when the window asks (the letters stay hidden while you type). Your browser opens SendEZ.
 3. **Connect Gmail.** Click **Settings** in the left menu:
    - Choose **Gmail**.
    - Type your Gmail address.
-   - Get an **App Password**: open myaccount.google.com/apppasswords (turn on 2-Step Verification first if asked), type "SealSend", click Create, and copy the 16 letters.
+   - Get an **App Password**: open myaccount.google.com/apppasswords (turn on 2-Step Verification first if asked), type "SendEZ", click Create, and copy the 16 letters.
    - Paste them into **App Password** and click **Save & Test**. You should see **✓ Connected**.
    - Type your own email next to **Send test** and click it. Check your inbox.
 4. *(Optional)* In Settings, fill in **Organization defaults** (your college name and signatories) and click **Save**.
@@ -107,11 +107,11 @@
 | Retry failed emails | Step 4 → **Retry Failed** |
 | Use your own Canva design | Left menu → **Templates** → **Import from Canva** → follow the 4 steps → drag the fields → **Save** |
 | Check a certificate is real | Scan its QR code, or left menu → **Verify a certificate** → upload the PDF |
-| Open SealSend on your phone | Left menu → **Open on another device** → scan the QR code |
+| Open SendEZ on your phone | Left menu → **Open on another device** → scan the QR code |
 | Show the judges the safety checks | Left menu → **Run Chaos Test** |
 
 ### Good to know
-- **Keep the SealSend window open** while you use the app. Closing it stops the app.
-- **Gmail sends about 500 emails a day.** If you have more students, SealSend pauses; press **Send** again the next day and it continues with the rest.
-- **Without Gmail connected**, SealSend runs in **test mode**: certificates are saved on your computer, not emailed.
-- **With the free online link**, the link changes every time you start SealSend.
+- **Keep the SendEZ window open** while you use the app. Closing it stops the app.
+- **Gmail sends about 500 emails a day.** If you have more students, SendEZ pauses; press **Send** again the next day and it continues with the rest.
+- **Without Gmail connected**, SendEZ runs in **test mode**: certificates are saved on your computer, not emailed.
+- **With the free online link**, the link changes every time you start SendEZ.

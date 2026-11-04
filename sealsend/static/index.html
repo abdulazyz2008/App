@@ -8,11 +8,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="SealSend">
+<meta name="apple-mobile-web-app-title" content="SendEZ">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
 <link rel="icon" href="/static/icon-192.png">
-<title>SealSend</title>
+<title>SendEZ</title>
 <style>
 :root{
   --bg:#f2f2f2; --card:#ffffff; --ink:#000000; --sub:#6e6e73; --ter:#aeaeb2;
@@ -199,7 +199,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
 
 <!-- first run -->
 <div id="setup" class="login hidden">
-  <div class="logo" style="margin:0 0 8px;font-size:34px"><i>✓</i>SealSend</div>
+  <div class="logo" style="margin:0 0 8px;font-size:34px"><i>✓</i>SendEZ</div>
   <p class="sub" style="margin:0 0 26px">Welcome! Create a password to protect your student data and email account.</p>
   <div id="setupForm">
     <div class="group">
@@ -213,7 +213,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
 
 <!-- sign in -->
 <div id="login" class="login hidden">
-  <div class="logo" style="margin:0 0 8px;font-size:34px"><i>✓</i>SealSend</div>
+  <div class="logo" style="margin:0 0 8px;font-size:34px"><i>✓</i>SendEZ</div>
   <p class="sub" style="margin:0 0 26px">Certificates that are provable, not just automated.</p>
   <form id="loginForm" class="group"><div class="item"><input type="password" id="lp" placeholder="Password" autocomplete="current-password" aria-label="Password" style="background:transparent;padding:0"></div></form>
   <button class="btn fill block lg" style="margin-top:16px" form="loginForm">Sign In</button>
@@ -222,7 +222,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
 
 <div id="app" class="app hidden">
   <aside class="side">
-    <div class="logo"><i>✓</i>SealSend</div>
+    <div class="logo"><i>✓</i>SendEZ</div>
     <div class="tagline">Impossible to get wrong. Impossible to fake.</div>
     <button class="btn fill block" onclick="showHome()">＋ New Event</button>
     <div class="cap" style="margin:16px 6px 8px">Events</div>
@@ -231,7 +231,8 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
       <button onclick="openSettings()"><span class="ico">⚙︎</span><span>Settings</span></button>
       <button onclick="openTemplates()"><span class="ico">▦</span><span>Templates</span></button>
       <a href="/verify" target="_blank"><span class="ico">✓</span><span>Verify a certificate</span></a>
-      <button onclick="openPhone()"><span class="ico">▯</span><span>Open on another device</span></button>
+      <button onclick="openPhone()"><span class="ico">⇪</span><span>Share online</span></button>
+      <button id="browserBtn" class="hidden" onclick="post('/api/desktop/open-browser').catch(e=>toast(e.message))"><span class="ico">↗</span><span>Open in your browser</span></button>
       <button id="chaosBtn" onclick="runChaos()"><span class="ico">⚡</span><span>Run Chaos Test <span class="lbl2 sub sm">(demo)</span></span></button>
       <button onclick="logout()"><span class="ico">⎋</span><span>Sign out</span></button>
       <div class="foot lbl2" style="margin:8px 10px 0" id="sideStatus"></div>
@@ -242,7 +243,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
     <!-- HOME -->
     <section id="home">
       <h1 class="title">New Event</h1>
-      <p class="subtitle">Upload your student list. SealSend reads it, picks the right certificate for each category, and emails every student their own signed certificate.</p>
+      <p class="subtitle">Upload your student list. SendEZ reads it, picks the right certificate for each category, and emails every student their own signed certificate.</p>
       <div id="setupNudge"></div>
       <div class="cap">Event name</div>
       <div class="group"><div class="item"><input type="text" id="batchName" placeholder="e.g. National Tech Fest 2026" style="background:transparent;padding:0"></div></div>
@@ -423,7 +424,7 @@ async function start(){
     showOnly('setup');
     if (!s.local){ $('#setupForm').classList.add('hidden'); $('#setupMsg').textContent = s.hosted
       ? 'No password is set yet. In your Render dashboard open this service → Environment, add ADMIN_PASSWORD with a password of your choice, save, and reload this page.'
-      : 'Open SealSend on the computer that runs it to create the password (for safety, this can’t be done from another device).'; }
+      : 'Open SendEZ on the computer that runs it to create the password (for safety, this can’t be done from another device).'; }
     return;
   }
   const r = await fetch('/api/me',{credentials:'same-origin'});
@@ -446,7 +447,14 @@ async function boot(firstRun){
   if (list.length && !firstRun) openBatch(list[0].id); else showHome();
   if (firstRun) setTimeout(()=>{ openSettings(); toast('Next: connect the Gmail account that will send certificates'); }, 400);
 }
+// In the desktop window, links that need your sign-in (PDFs) download inside the app instead of
+// opening the normal browser, which isn't signed in.
+document.addEventListener('click', e => {
+  const a = e.target.closest && e.target.closest('a[target="_blank"]');
+  if (me && me.desktop && a && (a.getAttribute('href') || '').startsWith('/api/')) { a.removeAttribute('target'); a.setAttribute('download', ''); }
+}, true);
 function renderSide(){
+  $('#browserBtn').classList.toggle('hidden', !me.desktop);
   const mode = {smtp:`Sending from ${me.mail.address}`, resend:`Resend · ${me.mail.address}`, sandbox:'Email not connected (test mode)'}[me.mail_mode];
   $('#sideStatus').innerHTML = `${esc(mode)}${me.quota.cap?`<br>${me.quota.left} of ${me.quota.cap} emails left today`:''}`;
   $('#setupNudge').innerHTML = me.mail_mode==='sandbox' ? `<div class="banner light"><span class="ico">!</span><div class="grow"><b>Connect your email first</b><div class="desc">Until you connect Gmail, certificates are only saved on this computer (test mode), not emailed.</div></div><button class="btn sm fill" onclick="openSettings()">Connect Gmail</button></div>` : '';
@@ -979,7 +987,7 @@ async function openSettings(){
       <div class="item"><span class="grow"></span><button class="btn sm fill" onclick="saveOrg()">Save</button></div></div>
     <p class="foot">New events start with these. Logos and signature images are added per event in step 2.</p>
     <div class="cap">Verification link (QR codes)</div>
-    <div class="group"><div class="item" style="display:block"><div class="desc" style="margin-bottom:6px">QR codes on certificates open <b class="mono">${esc(s.public_base_url)}</b>${s.temporary_url&&!s.public_base_url_custom?'. <b>This free link changes every time SealSend restarts</b>, so QR codes on certificates made now only verify while this session is running. For permanent verification, use a permanent address (see the README).':s.public_base_url_custom||s.hosted?'. Anyone can open it from anywhere.':': this computer on your Wi-Fi, so it works for phones on the same Wi-Fi. So that anyone can verify from anywhere, host SealSend online and enter its address here <b>before</b> creating certificates.'}</div>
+    <div class="group"><div class="item" style="display:block"><div class="desc" style="margin-bottom:6px">QR codes on certificates open <b class="mono">${esc(s.public_base_url)}</b>${s.temporary_url&&!s.public_base_url_custom?'. <b>This free link changes every time SendEZ restarts</b>, so QR codes on certificates made now only verify while this session is running. For permanent verification, use a permanent address (see the README).':s.public_base_url_custom||s.hosted?'. Anyone can open it from anywhere.':': this computer on your Wi-Fi, so it works for phones on the same Wi-Fi. So that anyone can verify from anywhere, host SendEZ online and enter its address here <b>before</b> creating certificates.'}</div>
       <div class="row"><input type="url" id="pubUrl" value="${esc(s.public_base_url_custom)}" placeholder="https://certificates.your-college.edu" style="flex:1"><button class="btn sm" onclick="savePubUrl()">Save</button></div></div></div>
     <div class="cap">Security</div>
     <div class="group">${s.admin_from_env?'<div class="item"><span class="desc">Password is set in the .env file.</span></div>':`<div class="item"><input type="password" id="pwOld" placeholder="Current password" style="background:transparent;padding:0"></div><div class="item"><input type="password" id="pwNew" placeholder="New password (8+ characters)" style="background:transparent;padding:0"></div><div class="item"><span class="grow"></span><button class="btn sm" onclick="changePw()">Change password</button></div>`}
@@ -995,9 +1003,9 @@ function setProvider(k){
   const pwd = same && m.has_password ? 'Saved. Leave empty to keep it' : (k==='gmail' ? '16-letter App Password' : 'Password');
   const help = k==='gmail' ? `<div class="card" style="margin-top:10px"><b>How to get a Gmail App Password (2 minutes)</b><ol class="steplist sm">
       <li>Turn on <b>2-Step Verification</b> for the Gmail account (<a href="https://myaccount.google.com/signinoptions/twosv" target="_blank">open ↗</a>).</li>
-      <li>Open <a href="https://myaccount.google.com/apppasswords" target="_blank"><b>App passwords</b> ↗</a>, type “SealSend”, press Create.</li>
+      <li>Open <a href="https://myaccount.google.com/apppasswords" target="_blank"><b>App passwords</b> ↗</a>, type “SendEZ”, press Create.</li>
       <li>Copy the 16 letters it shows and paste them above. Your normal Gmail password will not work here.</li></ol>
-      <div class="desc">Gmail allows about 500 emails a day (about 2,000 for Google Workspace). SealSend stops safely at the limit you set and continues when you press Send again.</div></div>` : '';
+      <div class="desc">Gmail allows about 500 emails a day (about 2,000 for Google Workspace). SendEZ stops safely at the limit you set and continues when you press Send again.</div></div>` : '';
   $('#mailForm').innerHTML = k==='sandbox' ? `<div class="group"><div class="item"><div class="desc">Test mode: certificates and emails are saved on this computer (data/outbox) and not delivered. Good for trying things out.</div></div><div class="item"><span class="grow"></span><button class="btn sm fill" onclick="saveMail('sandbox')">Use test mode</button></div></div>` :
     `<div class="group">
       <div class="item"><span class="grow lbl">${k==='gmail'?'Gmail address':'Email address'}</span><input class="inl" type="email" id="mAddr" value="${esc(same?m.address:'')}" placeholder="${k==='gmail'?'you@gmail.com':'you@college.edu'}"></div>
@@ -1034,23 +1042,42 @@ async function sendTest(){
 async function saveOrg(){ await put('/api/settings/org', {...window._settings.org, org_name:$('#orgName').value, signer1_name:$('#s1n').value, signer1_title:$('#s1t').value, signer2_name:$('#s2n').value, signer2_title:$('#s2t').value}); await refreshMe(); toast('Saved'); }
 async function savePubUrl(){ try { const r = await put('/api/settings/public-url', {url: $('#pubUrl').value}); toast(`QR codes will open ${r.public_base_url}`); openSettings(); } catch(e){ toast(e.message); } }
 async function changePw(){ try { await put('/api/settings/password', {current:$('#pwOld').value, new:$('#pwNew').value}); toast('Password changed'); } catch(e){ toast(e.message); } }
-function openPhone(){
+let sharePoll = null;
+async function openPhone(){
+  clearTimeout(sharePoll);
+  let st;
+  try { st = await api('/api/share'); } catch(e){ return toast(e.message); }
+  const qr = url => `<div style="text-align:center;margin:10px 0"><img src="/api/qr.png?data=${encodeURIComponent(url)}" alt="QR code" style="width:200px;background:#fff;border-radius:12px;padding:6px"></div>`;
+  const linkRow = url => `<div class="group"><div class="item"><span class="grow mono" style="overflow-wrap:anywhere">${esc(url)}</span><button class="btn sm fill" onclick="copyText('${esc(url)}')">Copy</button></div></div>`;
+  let body = '';
+  if (!st.available){
+    body = `<p class="sub">SendEZ is online. Open this link on any phone, tablet or computer:</p>${linkRow(st.external_url)}${qr(st.external_url)}
+      <p class="foot">People sign in with your SendEZ password.</p>`;
+  } else if (st.state === 'on'){
+    body = `<p class="sub"><b>You're online.</b> Send this link to your operator or open it on your phone:</p>${linkRow(st.url)}${qr(st.url)}
+      <div class="group">
+        <div class="check"><span class="ck y">1</span><div>They open the link and sign in with <b>your SendEZ password</b>. Only share it with people you trust: they can send email from your account.</div></div>
+        <div class="check"><span class="ck w">!</span><div><b>Keep this computer on and SendEZ open.</b> The link stops when SendEZ closes or the computer sleeps.</div></div>
+        <div class="check"><span class="ck w">!</span><div><b>You get a new link each time</b> you start sharing. QR codes on certificates made now only verify while this link works.</div></div>
+      </div>
+      <div class="row" style="margin-top:14px"><button class="btn" onclick="shareStop()">Stop sharing</button></div>`;
+  } else if (st.state === 'starting'){
+    body = `<div class="card"><div class="row"><span class="spin"></span><b>Opening your public link…</b></div>
+      <p class="foot" style="margin:8px 0 0">This takes a few seconds. The very first time it also downloads Cloudflare’s free tunnel tool (20–55 MB).</p></div>`;
+    sharePoll = setTimeout(() => { if ($('#sheetWrap').classList.contains('open') && $('#shareSheet')) openPhone(); }, 1500);
+  } else {
+    body = `${st.state==='error'?`<div class="banner light" style="margin-top:0"><span class="ico">!</span><div class="grow">${esc(st.error)}</div></div>`:''}
+      <p class="sub">Get a free public link so your operator, or you on your phone, can use SendEZ from anywhere. Nothing to install for them, and no account needed.</p>
+      <button class="btn fill block lg" style="margin-top:6px" onclick="shareStart()">${st.state==='error'?'Try again':'Start sharing'}</button>
+      <p class="foot" style="margin-top:12px">Free link by Cloudflare. It works while this computer is on and SendEZ is open, and changes each time you start sharing.</p>
+      ${me.lan_available?`<div class="cap">Or on the same Wi-Fi</div>${linkRow(me.lan_url)}`:''}`;
+  }
   $('#sheet').className = 'sheet';
-  if (me.hosted){ $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Open on any device</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
-    <p class="sub">SealSend is online. Scan this or open the link on any phone, tablet or computer:</p>
-    <div style="text-align:center"><img src="/api/qr.png?data=${encodeURIComponent(me.lan_url)}" alt="QR code" style="width:220px;background:#fff;border-radius:12px;padding:6px"></div>
-    <p style="text-align:center" class="mono">${esc(me.lan_url)}</p>
-    <div class="group"><div class="check"><span class="ck y">1</span><div>Sign in with your password.</div></div>
-      <div class="check"><span class="ck y">2</span><div><b>iPhone/iPad:</b> Share → Add to Home Screen. <b>Android:</b> ⋮ → Install app.</div></div></div>`; return openSheet(); }
-  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Open on phone or iPad</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
-    <p class="sub">Connect the phone or iPad to the <b>same Wi-Fi</b> as this computer, then scan:</p>
-    <div style="text-align:center"><img src="/api/qr.png?data=${encodeURIComponent(me.lan_url)}" alt="QR code" style="width:220px;background:#fff;border-radius:12px;padding:6px"></div>
-    <p style="text-align:center" class="mono">${esc(me.lan_url)}</p>
-    <div class="group"><div class="check"><span class="ck y">1</span><div>Sign in with the same password.</div></div>
-      <div class="check"><span class="ck y">2</span><div><b>iPhone/iPad:</b> Share → Add to Home Screen. <b>Android:</b> ⋮ → Install app / Add to Home screen.</div></div>
-      <div class="check"><span class="ck y">3</span><div>Keep SealSend running on this computer while you use it on other devices.</div></div></div>`;
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead" id="shareSheet"><h2>Share online</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>${body}`;
   openSheet();
 }
+async function shareStart(){ try { await post('/api/share/start'); openPhone(); } catch(e){ toast(e.message); } }
+async function shareStop(){ try { await post('/api/share/stop'); await refreshMe(); toast('Sharing stopped'); openPhone(); } catch(e){ toast(e.message); } }
 
 // ---------- live updates
 async function syncPoll(){

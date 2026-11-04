@@ -699,8 +699,8 @@ def verify_file(data: bytes) -> dict:
     """What the public verifier says about an uploaded PDF."""
     meta = certificate.read_proof(data)
     if not meta["code"]:
-        return {"status": "unknown", "title": "Not a SealSend certificate",
-                "reasons": ["This PDF carries no SealSend certificate ID."], "record": None}
+        return {"status": "unknown", "title": "Not a SendEZ certificate",
+                "reasons": ["This PDF carries no SendEZ certificate ID."], "record": None}
     rec = db.one("SELECT * FROM records WHERE cert_code=?", (meta["code"],))
     if not rec or not rec["payload_json"]:
         return {"status": "not_found", "title": "No such certificate",

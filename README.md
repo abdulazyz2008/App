@@ -1,15 +1,15 @@
-# SealSend
+# SendEZ
 
 > Upload your student list once. Every student gets their own congratulatory email with the right certificate attached, and every certificate can be verified as genuine.
 
-SealSend reads any reasonable Excel or CSV file, works out who each student is and which category they belong to, picks the right certificate design for each category, and emails each student their own digitally signed PDF from your Gmail account. Before each email goes out, it checks that the attachment really belongs to that student.
+SendEZ reads any reasonable Excel or CSV file, works out who each student is and which category they belong to, picks the right certificate design for each category, and emails each student their own digitally signed PDF from your Gmail account. Before each email goes out, it checks that the attachment really belongs to that student.
 
 ---
 
 ## Free public link (no account, no card)
 
 Double-click **`start-online-windows.bat`** / **`start-online-mac.command`** / **`start-online-linux.sh`**.
-SealSend starts on your computer and prints a public link like `https://some-words.trycloudflare.com`, using Cloudflare's free Quick Tunnel.
+SendEZ starts on your computer and prints a public link like `https://some-words.trycloudflare.com`, using Cloudflare's free Quick Tunnel.
 Anyone can open that link on any device, anywhere. The first time, it downloads Cloudflare's tool (once) and asks you to set a password.
 
 - Free and instant, but **your computer must stay on with the window open**.
@@ -20,7 +20,7 @@ Anyone can open that link on any device, anywhere. The first time, it downloads 
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/abdulazyz2008/App)
 
-Press the button, sign in to Render, type a password for **ADMIN_PASSWORD**, and press **Deploy Blueprint**. A few minutes later you get a permanent link like `https://sealsend-xxxx.onrender.com` that works on any phone, tablet or computer. It uses a paid Render instance with a 1 GB disk, because free instances block email ports and delete data on restart. Check the exact price on Render before confirming.
+Press the button, sign in to Render, type a password for **ADMIN_PASSWORD**, and press **Deploy Blueprint**. A few minutes later you get a permanent link like `https://sendez-xxxx.onrender.com` that works on any phone, tablet or computer. It uses a paid Render instance with a 1 GB disk, because free instances block email ports and delete data on restart. Check the exact price on Render before confirming.
 
 ## Or run it on your own computer
 
@@ -32,25 +32,25 @@ Press the button, sign in to Render, type a password for **ADMIN_PASSWORD**, and
 | **Mac** | Double-click `start-mac.command` (first time: right-click → Open) |
 | **Linux** | Run `./start-linux.sh` |
 
-The first start takes 1–3 minutes to set itself up (needs internet once). Then your browser opens SealSend. Keep the black window open while you use it.
+The first start takes 1–3 minutes to set itself up (needs internet once). Then your browser opens SendEZ. Keep the black window open while you use it.
 
-**iPhone, iPad, Android:** connect to the same Wi-Fi as the computer, then in SealSend tap **Open on phone/iPad** and scan the QR code. Use *Share → Add to Home Screen* to install it like an app.
+**iPhone, iPad, Android:** connect to the same Wi-Fi as the computer, then in SendEZ tap **Open on phone/iPad** and scan the QR code. Use *Share → Add to Home Screen* to install it like an app.
 
 ## First-time setup (2 minutes)
 
-1. **Create a password** (only possible on the computer running SealSend).
+1. **Create a password** (only possible on the computer running SendEZ).
 2. **Connect Gmail:** Settings → Gmail → your address + a **Gmail App Password**:
-   - turn on [2-Step Verification](https://myaccount.google.com/signinoptions/twosv), then open [App passwords](https://myaccount.google.com/apppasswords), type “SealSend”, and copy the 16 letters.
+   - turn on [2-Step Verification](https://myaccount.google.com/signinoptions/twosv), then open [App passwords](https://myaccount.google.com/apppasswords), type “SendEZ”, and copy the 16 letters.
    - Your normal Gmail password will **not** work; Google requires an App Password.
 3. Press **Save & Test**, then **Send test** to your own address. If the test arrives with its sample certificate, you’re ready.
 
-Until Gmail is connected, SealSend runs in **test mode**: emails and certificates are saved in `data/outbox/` instead of being sent.
+Until Gmail is connected, SendEZ runs in **test mode**: emails and certificates are saved in `data/outbox/` instead of being sent.
 
 ## Issue certificates: 4 steps
 
 | Step | What happens |
 |---|---|
-| **1 · Students** | Upload the Excel/CSV. SealSend finds the right sheet, skips title rows, and detects the name (even split across *First Name* / *Last Name*), email, backup email, ID, date and **category** columns. You can correct any of them. Problem rows are flagged with their row number. |
+| **1 · Students** | Upload the Excel/CSV. SendEZ finds the right sheet, skips title rows, and detects the name (even split across *First Name* / *Last Name*), email, backup email, ID, date and **category** columns. You can correct any of them. Problem rows are flagged with their row number. |
 | **2 · Certificates** | Each category value (e.g. *Winner, Runner Up, Volunteer, Participant*) gets a design, a title and an email, guessed from its name: winners get **Gold Excellence** and a congratulations email, volunteers get *Certificate of Appreciation*, and so on. Click any design to choose another, add your organization name, logo and signatories. |
 | **3 · Email** | Check the sending account and edit the default message if you like. Each category already has a ready-written email (winner, participation, appreciation, completion). |
 | **4 · Review & Send** | A checklist, then a preview of exactly what any student will receive (certificate + email). Press **Send**. Progress, a live activity log, a CSV delivery report and a ZIP of all certificates are on the same page. |
@@ -79,7 +79,7 @@ Until Gmail is connected, SealSend runs in **test mode**: emails and certificate
 
 ## Handling the messy cases
 
-| Problem in the sheet | What SealSend does |
+| Problem in the sheet | What SendEZ does |
 |---|---|
 | Title rows above the header, several sheets, a “Total” row | Finds the real header and the sheet that has emails; skips the footer |
 | `name@gmial.com`, `.con`, spaces, `name(at)college` | Fixes it and shows what it changed |
@@ -101,7 +101,7 @@ Until Gmail is connected, SealSend runs in **test mode**: emails and certificate
 - **Batch seal:** a signed Merkle root covers the whole batch. *Proof → Verify Batch Now* re-checks every file.
 - **Chaos Test** (sidebar, demo): injects 15 real faults into a sandbox batch and shows each one being contained. Results come from opening every delivered email, not from what the app says about itself.
 
-**About the QR link:** QR codes open the address in *Settings → Verification link*. By default that is your computer on the local Wi-Fi, which is fine for a demo. For certificates students will show to employers later, host SealSend online (any server that runs Python) and enter its public address **before** creating certificates.
+**About the QR link:** QR codes open the address in *Settings → Verification link*. By default that is your computer on the local Wi-Fi, which is fine for a demo. For certificates students will show to employers later, host SendEZ online (any server that runs Python) and enter its public address **before** creating certificates.
 
 ## Tests
 

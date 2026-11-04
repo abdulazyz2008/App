@@ -270,7 +270,7 @@ class Sender:
             payload["reply_to"] = msg["Reply-To"]
         req = urllib.request.Request(
             "https://api.resend.com/emails", data=json.dumps(payload).encode(), method="POST",
-            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "User-Agent": "SealSend/1.0"})
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json", "User-Agent": "SendEZ/1.0"})
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
                 return f"Resend accepted: {json.loads(r.read() or b'{}').get('id', '')}"

@@ -1,4 +1,4 @@
-"""SealSend HTTP API, organizer UI and the public verify / claim pages."""
+"""SendEZ HTTP API, organizer UI and the public verify / claim pages."""
 import csv
 import hmac
 import html
@@ -15,11 +15,11 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import certificate, chaos, config, copilot, crypto, db, mailer, pipeline, settings
+from . import certificate, chaos, config, copilot, crypto, db, mailer, pipeline, settings, tunnel
 from . import templates_lib as T
 from .data import STYLES, suggest_categories
 
-STATIC = Path(__file__).parent / "static"
+STATIC = config.PACKAGE_DIR / "static"
 
 
 @asynccontextmanager
@@ -29,9 +29,10 @@ async def lifespan(_app):
         c.execute("UPDATE batches SET job=''")
     crypto.private_key()
     yield
+    tunnel.share.stop()  # never leave a public link open after the app quits
 
 
-app = FastAPI(title="SealSend", docs_url=None, redoc_url=None, lifespan=lifespan)
+app = FastAPI(title="SendEZ", docs_url=None, redoc_url=None, lifespan=lifespan)
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 
 
@@ -80,7 +81,7 @@ class Login(BaseModel):
 
 @app.get("/api/setup-status")
 def setup_status(request: Request):
-    return {"needs_setup": not settings.admin_configured(), "local": _is_local(request), "hosted": bool(config.HOSTED_URL)}
+    return {"needs_setup": not settings.admin_configured(), "local": _is_local(request), "hosted": bool(config.hosted_url())}
 
 
 @app.get("/healthz")
@@ -93,7 +94,7 @@ def first_run_setup(body: Login, request: Request, response: Response):
     if settings.admin_configured():
         raise HTTPException(400, "Already set up. Sign in instead.")
     if not _is_local(request):
-        raise HTTPException(403, "For safety, create the password on the computer running SealSend")
+        raise HTTPException(403, "For safety, create the password on the computer running SendEZ")
     if len(body.password) < 8:
         raise HTTPException(400, "Use at least 8 characters")
     settings.set_admin_password(body.password)
@@ -150,8 +151,8 @@ def _copilot_label() -> str:
 def me():
     return {"mail_mode": config.mail_mode(), "mail": settings.public_mail(), "quota": pipeline.quota_status(),
             "key_fingerprint": crypto.fingerprint(), "copilot": _copilot_label(),
-            "public_base_url": config.public_base_url(), "lan_url": config.app_url(), "hosted": bool(config.HOSTED_URL),
-            "temporary_url": config.TEMPORARY_URL, "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
+            "public_base_url": config.public_base_url(), "lan_url": config.app_url(), "hosted": bool(config.hosted_url()),
+            "temporary_url": config.is_temporary_url(), "lan_available": not config.LOCAL_ONLY, "desktop": config.DESKTOP, "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
             "presets": {k: v["label"] for k, v in mailer.PRESETS.items()},
             "styles": {k: v["title"] for k, v in STYLES.items()},
             "fonts": T.FONT_LABELS, "niches": T.NICHES + ["My templates"]}
@@ -665,8 +666,8 @@ def remove_template(template_id: str):
 @app.get("/api/settings", dependencies=[Depends(require_auth)])
 def get_settings():
     return {"mail": settings.public_mail(), "org": settings.org(), "public_base_url": config.public_base_url(),
-            "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": config.app_url(), "hosted": bool(config.HOSTED_URL),
-            "temporary_url": config.TEMPORARY_URL, "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
+            "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": config.app_url(), "hosted": bool(config.hosted_url()),
+            "temporary_url": config.is_temporary_url(), "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
             "admin_from_env": bool(config.ADMIN_PASSWORD)}
 
 
@@ -724,9 +725,9 @@ def test_email(body: TestEmailIn):
     tpl = certificate.resolve(certificate.DEFAULT_TEMPLATE_ID)
     pdf = T.render(tpl, certificate.sample_values(tpl, org), {k: org.get(k, "") for k in ("logo", "signer1_sig", "signer2_sig")},
                    {"title": "Sample certificate", "subject": "SS-SAMPLE0000"})
-    msg = mailer.build_message(body.to.strip(), "SealSend test", "SealSend test email: your setup works",
-                               "Hello!\n\nThis is a test from SealSend. If you can read this and open the attached sample "
-                               "certificate, students will receive their certificates the same way.\n\nSealSend",
+    msg = mailer.build_message(body.to.strip(), "SendEZ test", "SendEZ test email: your setup works",
+                               "Hello!\n\nThis is a test from SendEZ. If you can read this and open the attached sample "
+                               "certificate, students will receive their certificates the same way.\n\nSendEZ",
                                pdf, "Sample_Certificate.pdf", "SS-SAMPLE0000")
     try:
         with mailer.Sender() as s:
@@ -794,9 +795,46 @@ def branding_image(name: str):
     return FileResponse(path, media_type="image/png")
 
 
+@app.post("/api/desktop/open-browser", dependencies=[Depends(require_auth)])
+def open_in_browser(request: Request):
+    """Desktop app: open SendEZ in the computer's normal browser (it signs in there separately)."""
+    if not (config.DESKTOP and _is_local(request)):
+        raise HTTPException(404, "Not available")
+    import webbrowser
+    webbrowser.open(f"http://127.0.0.1:{config.PORT}/")
+    return {"ok": True}
+
+
+# ---------------------------------------------------------------- share online (free public link)
+def _share_status() -> dict:
+    st = tunnel.share.status()
+    external = bool(config.hosted_url()) and st["state"] != "on"  # already online some other way (website, run.py --online)
+    return {**st, "available": not external, "external_url": config.hosted_url() if external else ""}
+
+
+@app.get("/api/share", dependencies=[Depends(require_auth)])
+def share_status():
+    return _share_status()
+
+
+@app.post("/api/share/start", dependencies=[Depends(require_auth)])
+def share_start():
+    st = _share_status()
+    if not st["available"]:
+        raise HTTPException(400, f"SendEZ is already online at {st['external_url']}")
+    tunnel.share.start(config.PORT, config.DATA_DIR / "tools")
+    return _share_status()
+
+
+@app.post("/api/share/stop", dependencies=[Depends(require_auth)])
+def share_stop():
+    tunnel.share.stop()
+    return _share_status()
+
+
 @app.get("/api/qr.png", dependencies=[Depends(require_auth)])
 def qr_png(data: str):
-    """QR code image, e.g. for opening SealSend on a phone. Generated locally, no outside service."""
+    """QR code image, e.g. for opening SendEZ on a phone. Generated locally, no outside service."""
     from reportlab.graphics import renderPDF
     from reportlab.graphics.barcode import qr as rl_qr
     from reportlab.graphics.shapes import Drawing
@@ -835,7 +873,7 @@ def chaos_forged(batch_id: int):
 
 @app.get("/sample/{name}", dependencies=[Depends(require_auth)])
 def sample_file(name: str):
-    path = config.ROOT / "sample" / Path(name).name
+    path = config.SAMPLE_DIR / Path(name).name
     if not path.exists() or path.suffix not in (".csv", ".xlsx"):
         raise HTTPException(404, "Not found")
     return FileResponse(path, filename=path.name)
@@ -864,8 +902,8 @@ input[type=text],input[type=file]{width:100%;font:inherit;padding:13px 14px;bord
 
 def page(title: str, body: str) -> HTMLResponse:
     return HTMLResponse(f"""<!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · SealSend</title>
-<style>{PUBLIC_CSS}</style></head><body><div class="wrap"><div class="brand">SealSend Verify</div>{body}</div></body></html>""")
+<meta name="viewport" content="width=device-width,initial-scale=1"><title>{html.escape(title)} · SendEZ</title>
+<style>{PUBLIC_CSS}</style></head><body><div class="wrap"><div class="brand">SendEZ Verify</div>{body}</div></body></html>""")
 
 
 def _upload_form() -> str:
@@ -983,7 +1021,7 @@ def claim_download(token: str, student_id: str = Form("")):
 # ---------------------------------------------------------------- organizer UI (+ installable web app)
 @app.get("/manifest.webmanifest")
 def manifest():
-    return JSONResponse({"name": "SealSend", "short_name": "SealSend", "start_url": "/", "display": "standalone",
+    return JSONResponse({"name": "SendEZ", "short_name": "SendEZ", "start_url": "/", "display": "standalone",
                          "background_color": "#000000", "theme_color": "#000000",
                          "icons": [{"src": "/static/icon-192.png", "sizes": "192x192", "type": "image/png"},
                                    {"src": "/static/icon-512.png", "sizes": "512x512", "type": "image/png"}]},

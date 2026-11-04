@@ -1,5 +1,7 @@
 """Runtime configuration, read from environment variables (never hard-coded secrets)."""
 import os
+import sys
+import threading
 from pathlib import Path
 
 
@@ -15,10 +17,28 @@ def _load_dotenv(path: Path) -> None:
         os.environ.setdefault(key.strip(), value.strip().strip('"').strip("'"))
 
 
+FROZEN = bool(getattr(sys, "frozen", False))  # running as the packaged desktop app (PyInstaller)
 ROOT = Path(__file__).resolve().parent.parent
-_load_dotenv(ROOT / ".env")
+# Read-only files shipped with the app (static/, fonts/, sample/). Inside a packaged app they live in the bundle.
+RESOURCE_ROOT = Path(getattr(sys, "_MEIPASS", ROOT))
+PACKAGE_DIR = RESOURCE_ROOT / "sealsend" if FROZEN else Path(__file__).resolve().parent
+SAMPLE_DIR = RESOURCE_ROOT / "sample"
 
-DATA_DIR = Path(os.environ.get("SEALSEND_DATA_DIR", ROOT / "data")).resolve()
+
+def user_data_dir() -> Path:
+    """Where a packaged app keeps its data (never inside the app itself, which may be read-only)."""
+    home = Path.home()
+    if sys.platform == "darwin":
+        return home / "Library" / "Application Support" / "SendEZ"
+    if os.name == "nt":
+        return Path(os.environ.get("APPDATA") or home / "AppData" / "Roaming") / "SendEZ"
+    return Path(os.environ.get("XDG_DATA_HOME") or home / ".local" / "share") / "SendEZ"
+
+
+if not FROZEN:
+    _load_dotenv(ROOT / ".env")
+
+DATA_DIR = Path(os.environ.get("SEALSEND_DATA_DIR") or (user_data_dir() if FROZEN else ROOT / "data")).resolve()
 DB_PATH = DATA_DIR / "sealsend.db"
 UPLOAD_DIR = DATA_DIR / "uploads"
 CERT_DIR = DATA_DIR / "certificates"
@@ -36,7 +56,7 @@ SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 SMTP_SECURITY = os.environ.get("SMTP_SECURITY", "starttls").lower()  # starttls | ssl | none
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USER or "certificates@example.org")
-MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "SealSend Certificates")
+MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "SendEZ Certificates")
 ISSUER_NAME = os.environ.get("ISSUER_NAME", "Event Organizing Committee")
 
 SEND_DELAY_SECONDS = float(os.environ.get("SEND_DELAY_SECONDS", "0"))
@@ -62,20 +82,44 @@ def lan_ip() -> str:
 
 
 _PUBLIC_ENV = os.environ.get("PUBLIC_BASE_URL", "")
-HOSTED_URL = os.environ.get("RENDER_EXTERNAL_URL", "") or os.environ.get("SEALSEND_HOSTED_URL", "")  # set by the host
-TEMPORARY_URL = os.environ.get("SEALSEND_TEMPORARY_URL", "") == "1"  # free tunnel link: changes on every start
+LOCAL_ONLY = os.environ.get("SEALSEND_LOCAL_ONLY", "") == "1"  # desktop app listens on this computer only
+DESKTOP = os.environ.get("SEALSEND_DESKTOP", "") == "1"  # running inside the desktop app window
 WORKERS = int(os.environ.get("SEALSEND_WORKERS", "0")) or min(os.cpu_count() or 1, 8)
+
+# The public address can come from the host (Render), from `run.py --online`, or from the in-app
+# "Share online" button at runtime, so it is kept in a small mutable holder rather than a constant.
+_hosted_lock = threading.Lock()
+_hosted = {
+    "url": os.environ.get("RENDER_EXTERNAL_URL", "") or os.environ.get("SEALSEND_HOSTED_URL", ""),
+    "temporary": os.environ.get("SEALSEND_TEMPORARY_URL", "") == "1",  # free tunnel link: changes on every start
+}
+
+
+def hosted_url() -> str:
+    with _hosted_lock:
+        return _hosted["url"]
+
+
+def is_temporary_url() -> bool:
+    with _hosted_lock:
+        return bool(_hosted["url"]) and _hosted["temporary"]
+
+
+def set_hosted_url(url: str, temporary: bool = False) -> None:
+    with _hosted_lock:
+        _hosted["url"] = (url or "").rstrip("/")
+        _hosted["temporary"] = bool(url) and temporary
 
 
 def public_base_url() -> str:
     """Where QR codes and verify links point. Settings > env > website address > this laptop's LAN address."""
     from . import settings
-    return (settings.get("public_base_url") or _PUBLIC_ENV or HOSTED_URL or f"http://{lan_ip()}:{PORT}").rstrip("/")
+    return (settings.get("public_base_url") or _PUBLIC_ENV or hosted_url() or f"http://{lan_ip()}:{PORT}").rstrip("/")
 
 
 def app_url() -> str:
     """The address people open the app at: the website when hosted, else this laptop on the Wi-Fi."""
-    return (HOSTED_URL or f"http://{lan_ip()}:{PORT}").rstrip("/")
+    return (hosted_url() or f"http://{lan_ip()}:{PORT}").rstrip("/")
 
 
 PUBLIC_BASE_URL = _PUBLIC_ENV or "http://localhost:8000"  # legacy name; use public_base_url()
