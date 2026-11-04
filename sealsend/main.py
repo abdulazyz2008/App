@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import certificate, chaos, clubs, config, copilot, crypto, db, mailer, pipeline, settings, tunnel
+from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, mailer, pipeline, settings, tunnel
 from . import templates_lib as T
 from .data import STYLES, suggest_categories
 
@@ -805,6 +805,29 @@ def open_in_browser(request: Request):
     import webbrowser
     webbrowser.open(f"http://127.0.0.1:{config.PORT}/")
     return {"ok": True}
+
+
+# ---------------------------------------------------------------- help assistant
+class AskIn(BaseModel):
+    message: str
+    history: list = []
+    batch_id: int | None = None
+
+
+@app.post("/api/assistant", dependencies=[Depends(require_auth)])
+def ask_assistant(body: AskIn):
+    q = pipeline.quota_status()
+    m = settings.public_mail()
+    state = {"mail_mode": config.mail_mode(), "sending_account": m.get("address", ""), "provider": m.get("provider", ""),
+             "connection_tested": bool(m.get("verified_at")), "quota_left": q["left"], "events": db.one("SELECT COUNT(*) n FROM batches")["n"],
+             "sharing_online": tunnel.share.status()["state"] == "on"}
+    if body.batch_id:
+        b = db.get_batch(body.batch_id)
+        if b:
+            state["open_event"] = {"name": b["name"], "counts": db.status_counts(b["id"]), "club": (b["config"] or {}).get("club", ""),
+                                   "paused": b.get("pause_reason", "")}
+    history = [h for h in body.history if isinstance(h, dict)][-6:]
+    return assistant.ask(body.message, history, state)
 
 
 # ---------------------------------------------------------------- Mahindra University clubs

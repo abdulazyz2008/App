@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#000000">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -15,42 +16,53 @@
 <title>SendEZ</title>
 <style>
 :root{
-  --bg:#f2f2f2; --card:#ffffff; --ink:#000000; --sub:#6e6e73; --ter:#aeaeb2;
-  --line:rgba(0,0,0,.12); --fill:#000000; --on:#ffffff; --tint:#e9e9eb; --tint2:#f5f5f7; --track:#e3e3e6;
-  --shadow:0 1px 2px rgba(0,0,0,.06),0 4px 16px rgba(0,0,0,.05); --r:14px;
+  --bg:#f2f2f7; --card:#ffffff; --ink:#000000; --sub:#6e6e73; --ter:#aeaeb2;
+  --line:rgba(60,60,67,.15); --fill:#000000; --on:#ffffff; --tint:#e9e9ee; --tint2:#f4f4f7; --track:#e3e3e8;
+  --accent:#007aff; --accent-soft:rgba(0,122,255,.12); --green:#34c759; --green-ink:#248a3d; --green-soft:rgba(52,199,89,.15);
+  --orange:#ff9500; --orange-ink:#c93400; --orange-soft:rgba(255,149,0,.15); --red:#ff3b30; --red-ink:#d70015; --red-soft:rgba(255,59,48,.12);
+  --glass:rgba(249,249,251,.8); --shadow:0 1px 2px rgba(0,0,0,.05),0 4px 16px rgba(0,0,0,.05); --r:14px;
+  --sat:env(safe-area-inset-top,0px); --sab:env(safe-area-inset-bottom,0px); --sal:env(safe-area-inset-left,0px); --sar:env(safe-area-inset-right,0px);
 }
 @media (prefers-color-scheme:dark){:root{
   --bg:#000000; --card:#1c1c1e; --ink:#ffffff; --sub:#98989f; --ter:#636366;
-  --line:rgba(255,255,255,.14); --fill:#ffffff; --on:#000000; --tint:#2c2c2e; --tint2:#242426; --track:#3a3a3c; --shadow:none;
+  --line:rgba(255,255,255,.14); --fill:#ffffff; --on:#000000; --tint:#2c2c2e; --tint2:#242426; --track:#3a3a3c;
+  --accent:#0a84ff; --accent-soft:rgba(10,132,255,.2); --green:#30d158; --green-ink:#30d158; --green-soft:rgba(48,209,88,.18);
+  --orange:#ff9f0a; --orange-ink:#ff9f0a; --orange-soft:rgba(255,159,10,.18); --red:#ff453a; --red-ink:#ff6961; --red-soft:rgba(255,69,58,.18);
+  --glass:rgba(28,28,30,.78); --shadow:none;
 }}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--ink)}
-body{font:15px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.005em}
+body{font:15px/1.42 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased;letter-spacing:-.005em;-webkit-text-size-adjust:100%}
 button,input,select,textarea{font:inherit;color:inherit}
 a{color:inherit}
+a:not(.btn){color:var(--accent);text-decoration:none}
+.navl a:not(.btn){color:inherit}
+svg.i{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.mi{width:18px;height:18px;flex:none;vertical-align:-4px}
 .hidden{display:none!important}
 .mono{font-family:ui-monospace,"SF Mono",Menlo,Consolas,monospace;font-size:12.5px;letter-spacing:0}
 .sub{color:var(--sub)} .ter{color:var(--ter)} .sm{font-size:13px}
 .cap{font-size:12.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);margin:24px 16px 7px;font-weight:500}
 .foot{font-size:12.5px;color:var(--sub);margin:7px 16px 0}
-.btn{appearance:none;border:0;border-radius:11px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--tint);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;transition:transform .08s,opacity .15s;min-height:40px}
-.btn:active{transform:scale(.97)} .btn:disabled{opacity:.35;cursor:default;transform:none}
-.btn.fill{background:var(--fill);color:var(--on)}
-.btn.plain{background:transparent;padding:6px 8px;font-weight:500;min-height:0}
-.btn.sm{padding:6px 11px;font-size:13px;border-radius:9px;min-height:32px}
+.btn{appearance:none;border:0;border-radius:12px;padding:10px 16px;font-weight:600;cursor:pointer;background:var(--tint);color:var(--ink);text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap;transition:transform .08s,opacity .15s,filter .15s;min-height:40px}
+.btn:active{transform:scale(.97);filter:brightness(.92)} .btn:disabled{opacity:.35;cursor:default;transform:none;filter:none}
+.btn.fill{background:var(--accent);color:#fff}
+.btn.plain{background:transparent;padding:6px 8px;font-weight:500;min-height:0;color:var(--accent)}
+.btn.danger{color:var(--red)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:10px;min-height:32px}
 .btn.block{display:flex;width:100%}
-.btn.lg{padding:15px 22px;font-size:16.5px;border-radius:13px}
-.app{display:grid;grid-template-columns:276px minmax(0,1fr);min-height:100vh}
-.side{position:sticky;top:0;height:100vh;overflow:auto;padding:22px 14px 16px;border-right:.5px solid var(--line);display:flex;flex-direction:column}
+.btn.lg{padding:15px 22px;font-size:16.5px;border-radius:14px}
+.btn svg.i{width:18px;height:18px}
+.app{display:grid;grid-template-columns:276px minmax(0,1fr);min-height:100vh;min-height:100dvh}
+.side{position:sticky;top:0;height:100vh;height:100dvh;overflow:auto;padding:calc(22px + var(--sat)) 14px calc(16px + var(--sab)) calc(14px + var(--sal));border-right:.5px solid var(--line);display:flex;flex-direction:column}
 .logo{font-size:27px;font-weight:700;letter-spacing:-.03em;margin:0 6px;display:flex;align-items:center}
-.logo i{font-style:normal;display:inline-flex;width:30px;height:30px;border-radius:9px;background:var(--fill);color:var(--on);font-size:17px;align-items:center;justify-content:center;margin-right:9px}
+.logo i{font-style:normal;display:inline-flex;width:30px;height:30px;border-radius:9px;background:linear-gradient(140deg,#0a84ff,#5e5ce6);color:#fff;font-size:17px;align-items:center;justify-content:center;margin-right:9px;box-shadow:0 2px 8px rgba(10,132,255,.3)}
 .tagline{color:var(--sub);font-size:13px;margin:3px 6px 18px}
 .side .btn.block{margin-bottom:8px}
 .navl{display:flex;flex-direction:column;gap:2px;margin-top:auto;padding-top:14px}
-.navl a,.navl button{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;text-decoration:none;background:none;border:0;cursor:pointer;text-align:left;font-weight:500}
-.navl a:hover,.navl button:hover{background:var(--tint)}
-.navl .ico{width:22px;text-align:center}
-main{padding:28px 32px 90px;min-width:0;max-width:1180px}
+.navl a,.navl button{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;text-decoration:none;background:none;border:0;cursor:pointer;text-align:left;font-weight:500;min-height:40px}
+.navl .ico{width:22px;display:inline-flex;justify-content:center;color:var(--accent)}
+main{padding:28px 32px 100px;min-width:0;max-width:1180px}
 .title{font-size:34px;font-weight:700;letter-spacing:-.03em;line-height:1.1;margin:0}
 .subtitle{color:var(--sub);margin:5px 0 0}
 .group{background:var(--card);border-radius:var(--r);overflow:hidden}
@@ -64,86 +76,89 @@ main{padding:28px 32px 90px;min-width:0;max-width:1180px}
 .card{background:var(--card);border-radius:var(--r);padding:18px}
 .blist .item{border-radius:11px;margin-bottom:2px;padding:9px 12px;min-height:0}
 .blist .item:before{display:none}
-.blist .item.sel{background:var(--card);box-shadow:var(--shadow)}
+.blist .item.sel{background:var(--accent);color:#fff}
+.blist .item.sel .bmeta{color:rgba(255,255,255,.82)}
 .bname{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bmeta{font-size:12.5px;color:var(--sub)}
-.steps{display:flex;background:var(--track);border-radius:11px;padding:3px;gap:3px;overflow-x:auto;margin:22px 0 4px;scrollbar-width:none}
+.steps{display:flex;background:var(--track);border-radius:11px;padding:3px;gap:3px;overflow-x:auto;margin:22px 0 4px;scrollbar-width:none;position:sticky;top:calc(8px + var(--sat));z-index:6;outline:8px solid var(--bg)}
 .steps::-webkit-scrollbar{display:none}
 .steps button{flex:1 0 auto;border:0;background:transparent;border-radius:9px;padding:8px 14px;font-weight:500;font-size:13.5px;cursor:pointer;white-space:nowrap;display:flex;align-items:center;justify-content:center;gap:7px}
-.steps button .n{width:20px;height:20px;border-radius:50%;background:var(--ter);color:var(--on);font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
-.steps button.done .n{background:var(--ink)}
+.steps button .n{width:20px;height:20px;border-radius:50%;background:var(--ter);color:#fff;font-size:11.5px;font-weight:700;display:inline-flex;align-items:center;justify-content:center}
+.steps button.done .n{background:var(--green)}
 .steps button.on{background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.12);font-weight:600}
-.steps button.on .n{background:var(--ink)}
+.steps button.on .n{background:var(--accent)}
 @media (prefers-color-scheme:dark){.steps button.on{background:#636366}}
 select,input[type=text],input[type=password],input[type=search],input[type=email],input[type=number],input[type=url],textarea{width:100%;background:var(--tint2);border:0;border-radius:10px;padding:10px 12px;outline:none;min-height:40px}
 .item select{width:auto;max-width:62%;background:transparent;text-align:right;padding:4px 0;color:var(--sub);cursor:pointer;min-height:0}
 .item input.inl{background:transparent;text-align:right;padding:0;min-height:0;color:var(--sub);max-width:62%}
 textarea{resize:vertical;min-height:90px;line-height:1.45}
-input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
+input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--accent)}
 .switch{position:relative;width:51px;height:31px;flex:none}
 .switch input{opacity:0;width:0;height:0}
 .switch span{position:absolute;inset:0;background:var(--track);border-radius:31px;transition:.2s;cursor:pointer}
 .switch span:before{content:"";position:absolute;width:27px;height:27px;left:2px;top:2px;background:#fff;border-radius:50%;box-shadow:0 2px 4px rgba(0,0,0,.2);transition:.2s}
-.switch input:checked+span{background:var(--fill)}
-@media (prefers-color-scheme:dark){.switch input:checked+span{background:#fff}.switch input:checked+span:before{background:#000}}
+.switch input:checked+span{background:var(--green)}
 .switch input:checked+span:before{transform:translateX(20px)}
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;border:1px solid transparent;line-height:1.3}
-.st-Sent,.st-Claimed{background:var(--fill);color:var(--on)}
-.st-Generated{border-color:var(--ink)}
-.st-Pending,.st-Sending,.st-Skipped{background:var(--tint)}
-.st-Failed{border:1.5px solid var(--ink);background:var(--card)}
-.st-Invalid{border:1.5px dashed var(--ink)}
-.st-Claim{border:1px solid var(--ink);background:var(--tint2)}
+.switch input:focus-visible+span{box-shadow:0 0 0 2px var(--accent)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;white-space:nowrap;line-height:1.3;background:var(--tint)}
+.st-Sent,.st-Claimed{background:var(--green-soft);color:var(--green-ink)}
+.st-Generated,.st-Claim{background:var(--accent-soft);color:var(--accent)}
+.st-Failed{background:var(--red-soft);color:var(--red-ink)}
+.st-Invalid{background:var(--orange-soft);color:var(--orange-ink)}
 .tagc{display:inline-block;font-size:11.5px;padding:2px 8px;border-radius:6px;background:var(--tint);font-weight:500}
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(122px,1fr));gap:10px}
 .stat{background:var(--card);border-radius:var(--r);padding:13px 15px;cursor:pointer;border:1.5px solid transparent}
-.stat.on{border-color:var(--ink)}
+.stat.on{border-color:var(--accent)}
 .stat .n{font-size:26px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .stat .l{font-size:12.5px;color:var(--sub);margin-top:1px}
 .tbl{width:100%;border-collapse:collapse;font-size:13.5px}
 .tbl th{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);font-weight:500;text-align:left;padding:10px 12px;border-bottom:.5px solid var(--line);position:sticky;top:0;background:var(--card);z-index:1}
 .tbl td{padding:11px 12px;border-bottom:.5px solid var(--line);vertical-align:top}
-.tbl tr.tap{cursor:pointer} .tbl tr.tap:hover td{background:var(--tint2)}
+.tbl tr.tap{cursor:pointer} .tbl tr.tap:active td{background:var(--tint2)}
 .tbl tr:last-child td{border-bottom:0}
-.tablebox{max-height:560px;overflow:auto;border-radius:var(--r);background:var(--card)}
+.tablebox{max-height:560px;overflow:auto;border-radius:var(--r);background:var(--card);-webkit-overflow-scrolling:touch}
 .issue{font-size:12.5px;margin-top:2px}
-.issue.e:before{content:"✕ ";font-weight:700} .issue.w{color:var(--sub)} .issue.w:before{content:"! ";font-weight:700}
+.issue.e{color:var(--red-ink)} .issue.e:before{content:"✕ ";font-weight:700} .issue.w{color:var(--orange-ink)} .issue.w:before{content:"! ";font-weight:700}
 .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
 .spacer{flex:1}
-.drop{border:1.5px dashed var(--ter);border-radius:var(--r);padding:44px 20px;text-align:center;cursor:pointer;background:var(--card);transition:.15s}
-.drop.over{border-color:var(--ink);background:var(--tint2)}
-.drop b{display:block;font-size:18px;margin-bottom:4px}
+.drop{border:1.5px dashed var(--ter);border-radius:var(--r);padding:40px 20px;text-align:center;cursor:pointer;background:var(--card);transition:.15s;display:flex;flex-direction:column;align-items:center;gap:2px}
+.drop .dico{width:46px;height:46px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.drop .dico svg{width:24px;height:24px}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+.drop b{display:block;font-size:18px;margin-bottom:2px}
 .clubs{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .club{background:var(--card);border:2px solid transparent;border-radius:var(--r);padding:12px;cursor:pointer;text-align:left;display:flex;flex-direction:column;gap:8px;min-height:44px;transition:transform .1s}
 .club:active{transform:scale(.98)}
-.club.on{border-color:var(--accent,var(--ink))}
+.club.on{border-color:var(--accent);background:linear-gradient(var(--accent-soft),var(--accent-soft)),var(--card)}
 .club img{width:44px;height:44px;object-fit:contain;border-radius:10px;background:#fff}
 .club b{font-size:14px;line-height:1.2}.club small{font-size:12px;color:var(--sub);line-height:1.3}
 .how{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px;margin-top:10px}
 .howc{background:var(--card);border-radius:var(--r);padding:15px}
-.howc .k{font-size:12px;color:var(--sub);font-weight:600;letter-spacing:.04em}
+.howc .k{font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.04em}
 .howc .t{font-weight:600;margin:3px 0 2px}
 .howc .d{font-size:13px;color:var(--sub)}
-.banner{border-radius:var(--r);padding:13px 16px;margin-top:14px;display:flex;gap:12px;align-items:flex-start}
-.banner.dark{background:var(--fill);color:var(--on)} .banner.light{background:var(--card);border:1.5px solid var(--ink)}
-.banner .ico{font-weight:800;font-size:16px;line-height:1.2}
+.banner{border-radius:var(--r);padding:13px 16px;margin-top:14px;display:flex;gap:12px;align-items:center;background:var(--card);box-shadow:var(--shadow)}
+.banner.dark{background:var(--orange-soft);box-shadow:none}
+.banner .ico{width:28px;height:28px;border-radius:50%;background:var(--orange);color:#fff;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;flex:none}
+.banner .grow{flex:1;min-width:0}
 .thumbbtn{display:flex;gap:10px;align-items:center;cursor:pointer;border:0;background:none;padding:0;text-align:left}
 .thumbbtn img{width:92px;height:65px;object-fit:cover;border-radius:6px;box-shadow:0 0 0 .5px var(--line),var(--shadow);background:#fff}
+.thumbbtn .sub{color:var(--accent)}
 .catrow{display:grid;grid-template-columns:minmax(120px,1fr) 64px minmax(200px,1.4fr) minmax(170px,1.2fr) minmax(160px,1fr);gap:12px;align-items:center;padding:12px 16px;position:relative}
 .catrow+.catrow:before{content:"";position:absolute;top:0;left:16px;right:0;border-top:.5px solid var(--line)}
 .catrow.head{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--sub);padding-top:10px;padding-bottom:6px}
 .catrow input,.catrow select{min-height:36px;padding:7px 10px;font-size:13.5px}
 .gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
 .galc{background:var(--card);border-radius:var(--r);padding:10px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
-.galc:hover{transform:translateY(-2px)}
-.galc.on{border-color:var(--ink)}
+.galc:active{transform:scale(.98)}
+.galc.on{border-color:var(--accent)}
 .galc img{width:100%;aspect-ratio:1.414;object-fit:cover;border-radius:7px;display:block;background:#fff;box-shadow:0 0 0 .5px var(--line)}
 .galc b{display:block;margin-top:8px;font-size:14px}
 .galc small{color:var(--sub);font-size:12px;display:block;line-height:1.35}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
-.chipb{display:inline-block;font-size:13px;background:var(--tint);padding:6px 11px;border-radius:999px;cursor:pointer;border:0;font-weight:500}
-.chipb.on{background:var(--fill);color:var(--on)}
+.chipb{display:inline-flex;align-items:center;gap:6px;font-size:13px;background:var(--tint);padding:6px 12px;border-radius:999px;cursor:pointer;border:0;font-weight:500;min-height:34px}
+.chipb.on{background:var(--accent-soft);color:var(--accent);box-shadow:inset 0 0 0 1.5px var(--accent);font-weight:600}
 .phchip{display:inline-block;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;background:var(--tint);padding:3px 8px;border-radius:7px;margin:0 4px 4px 0;cursor:pointer}
 .preview{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:16px;align-items:start}
 .certimg{width:100%;display:block;border-radius:10px;box-shadow:var(--shadow);background:#fff}
@@ -151,53 +166,123 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
 .mail .hdr div{display:flex;gap:8px}.mail .hdr span:first-child{color:var(--sub);width:58px;flex:none}
 .mail pre{white-space:pre-wrap;font:inherit;margin:0;padding:16px;font-size:14px;overflow-wrap:anywhere}
 .attach{margin:0 16px 16px;display:flex;align-items:center;gap:10px;background:var(--tint2);border-radius:10px;padding:10px 12px;font-size:13px}
-.attach .pdf{width:34px;height:40px;border-radius:5px;background:var(--fill);color:var(--on);font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.attach .pdf{width:34px;height:40px;border-radius:5px;background:var(--red);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+.mtile{width:38px;height:38px;border-radius:10px;background:#fff;box-shadow:0 0 0 .5px var(--line);display:flex;align-items:center;justify-content:center;flex:none}
+.mtile .mi{width:24px;height:24px}
+.ok{color:var(--green-ink);font-weight:600}
 .progress{height:6px;background:var(--track);border-radius:9px;overflow:hidden}
-.progress div{height:100%;background:var(--fill);border-radius:9px;transition:width .4s}
+.progress div{height:100%;background:var(--accent);border-radius:9px;transition:width .4s}
 .feed .item{align-items:flex-start;padding:10px 16px}
-.lv{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none;margin-top:1px}
-.lv-ok{background:var(--fill);color:var(--on)} .lv-heal{border:1.5px solid var(--ink)} .lv-block{background:var(--ink);color:var(--on);border-radius:5px}
-.lv-warn,.lv-info{background:var(--tint)} .lv-error{border:2px solid var(--ink)}
+.lv{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none;margin-top:1px;background:var(--tint)}
+.lv-ok{background:var(--green);color:#fff} .lv-heal{background:var(--accent-soft);color:var(--accent)} .lv-block{background:var(--red);color:#fff;border-radius:6px}
+.lv-warn{background:var(--orange-soft);color:var(--orange-ink)} .lv-error{background:var(--red-soft);color:var(--red-ink)}
 .feed .msg{font-size:13.5px} .feed .when{font-size:11.5px;color:var(--sub)}
 .big{font-size:56px;font-weight:700;letter-spacing:-.04em;line-height:1}
 .hash{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12px;word-break:break-all;background:var(--tint2);padding:10px 12px;border-radius:10px}
 .check{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;position:relative}
 .check+.check:before{content:"";position:absolute;top:0;left:52px;right:0;border-top:.5px solid var(--line)}
 .ck{width:24px;height:24px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
-.ck.y{background:var(--fill);color:var(--on)} .ck.n{border:2px solid var(--ink)} .ck.w{background:var(--tint);color:var(--ink)}
+.ck.y{background:var(--green);color:#fff} .ck.n{background:var(--red);color:#fff} .ck.w{background:var(--orange);color:#fff}
 .empty{padding:30px;text-align:center;color:var(--sub)}
 .nextbar{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;flex-wrap:wrap}
-.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.38);display:flex;align-items:flex-end;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.32);display:flex;align-items:flex-end;justify-content:center;z-index:50;opacity:0;pointer-events:none;transition:opacity .2s}
 .backdrop.open{opacity:1;pointer-events:auto}
-.sheet{background:var(--bg);width:min(760px,100%);max-height:92vh;overflow:auto;border-radius:16px 16px 0 0;padding:8px 18px 34px;transform:translateY(30px);transition:transform .25s cubic-bezier(.2,.9,.3,1)}
+.sheet{background:var(--bg);width:min(760px,100%);max-height:92vh;max-height:92dvh;overflow:auto;border-radius:16px 16px 0 0;padding:0 calc(18px + var(--sar)) calc(34px + var(--sab)) calc(18px + var(--sal));transform:translateY(30px);transition:transform .25s cubic-bezier(.2,.9,.3,1);overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
 .sheet.wide{width:min(1100px,100%)}
 .backdrop.open .sheet{transform:none}
-.grabber{width:38px;height:5px;border-radius:3px;background:var(--ter);margin:4px auto 12px}
-.sheethead{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.grabber{width:38px;height:5px;border-radius:3px;background:var(--ter);margin:8px auto 10px}
+.sheethead{display:flex;align-items:center;gap:10px;margin:0 -18px 6px;padding:6px 18px 8px;position:sticky;top:0;z-index:3;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
 .sheethead h2{margin:0;font-size:24px;letter-spacing:-.02em;flex:1}
 @media (min-width:900px){.backdrop{align-items:center}.sheet{border-radius:16px;max-height:88vh}}
-#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);background:var(--fill);color:var(--on);padding:11px 18px;border-radius:12px;opacity:0;transition:.25s;pointer-events:none;z-index:60;font-weight:500;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.2);text-align:center}
+#toast{position:fixed;left:50%;bottom:calc(26px + var(--sab));transform:translate(-50%,20px);background:rgba(28,28,30,.92);color:#fff;-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);padding:11px 18px;border-radius:14px;opacity:0;transition:.25s;pointer-events:none;z-index:60;font-weight:500;max-width:90vw;box-shadow:0 8px 30px rgba(0,0,0,.2);text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 .login{max-width:400px;margin:12vh auto;padding:0 16px}
 .spin{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block;flex:none}
 @keyframes sp{to{transform:rotate(360deg)}}
 .editor{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px}
-.canvas{position:relative;user-select:none;touch-action:none;border-radius:8px;overflow:hidden;box-shadow:var(--shadow);background:#fff}
+.canvas{position:relative;user-select:none;-webkit-user-select:none;touch-action:none;border-radius:8px;overflow:hidden;box-shadow:var(--shadow);background:#fff}
 .canvas img{width:100%;display:block;pointer-events:none}
 .fbox{position:absolute;padding:2px 6px;border:1.5px dashed rgba(0,0,0,.55);border-radius:4px;cursor:move;white-space:nowrap;color:#111;background:rgba(255,255,255,.55);line-height:1.15;touch-action:none}
-.fbox.sel{border:2px solid #000;background:rgba(255,255,255,.8)}
+.fbox.sel{border:2px solid var(--accent);background:rgba(255,255,255,.8)}
 .fbox.qr{background:repeating-conic-gradient(#000 0 25%,#fff 0 50%) 50%/10px 10px;border:2px solid #000}
 .steplist{margin:6px 0 0;padding-left:20px} .steplist li{margin:5px 0}
+
+/* phone top bar + bottom tab bar (shown on phones only) */
+.mtop{display:none;align-items:center;gap:10px;margin:0 0 14px}
+.mtop .logo{margin:0;font-size:22px}.mtop .logo i{width:26px;height:26px;font-size:14px;border-radius:8px}
+.pill{display:inline-flex;align-items:center;gap:6px;border:0;background:var(--card);border-radius:999px;padding:6px 11px;font-size:12.5px;font-weight:600;cursor:pointer;max-width:58vw;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.tabbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-top:.5px solid var(--line);padding:5px calc(6px + var(--sar)) calc(5px + var(--sab)) calc(6px + var(--sal))}
+.tabbar button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:10.5px;font-weight:500;color:var(--sub);padding:3px 0;cursor:pointer;min-height:46px}
+.tabbar button svg.i{width:25px;height:25px}
+.tabbar button.on{color:var(--accent)}
+body:not([data-view=app]) .tabbar,body:not([data-view=app]) .fab,body:not([data-view=app]) .chat{display:none!important}
+
+/* help assistant */
+.fab{position:fixed;right:calc(22px + var(--sar));bottom:calc(22px + var(--sab));z-index:45;border:0;border-radius:999px;background:var(--accent);color:#fff;display:flex;align-items:center;gap:8px;padding:12px 18px 12px 15px;font-weight:600;box-shadow:0 6px 24px rgba(0,122,255,.32);cursor:pointer;transition:transform .1s}
+.fab:active{transform:scale(.96)}
+.chat{position:fixed;right:calc(22px + var(--sar));bottom:calc(22px + var(--sab));width:min(390px,calc(100vw - 32px));height:min(640px,calc(100vh - 44px));z-index:48;background:var(--bg);border-radius:22px;box-shadow:0 20px 60px rgba(0,0,0,.25),0 0 0 .5px var(--line);display:flex;flex-direction:column;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(16px) scale(.98);transform-origin:bottom right;transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1),visibility 0s .25s}
+.chat.open{opacity:1;visibility:visible;transform:none;transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1)}
+.chathead{display:flex;align-items:center;gap:10px;padding:12px 12px 12px 14px;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:.5px solid var(--line)}
+.chathead .grow{flex:1;min-width:0}
+.chatav{width:34px;height:34px;border-radius:50%;background:linear-gradient(140deg,#0a84ff,#5e5ce6);color:#fff;display:flex;align-items:center;justify-content:center;flex:none}
+.chatav svg.i{width:18px;height:18px}
+.chatlog{position:relative;flex:1;overflow:auto;padding:14px 12px;display:flex;flex-direction:column;gap:6px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+.bub{max-width:86%;padding:9px 13px;border-radius:19px;font-size:14.5px;line-height:1.42;overflow-wrap:anywhere}
+.bub.me{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:6px}
+.bub.bot{align-self:flex-start;background:var(--card);border-bottom-left-radius:6px}
+.bacts{display:flex;flex-wrap:wrap;gap:6px;align-self:flex-start;margin:2px 0 4px}
+.sugg{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 2px}
+.sugg button{border:1px solid var(--accent);background:transparent;color:var(--accent);border-radius:999px;padding:6px 12px;font-size:13px;cursor:pointer;font-weight:500;text-align:left}
+.typing{display:flex;gap:4px;padding:13px 14px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--ter);animation:bl 1.2s infinite}
+.typing span:nth-child(2){animation-delay:.2s}.typing span:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,80%,100%{opacity:.3}40%{opacity:1}}
+.chatin{display:flex;gap:8px;align-items:center;padding:10px 12px calc(10px + var(--sab));border-top:.5px solid var(--line);background:var(--glass);margin:0}
+.chatin input[type=text]{flex:1;border-radius:999px;background:var(--card);padding:8px 14px;min-height:36px;box-shadow:inset 0 0 0 .5px var(--line)}
+.sendb{width:34px;height:34px;border-radius:50%;border:0;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none}
+.sendb:disabled{opacity:.4}
+.sendb svg.i{width:18px;height:18px;stroke-width:2.4}
+
+@media (hover:hover){
+  .navl a:hover,.navl button:hover,.blist .item:not(.sel):hover{background:var(--tint)}
+  .tbl tr.tap:hover td{background:var(--tint2)}
+  .galc:hover{transform:translateY(-2px)}
+}
+@media (pointer:coarse){
+  select,input,textarea,.catrow input,.catrow select{font-size:16px}
+  .btn{min-height:44px} .btn.sm{min-height:36px}
+}
+@media (max-width:1100px){.app{grid-template-columns:240px minmax(0,1fr)} main{padding:24px 24px 100px}
+  .steps button{flex:0 1 auto;padding:8px 12px}.steps button.on{flex:1 0 auto}.steps button:not(.on) .n+.tl{display:none}}
 @media (max-width:980px){.catrow{grid-template-columns:1fr 1fr}.catrow.head{display:none}.catrow>*:first-child{grid-column:1/-1;font-weight:600}}
-@media (max-width:900px){
+@media (max-width:900px){.grid2,.preview,.editor{grid-template-columns:1fr}.title{font-size:30px}}
+@media (max-width:700px){
   .app{grid-template-columns:1fr}
-  .side{position:static;height:auto;border-right:0;border-bottom:.5px solid var(--line);padding:14px}
-  .side .blist{max-height:170px;overflow:auto}
-  .tagline,.navl .lbl2{display:none}
-  .navl{flex-direction:row;flex-wrap:wrap;margin-top:8px}
-  main{padding:20px 16px 80px}
-  .grid2,.preview,.editor{grid-template-columns:1fr}
-  .title{font-size:29px}
+  .side,.fab{display:none}
+  .mtop,.tabbar{display:flex}
+  main{padding:calc(12px + var(--sat)) calc(16px + var(--sar)) calc(96px + var(--sab)) calc(16px + var(--sal))}
+  #toast{bottom:calc(76px + var(--sab))}
+  .catrow{grid-template-columns:1fr}
+  .stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+  .stat{padding:11px 12px}.stat .n{font-size:22px}
+  .nextbar .btn{flex:1}
+  .item select{max-width:55%}
+  .sheet{width:100%;max-height:calc(100% - var(--sat) - 12px);border-radius:14px 14px 0 0}
+  .sheethead h2{font-size:22px}
+  .tablebox{max-height:none}
+  .tbl thead{display:none}
+  .tbl,.tbl tbody{display:block}
+  .tbl tr{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;padding:12px 14px;border-bottom:.5px solid var(--line)}
+  .tbl tr:last-child{border-bottom:0}
+  .tbl td{padding:0;border:0}
+  .tbl td:nth-child(1):not(.empty){display:none}
+  .tbl td:nth-child(2){grid-column:1;grid-row:1}
+  .tbl td:nth-child(5){grid-column:2;grid-row:1;text-align:right}
+  .tbl td:nth-child(3){grid-column:1/-1;font-size:13px;overflow-wrap:anywhere}
+  .tbl td:nth-child(4){grid-column:1/-1}
+  .tbl td.empty{grid-column:1/-1}
+  .chat{inset:0;width:auto;height:auto;border-radius:0;padding-top:var(--sat);transform:translateY(24px)}
+  .big{font-size:44px}
 }
 </style>
 </head>
@@ -230,22 +315,24 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
   <aside class="side">
     <div class="logo"><i>✓</i>SendEZ</div>
     <div class="tagline">Impossible to get wrong. Impossible to fake.</div>
-    <button class="btn fill block" onclick="showHome()">＋ New Event</button>
+    <button class="btn fill block" onclick="showHome()"><span data-ic="plus"></span>New Event</button>
     <div class="cap" style="margin:16px 6px 8px">Events</div>
     <div class="blist" id="batches"></div>
     <div class="navl">
-      <button onclick="openSettings()"><span class="ico">⚙︎</span><span>Settings</span></button>
-      <button onclick="openTemplates()"><span class="ico">▦</span><span>Templates</span></button>
-      <a href="/verify" target="_blank"><span class="ico">✓</span><span>Verify a certificate</span></a>
-      <button onclick="openPhone()"><span class="ico">⇪</span><span>Share online</span></button>
-      <button id="browserBtn" class="hidden" onclick="post('/api/desktop/open-browser').catch(e=>toast(e.message))"><span class="ico">↗</span><span>Open in your browser</span></button>
-      <button id="chaosBtn" onclick="runChaos()"><span class="ico">⚡</span><span>Run Chaos Test <span class="lbl2 sub sm">(demo)</span></span></button>
-      <button onclick="logout()"><span class="ico">⎋</span><span>Sign out</span></button>
+      <button onclick="openChat()"><span class="ico" data-ic="help"></span><span>Ask for help</span></button>
+      <button onclick="openSettings()"><span class="ico" data-ic="gear"></span><span>Settings</span></button>
+      <button onclick="openTemplates()"><span class="ico" data-ic="grid"></span><span>Templates</span></button>
+      <a href="/verify" target="_blank"><span class="ico" data-ic="seal"></span><span>Verify a certificate</span></a>
+      <button onclick="openPhone()"><span class="ico" data-ic="share"></span><span>Share online</span></button>
+      <button id="browserBtn" class="hidden" onclick="openInBrowser()"><span class="ico" data-ic="out"></span><span>Open in your browser</span></button>
+      <button id="chaosBtn" onclick="runChaos()"><span class="ico" data-ic="bolt"></span><span>Run Chaos Test <span class="lbl2 sub sm">(demo)</span></span></button>
+      <button onclick="logout()"><span class="ico" data-ic="signout"></span><span>Sign out</span></button>
       <div class="foot lbl2" style="margin:8px 10px 0" id="sideStatus"></div>
     </div>
   </aside>
 
   <main>
+    <div class="mtop"><div class="logo"><i>✓</i>SendEZ</div><span class="spacer"></span><button class="pill" id="mStatusPill" onclick="openSettings()"></button></div>
     <!-- HOME -->
     <section id="home">
       <h1 class="title">New Event</h1>
@@ -258,7 +345,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
       <div class="group"><div class="item"><input type="text" id="batchName" placeholder="e.g. National Tech Fest 2026" style="background:transparent;padding:0"></div></div>
       <p class="foot">Used on the certificates and in the emails. It also helps choose a matching design.</p>
       <div class="cap">Student list</div>
-      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload Excel or CSV"><b>Drop your Excel or CSV file here</b><span class="sub">or tap to choose · .xlsx or .csv · any column names</span></div>
+      <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload Excel or CSV"></div>
       <input type="file" id="file" accept=".csv,.xlsx,.xlsm,.tsv,.xls" hidden>
       <p class="foot">Want to try first? <a href="#" onclick="useSample('tech_fest_2026.xlsx','National Tech Fest 2026');return false"><b>Use a sample Excel file</b></a> (messy on purpose: title rows, typos, missing emails, mixed categories).</p>
       <div class="cap">How it works</div>
@@ -274,7 +361,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
     <section id="batch" class="hidden">
       <div class="row" style="align-items:flex-start">
         <div style="min-width:0;flex:1"><h1 class="title" id="bTitle"></h1><p class="subtitle" id="bSub"></p></div>
-        <button class="btn sm" onclick="deleteBatch()">Delete</button>
+        <button class="btn sm danger" onclick="deleteBatch()">Delete</button>
       </div>
       <div id="pauseBanner"></div>
       <div class="steps" id="tabs" role="tablist"></div>
@@ -396,6 +483,21 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--ink)}
   </main>
 </div>
 
+<nav class="tabbar" id="tabbar" aria-label="Main">
+  <button data-t="events" onclick="openEvents()"><span data-ic="list"></span>Events</button>
+  <button data-t="new" onclick="showHome()"><span data-ic="plusc"></span>New</button>
+  <button data-t="help" onclick="openChat()"><span data-ic="help"></span>Help</button>
+  <button data-t="settings" onclick="openSettings()"><span data-ic="gear"></span>Settings</button>
+  <button data-t="more" onclick="openMore()"><span data-ic="more"></span>More</button>
+</nav>
+<button class="fab hidden" id="helpFab" onclick="openChat()" aria-label="Ask for help"><span data-ic="spark"></span>Help</button>
+<div class="chat" id="chat" role="dialog" aria-label="SendEZ Help" aria-hidden="true">
+  <div class="chathead"><span class="chatav" data-ic="spark"></span><div class="grow"><b>SendEZ Help</b><div class="desc" id="chatSub">Ask me anything about SendEZ</div></div>
+    <button class="btn sm plain" onclick="chatReset()" title="Start over">Clear</button><button class="btn sm plain" onclick="closeChat()"><b>Done</b></button></div>
+  <div class="chatlog" id="chatLog" aria-live="polite"></div>
+  <form class="chatin" id="chatForm"><input type="text" id="chatText" placeholder="Ask a question…" autocomplete="off" enterkeyhint="send" aria-label="Your question" maxlength="500"><button class="sendb" id="chatSend" aria-label="Send"><span data-ic="up"></span></button></form>
+</div>
+
 <div class="backdrop" id="sheetWrap" onclick="if(event.target===this)closeSheet()"><div class="sheet" id="sheet" role="dialog" aria-modal="true"></div></div>
 <div id="toast" role="status"></div>
 
@@ -412,6 +514,37 @@ const tplName = id => (catalog.find(t=>t.id===id)||{}).name || id;
 let thumbV = Date.now();
 const thumb = (id, dpi=40) => `/api/templates/${encodeURIComponent(id)}/thumb.png?dpi=${dpi}${batch?`&batch=${batch.id}`:''}&v=${thumbV}`;
 
+// ---------- icons (line icons in the style of iOS; Gmail and Outlook marks in colour)
+const IC = {
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  plusc:'<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>',
+  gear:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  grid:'<rect x="3.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="3.5" width="7" height="7" rx="1.8"/><rect x="3.5" y="13.5" width="7" height="7" rx="1.8"/><rect x="13.5" y="13.5" width="7" height="7" rx="1.8"/>',
+  seal:'<path d="M12 3l7 3v5.5c0 4.6-3 8-7 9.5-4-1.5-7-4.9-7-9.5V6z"/><path d="M9 12l2.2 2.2L15.5 10"/>',
+  share:'<path d="M12 3.5v11M8 7.5l4-4 4 4"/><path d="M6 11H5a1 1 0 0 0-1 1v7.5a1.5 1.5 0 0 0 1.5 1.5h13a1.5 1.5 0 0 0 1.5-1.5V12a1 1 0 0 0-1-1h-1"/>',
+  out:'<path d="M14 4h6v6M20 4l-9 9"/><path d="M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/>',
+  bolt:'<path d="M13 2.5L4.5 13.5H11l-1 8 8.5-11H12z"/>',
+  signout:'<path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 16.5L5.5 12 10 7.5M5.5 12H16"/>',
+  help:'<path d="M20.5 11.5a8.5 8.5 0 0 1-12.3 7.6L3.5 20.5l1.4-4.3A8.5 8.5 0 1 1 20.5 11.5z"/><path d="M9.7 9.3a2.4 2.4 0 1 1 3.3 2.2c-.6.3-1 .8-1 1.4v.4"/><path d="M12 16.2v.1"/>',
+  spark:'<path d="M11 3.5l1.9 5 5 1.9-5 1.9-1.9 5-1.9-5-5-1.9 5-1.9z"/><path d="M18.5 15l.9 2.1 2.1.9-2.1.9-.9 2.1-.9-2.1-2.1-.9 2.1-.9z"/>',
+  list:'<path d="M9 6.5h11M9 12h11M9 17.5h11"/><path d="M4.5 6.5h.1M4.5 12h.1M4.5 17.5h.1" stroke-width="2.6"/>',
+  more:'<circle cx="12" cy="12" r="9"/><path d="M8 12h.1M12 12h.1M16 12h.1" stroke-width="2.6"/>',
+  up:'<path d="M12 19V5.5M6 11.5l6-6 6 6"/>',
+  upload:'<path d="M12 15.5V4M7.5 8.5L12 4l4.5 4.5"/><path d="M4.5 14.5v3A2.5 2.5 0 0 0 7 20h10a2.5 2.5 0 0 0 2.5-2.5v-3"/>',
+  mail:'<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="M3.5 7l8.5 6 8.5-6"/>',
+  tray:'<path d="M3.5 13.5h5l1.5 2.5h4l1.5-2.5h5"/><path d="M5.5 5.5h13l2 8v4a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-4z"/>',
+  chev:'<path d="M9.5 6l6 6-6 6"/>',
+};
+const icon = k => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[k]||''}</svg>`;
+const GMAIL = '<svg class="mi" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M6 38h7V21L4 14.5V35a3 3 0 0 0 2 3z"/><path fill="#34A853" d="M35 38h7a3 3 0 0 0 2-3V14.5L35 21z"/><path fill="#FBBC04" d="M35 12v9l9-6.5V12c0-3.7-4.2-5.8-7.2-3.6z"/><path fill="#EA4335" d="M13 21v-9l11 8.2L35 12v9l-11 8.2z"/><path fill="#C5221F" d="M4 12v2.5L13 21v-9l-1.8-1.6C8.2 8.2 4 10.3 4 12z"/></svg>';
+const OUTLOOK = '<svg class="mi" viewBox="0 0 48 48" aria-hidden="true"><rect x="17" y="10" width="27" height="28" rx="3" fill="#28A8EA"/><path d="M17.5 17l13.5 9.5L44 17" fill="none" stroke="#fff" stroke-width="2.4"/><rect x="4" y="12" width="23" height="24" rx="3.5" fill="#0F6CBD"/><ellipse cx="15.5" cy="24" rx="5.2" ry="6.6" fill="none" stroke="#fff" stroke-width="3"/></svg>';
+function mailIcon(p){ return p==='gmail' ? GMAIL : p==='outlook' ? OUTLOOK : `<svg class="mi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[p==='sandbox'?'tray':'mail']}</svg>`; }
+const providerName = p => ({gmail:'Gmail', outlook:'Outlook', smtp:'Email', resend:'Resend', sandbox:'Test mode'})[p] || 'Email';
+function fillIcons(root=document){ root.querySelectorAll('[data-ic]').forEach(el => { if (!el.firstChild) el.innerHTML = icon(el.dataset.ic); }); }
+fillIcons();
+const DROP_HTML = `<span class="dico">${icon('upload')}</span><b>Drop your Excel or CSV file here</b><span class="sub">or tap to choose · .xlsx or .csv · any column names</span>`;
+$('#drop').innerHTML = DROP_HTML;
+
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3400); }
 async function api(path, opts={}){
   const r = await fetch(path, {credentials:'same-origin', ...opts, headers: opts.body && !(opts.body instanceof FormData) ? {'Content-Type':'application/json'} : {}});
@@ -425,7 +558,7 @@ const put = (p, b) => api(p, {method:'PUT', body: JSON.stringify(b)});
 const post = (p, b) => api(p, {method:'POST', body: JSON.stringify(b||{})});
 
 // ---------- auth
-function showOnly(id){ ['setup','login','app'].forEach(x => $('#'+x).classList.toggle('hidden', x!==id)); }
+function showOnly(id){ ['setup','login','app'].forEach(x => $('#'+x).classList.toggle('hidden', x!==id)); document.body.dataset.view = id; if (id!=='app') closeChat(); }
 function showLogin(){ showOnly('login'); setTimeout(()=>$('#lp').focus(),50); }
 async function start(){
   const s = await fetch('/api/setup-status').then(r=>r.json());
@@ -452,6 +585,7 @@ async function logout(){ await post('/api/logout'); showLogin(); }
 async function boot(firstRun){
   me = await api('/api/me'); catalog = await api('/api/templates');
   showOnly('app'); renderSide();
+  await renderClubs();
   const list = await loadBatches();
   if (list.length && !firstRun) openBatch(list[0].id); else showHome();
   if (firstRun) setTimeout(()=>{ openSettings(); toast('Next: connect the Gmail account that will send certificates'); }, 400);
@@ -464,10 +598,15 @@ document.addEventListener('click', e => {
 }, true);
 function renderSide(){
   $('#browserBtn').classList.toggle('hidden', !me.desktop);
+  $('#helpFab').classList.remove('hidden');
+  const sandbox = me.mail_mode==='sandbox', prov = me.mail_mode==='resend' ? 'resend' : (sandbox ? 'sandbox' : me.mail.provider);
   const mode = {smtp:`Sending from ${me.mail.address}`, resend:`Resend · ${me.mail.address}`, sandbox:'Email not connected (test mode)'}[me.mail_mode];
-  $('#sideStatus').innerHTML = `${esc(mode)}${me.quota.cap?`<br>${me.quota.left} of ${me.quota.cap} emails left today`:''}`;
-  $('#setupNudge').innerHTML = me.mail_mode==='sandbox' ? `<div class="banner light"><span class="ico">!</span><div class="grow"><b>Connect your email first</b><div class="desc">Until you connect Gmail, certificates are only saved on this computer (test mode), not emailed.</div></div><button class="btn sm fill" onclick="openSettings()">Connect Gmail</button></div>` : '';
+  $('#sideStatus').innerHTML = `<span style="display:inline-flex;gap:6px;align-items:flex-start">${mailIcon(prov)}<span>${esc(mode)}${me.quota.cap?`<br>${me.quota.left} of ${me.quota.cap} emails left today`:''}</span></span>`;
+  $('#mStatusPill').innerHTML = sandbox ? `${mailIcon('sandbox')}<span style="color:var(--orange-ink)">Connect Gmail</span>` : `${mailIcon(prov)}<span>${esc(me.mail.address)}</span>`;
+  $('#setupNudge').innerHTML = sandbox ? `<div class="banner light"><span class="mtile">${GMAIL}</span><div class="grow"><b>Connect your email first</b><div class="desc">Until you connect Gmail or Outlook, certificates are only saved on this computer (test mode), not emailed.</div></div><button class="btn sm fill" onclick="openSettings()">Connect</button></div>` : '';
 }
+function setTabbar(k){ document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('on', b.dataset.t === k)); }
+function openInBrowser(){ post('/api/desktop/open-browser').catch(e=>toast(e.message)); }
 async function refreshMe(){ me = await api('/api/me'); renderSide(); }
 
 async function loadBatches(){
@@ -487,7 +626,7 @@ async function renderClubs(){
     `<button class="club ${selectedClub===''?'on':''}" onclick="pickClub('')" aria-pressed="${selectedClub===''}"><span style="width:44px;height:44px;border-radius:10px;background:var(--tint);display:flex;align-items:center;justify-content:center;font-size:20px">＋</span><b>Other</b><small>Not a club event</small></button>`;
 }
 function pickClub(id){ selectedClub = id; renderClubs(); }
-function showHome(){ batch=null; cfg=null; stopPoll(); $('#batch').classList.add('hidden'); $('#home').classList.remove('hidden'); loadBatches(); renderClubs(); }
+function showHome(){ batch=null; cfg=null; stopPoll(); closeSheet(); $('#batch').classList.add('hidden'); $('#home').classList.remove('hidden'); setTabbar('new'); window.scrollTo({top:0}); loadBatches(); renderClubs(); }
 
 // ---------- upload
 const drop = $('#drop');
@@ -502,7 +641,7 @@ async function upload(file){
   drop.innerHTML = '<span class="spin"></span> <span class="sub">Reading your sheet…</span>';
   try { const b = await api('/api/batches',{method:'POST',body:fd}); $('#batchName').value=''; tab='students'; await openBatch(b.id); toast('Sheet read. Check what we found, then press Next.'); }
   catch(err){ toast(err.message); }
-  finally { drop.innerHTML = '<b>Drop your Excel or CSV file here</b><span class="sub">or tap to choose · .xlsx or .csv · any column names</span>'; }
+  finally { drop.innerHTML = DROP_HTML; }
 }
 async function useSample(name, label){
   const r = await fetch('/sample/'+name,{credentials:'same-origin'});
@@ -522,7 +661,7 @@ async function openBatch(id){
   batch = await api(`/api/batches/${id}`); cfg = batch.config;
   if (!same && tab !== 'chaos') tab = batch.is_chaos ? 'chaos' : ((batch.counts.Sent||0) ? 'review' : 'students');
   if (tab === 'chaos' && !batch.is_chaos) tab = 'students';
-  $('#home').classList.add('hidden'); $('#batch').classList.remove('hidden');
+  $('#home').classList.add('hidden'); $('#batch').classList.remove('hidden'); setTabbar('events');
   $('#bTitle').textContent = batch.name;
   $('#zipBtn').href = `/api/batches/${id}/certificates.zip`; $('#csvBtn').href = `/api/batches/${id}/report.csv`;
   filter = ''; $('#search').value = ''; proposal = null; pvIndex = 0; thumbV = Date.now();
@@ -531,11 +670,12 @@ async function openBatch(id){
 }
 function renderHeader(){
   const c = batch.counts;
-  $('#bSub').textContent = `${batch.filename}${batch.sheet?` · sheet “${batch.sheet}”`:''} · ${c.Total} students`;
+  const club = cfg && cfg.club && clubData ? clubData.clubs.find(x => x.id === cfg.club) : null;
+  $('#bSub').textContent = `${club ? `${club.name} · ` : ''}${batch.filename}${batch.sheet?` · sheet “${batch.sheet}”`:''} · ${c.Total} students`;
   $('#pauseBanner').innerHTML = batch.pause_reason ? `<div class="banner dark"><span class="ico">!</span><div class="grow"><b>Sending paused</b><div class="sm" style="opacity:.85">${esc(batch.pause_reason)}</div></div><button class="btn sm" onclick="showTab('review')">Review</button></div>` : '';
   const t = batch.is_chaos ? [['chaos','Chaos Report',0], ...TABS] : TABS;
   const doneUpTo = {students:1, certs:2, email:3, review:4}[tab] || 0;
-  $('#tabs').innerHTML = t.map(([k,l,n]) => `<button role="tab" class="${k===tab?'on':''} ${n && n<doneUpTo?'done':''}" onclick="showTab('${k}')">${n?`<span class="n">${n<doneUpTo?'✓':n}</span>`:''}${l}</button>`).join('');
+  $('#tabs').innerHTML = t.map(([k,l,n]) => `<button role="tab" class="${k===tab?'on':''} ${n && n<doneUpTo?'done':''}" onclick="showTab('${k}')" aria-label="${esc(l)}">${n?`<span class="n">${n<doneUpTo?'✓':n}</span>`:''}<span class="tl">${l}</span></button>`).join('');
 }
 async function showTab(k){
   tab = k; renderHeader();
@@ -790,8 +930,8 @@ async function applyProposal(){ cfg.rules = proposal.rules; cfg.category_column 
 function loadEmail(){
   const m = me.mail, q = me.quota;
   $('#acctBox').innerHTML = me.mail_mode === 'sandbox'
-    ? `<div class="banner light" style="margin-top:0"><span class="ico">!</span><div class="grow"><b>No email account connected</b><div class="desc">Certificates will be saved on this computer instead of emailed. Connect Gmail to send them for real.</div></div><button class="btn sm fill" onclick="openSettings()">Connect Gmail</button></div>`
-    : `<div class="group"><div class="item"><span class="ck y">✓</span><div class="grow"><b>${esc(m.address)}</b><div class="desc">${esc(me.providers[m.provider]||'SMTP')}${m.verified_at?` · connection tested ${when(m.verified_at)}`:' · not tested yet'}${q.cap?` · ${q.left} of ${q.cap} emails left today`:''}</div></div><button class="btn sm" onclick="openSettings()">Change</button></div></div>`;
+    ? `<div class="banner light" style="margin-top:0"><span class="mtile">${GMAIL}</span><div class="grow"><b>No email account connected</b><div class="desc">Certificates will be saved on this computer instead of emailed. Connect Gmail or Outlook to send them for real.</div></div><button class="btn sm fill" onclick="openSettings()">Connect</button></div>`
+    : `<div class="group"><div class="item"><span class="mtile">${mailIcon(me.mail_mode==='resend'?'resend':m.provider)}</span><div class="grow"><b>${esc(m.address)}</b><div class="desc">${esc(me.providers[m.provider]||'SMTP')}${m.verified_at?` · <span class="ok">✓ connection tested</span> ${when(m.verified_at)}`:' · not tested yet'}${q.cap?` · ${q.left} of ${q.cap} emails left today`:''}</div></div><button class="btn sm" onclick="openSettings()">Change</button></div></div>`;
   const rules = cfg.rules || [];
   $('#emailCats').innerHTML = (rules.length ? rules : [{label:'All students', email:'standard'}]).map(r => `<div class="item"><span class="grow lbl">${esc(r.label)}</span><span class="val">${esc(me.presets[r.email]||'Custom')}</span></div>`).join('');
   $('#subj').value = cfg.email_subject; $('#body').value = cfg.email_body; $('#fnPattern').value = cfg.filename_pattern;
@@ -829,7 +969,7 @@ async function loadReview(){
   const items = [
     [c.Invalid ? 'w':'y', `${ready} student${ready===1?'':'s'} ready`, c.Invalid ? `${c.Invalid} row${c.Invalid===1?'':'s'} with problems will be skipped. <a href="#" onclick="filter='Invalid';showTab('students');return false">See them</a>` : 'Every row passed the checks'],
     ['y', `${(cfg.rules||[]).length || 1} design${(cfg.rules||[]).length>1?'s':''} assigned`, (cfg.rules||[]).map(r=>`${esc(r.label)} → ${esc(tplName(r.template))}`).join(' · ') || esc(tplName(cfg.template_id))],
-    [sandbox ? 'n':'y', sandbox ? 'Email not connected' : `Sending from ${esc(me.mail.address)}`, sandbox ? 'Certificates will only be saved on this computer. <a href="#" onclick="openSettings();return false">Connect Gmail</a>' : (me.mail.verified_at ? 'Connection tested' : 'Tip: test the connection in Settings first')],
+    [sandbox ? 'n':'y', sandbox ? 'Email not connected' : `<span style="display:inline-flex;gap:6px;align-items:center">${mailIcon(me.mail_mode==='resend'?'resend':me.mail.provider)}Sending from ${esc(me.mail.address)}</span>`, sandbox ? 'Certificates will only be saved on this computer. <a href="#" onclick="openSettings();return false">Connect Gmail</a>' : (me.mail.verified_at ? 'Connection tested' : 'Tip: test the connection in Settings first')],
     [q.cap && toEmail > q.left ? 'w':'y', q.cap ? `${q.left} of ${q.cap} emails left today` : 'No daily limit in test mode', q.cap && toEmail > q.left ? `${toEmail} emails needed: the first ${q.left} go now, then sending pauses safely. Press Send again tomorrow for the rest.` : 'Enough for this batch'],
     [claimsPending ? 'w':'y', claimsPending ? `${claimsPending} will get a claim link` : 'Everyone has an email', claimsPending ? 'Copy their links from the student list after sending' : ''],
   ];
@@ -975,7 +1115,7 @@ async function openRecord(id){
   openSheet();
 }
 function openSheet(){ $('#sheetWrap').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeSheet(){ $('#sheetWrap').classList.remove('open'); document.body.style.overflow=''; galleryCb = null; }
+function closeSheet(){ $('#sheetWrap').classList.remove('open'); document.body.style.overflow=''; galleryCb = null; if (me) setTabbar(batch ? 'events' : 'new'); }
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeSheet(); });
 async function copyText(t){ try { await navigator.clipboard.writeText(t); toast('Copied'); } catch { prompt('Copy this link', t); } }
 async function previewRec(id){ $('#pvCat').value=''; await showTab('review'); const i = pvList.findIndex(x=>x.id===id); if (i>=0){ pvIndex=i; showPreview(); } }
@@ -995,7 +1135,7 @@ async function openSettings(){
   $('#sheet').className = 'sheet';
   $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Settings</h2><button class="btn sm plain" onclick="closeSheet()">Done</button></div>
     <div class="cap">Email account</div>
-    <div class="chips" style="margin:0 0 10px" id="provChips">${['gmail','outlook','smtp','sandbox'].map(k=>`<button class="chipb ${k===prov?'on':''}" data-p="${k}">${esc({gmail:'Gmail',outlook:'Outlook / Microsoft 365',smtp:'Other',sandbox:'Test mode'}[k])}</button>`).join('')}</div>
+    <div class="chips" style="margin:0 0 10px" id="provChips">${['gmail','outlook','smtp','sandbox'].map(k=>`<button class="chipb ${k===prov?'on':''}" data-p="${k}">${mailIcon(k)}${esc({gmail:'Gmail',outlook:'Outlook / Microsoft 365',smtp:'Other',sandbox:'Test mode'}[k])}</button>`).join('')}</div>
     <div id="mailForm"></div>
     <div class="cap">Mahindra University logos</div>
     <div class="group" id="muLogos"></div>
@@ -1016,7 +1156,7 @@ async function openSettings(){
   window._settings = s;
   renderMuLogos();
   document.querySelectorAll('#provChips .chipb').forEach(b => b.onclick = () => setProvider(b.dataset.p));
-  setProvider(prov); openSheet();
+  setProvider(prov); openSheet(); setTabbar('settings');
 }
 function setProvider(k){
   const s = window._settings, m = s.mail, same = m.provider === k;
@@ -1030,14 +1170,14 @@ function setProvider(k){
       <div class="desc">Gmail allows about 500 emails a day (about 2,000 for Google Workspace). SendEZ stops safely at the limit you set and continues when you press Send again.</div></div>` : '';
   $('#mailForm').innerHTML = k==='sandbox' ? `<div class="group"><div class="item"><div class="desc">Test mode: certificates and emails are saved on this computer (data/outbox) and not delivered. Good for trying things out.</div></div><div class="item"><span class="grow"></span><button class="btn sm fill" onclick="saveMail('sandbox')">Use test mode</button></div></div>` :
     `<div class="group">
-      <div class="item"><span class="grow lbl">${k==='gmail'?'Gmail address':'Email address'}</span><input class="inl" type="email" id="mAddr" value="${esc(same?m.address:'')}" placeholder="${k==='gmail'?'you@gmail.com':'you@college.edu'}"></div>
+      <div class="item">${k==='gmail'||k==='outlook'?mailIcon(k):''}<span class="grow lbl">${k==='gmail'?'Gmail address':(k==='outlook'?'Outlook address':'Email address')}</span><input class="inl" type="email" id="mAddr" value="${esc(same?m.address:'')}" placeholder="${k==='gmail'?'you@gmail.com':'you@college.edu'}"></div>
       <div class="item"><span class="grow lbl">${k==='gmail'?'App Password':'Password'}</span><input class="inl" type="password" id="mPass" placeholder="${esc(pwd)}" autocomplete="new-password"></div>
       <div class="item"><span class="grow lbl">Sender name</span><input class="inl" type="text" id="mName" value="${esc(same?m.from_name:'')}" placeholder="e.g. Tech Fest Team"></div>
       <div class="item"><span class="grow lbl">Replies go to <span class="ter sm">optional</span></span><input class="inl" type="email" id="mReply" value="${esc(same?m.reply_to:'')}" placeholder="coordinator@college.edu"></div>
       ${k==='smtp'?`<div class="item"><span class="grow lbl">SMTP server</span><input class="inl" type="text" id="mHost" value="${esc(same?m.host:'')}" placeholder="smtp.example.com"></div><div class="item"><span class="grow lbl">Port</span><input class="inl" type="number" id="mPort" value="${same?m.port:587}"></div><div class="item"><span class="grow lbl">Security</span><select id="mSec">${['starttls','ssl','none'].map(x=>`<option ${x===(same?m.security:'starttls')?'selected':''}>${x}</option>`).join('')}</select></div>`:''}
       <div class="item"><div class="grow"><div class="lbl">Daily limit</div><div class="desc">Sending pauses here and continues later</div></div><input class="inl" type="number" id="mCap" value="${cap}" style="max-width:90px"></div>
       <div class="item"><div class="grow"><div class="lbl">Pause between emails</div><div class="desc">Seconds; 1 is gentle on Gmail</div></div><input class="inl" type="number" step="0.5" id="mDelay" value="${same?m.delay_seconds:1}" style="max-width:90px"></div>
-      <div class="item"><span class="grow" id="mStatus">${same&&m.verified_at?`<span class="sub sm">✓ Tested ${when(m.verified_at)}</span>`:''}</span><button class="btn sm fill" onclick="saveMail('${k}')">Save &amp; Test</button></div>
+      <div class="item"><span class="grow" id="mStatus">${same&&m.verified_at?`<span class="ok sm">✓ Tested ${when(m.verified_at)}</span>`:''}</span><button class="btn sm fill" onclick="saveMail('${k}')">Save &amp; Test</button></div>
       <div class="item"><input type="email" id="mTestTo" placeholder="Send a test email to…" style="flex:1"><button class="btn sm" onclick="sendTest()">Send test</button></div>
     </div>${help}`;
 }
@@ -1050,7 +1190,7 @@ async function saveMail(k){
     if (k==='sandbox'){ toast('Test mode on'); return openSettings(); }
     $('#mStatus').innerHTML = '<span class="spin"></span> <span class="sub sm">Testing the connection…</span>';
     const r = await post('/api/settings/test-connection');
-    $('#mStatus').innerHTML = r.ok ? '<b>✓ Connected</b>' : `<span class="issue e">${esc(r.message)}</span>`;
+    $('#mStatus').innerHTML = r.ok ? '<span class="ok">✓ Connected</span>' : `<span class="issue e">${esc(r.message)}</span>`;
     toast(r.ok ? 'Connected. You can send certificates now' : 'Saved, but the connection failed. See the message');
     await refreshMe(); if (batch && tab==='email') loadEmail();
   } catch(e){ toast(e.message); }
@@ -1058,7 +1198,7 @@ async function saveMail(k){
 async function sendTest(){
   const to = $('#mTestTo').value.trim(); if (!to) return toast('Type an address to send the test to');
   $('#mStatus').innerHTML = '<span class="spin"></span> <span class="sub sm">Sending…</span>';
-  try { const r = await post('/api/settings/test-email', {to}); $('#mStatus').innerHTML = r.ok ? '<b>✓ Test email sent</b>' : `<span class="issue e">${esc(r.message)}</span>`; }
+  try { const r = await post('/api/settings/test-email', {to}); $('#mStatus').innerHTML = r.ok ? '<span class="ok">✓ Test email sent</span>' : `<span class="issue e">${esc(r.message)}</span>`; }
   catch(e){ $('#mStatus').innerHTML = `<span class="issue e">${esc(e.message)}</span>`; }
 }
 async function renderMuLogos(){
@@ -1112,6 +1252,90 @@ async function openPhone(){
 }
 async function shareStart(){ try { await post('/api/share/start'); openPhone(); } catch(e){ toast(e.message); } }
 async function shareStop(){ try { await post('/api/share/stop'); await refreshMe(); toast('Sharing stopped'); openPhone(); } catch(e){ toast(e.message); } }
+
+// ---------- phone: events list + more
+async function openEvents(){
+  const list = await api('/api/batches');
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Events</h2><button class="btn sm fill" onclick="showHome()">${icon('plus')}New</button><button class="btn sm plain" onclick="closeSheet()"><b>Done</b></button></div>
+    <div class="group">${list.map(b => `<div class="item tap" onclick="closeSheet();openBatch(${b.id})"><div class="grow"><div class="bname">${b.is_chaos?'⚡ ':''}${esc(b.name)}</div>
+      <div class="bmeta">${b.job?'working · ':''}${b.counts.Total||0} students · ${b.counts.Sent||0} sent${b.counts.Failed?` · ${b.counts.Failed} failed`:''}${b.pause_reason?' · paused':''}</div></div>${batch&&batch.id===b.id?'<span class="ok">✓</span>':''}<span class="ter">${icon('chev')}</span></div>`).join('')
+      || '<div class="empty">No events yet. Tap New to upload your first student list.</div>'}</div>`;
+  openSheet(); setTabbar('events');
+}
+function openMore(){
+  const row = (ic, label, js, sub='') => `<div class="item tap" onclick="${js}"><span style="color:var(--accent);display:flex">${icon(ic)}</span><div class="grow"><div class="lbl">${label}</div>${sub?`<div class="desc">${sub}</div>`:''}</div><span class="ter">${icon('chev')}</span></div>`;
+  $('#sheet').className = 'sheet';
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>More</h2><button class="btn sm plain" onclick="closeSheet()"><b>Done</b></button></div>
+    <div class="group">${row('share','Share online','openPhone()','A link for your operator or your phone')}${row('grid','Templates','openTemplates()','14 designs, or import from Canva')}
+      ${row('seal','Verify a certificate',"closeSheet();openLink('/verify')")}${row('bolt','Run Chaos Test','closeSheet();runChaos()','Demo of every safety check')}
+      ${me.desktop?row('out','Open in your browser','openInBrowser()'):''}${row('signout','Sign out','closeSheet();logout()')}</div>
+    <p class="foot">${esc($('#sideStatus').textContent)}</p>`;
+  openSheet(); setTabbar('more');
+}
+function openLink(href){ const a = document.createElement('a'); a.href = href; a.target = '_blank'; a.rel = 'noopener'; document.body.appendChild(a); a.click(); a.remove(); }
+
+// ---------- help assistant
+let chatHist = [], chatBusy = false;
+const CHAT_ACT = {open_settings:()=>openSettings(), open_share:()=>openPhone(), new_event:()=>showHome(), open_templates:()=>openTemplates(),
+  goto_students:()=>showTab('students'), goto_certs:()=>showTab('certs'), goto_email:()=>showTab('email'), goto_review:()=>showTab('review'),
+  goto_proof:()=>showTab('proof'), open_verify:()=>openLink('/verify'), run_chaos:()=>runChaos()};
+function md(t){
+  return esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+    .replace(/https?:\/\/[^\s<)]+[^\s<).,;:!?]/g, u => `<a href="${u}" target="_blank" rel="noopener">${u.replace(/^https?:\/\//,'')}</a>`)
+    .replace(/\n/g, '<br>');
+}
+function chatScroll(){ const l = $('#chatLog'); l.scrollTop = l.scrollHeight; }
+function chatBubble(who, html){ const d = document.createElement('div'); d.className = `bub ${who}`; d.innerHTML = html; $('#chatLog').appendChild(d); chatScroll(); return d; }
+function chatExtras(r){
+  document.querySelectorAll('#chatLog .sugg').forEach(e => e.remove());
+  if (r.actions && r.actions.length){
+    const a = document.createElement('div'); a.className = 'bacts';
+    a.innerHTML = r.actions.map(x => `<button class="btn sm fill" data-a="${esc(x.id)}">${esc(x.label)}</button>`).join('');
+    a.querySelectorAll('button').forEach(b => b.onclick = () => chatAct(b.dataset.a));
+    $('#chatLog').appendChild(a);
+  }
+  if (r.suggestions && r.suggestions.length){
+    const sg = document.createElement('div'); sg.className = 'sugg';
+    sg.innerHTML = r.suggestions.map(q => `<button>${esc(q)}</button>`).join('');
+    sg.querySelectorAll('button').forEach(b => b.onclick = () => chatAsk(b.textContent));
+    $('#chatLog').appendChild(sg);
+  }
+  chatScroll();
+}
+function chatAct(id){
+  if (id.startsWith('goto_') && !batch){ toast('Open an event first, or start a New Event'); return; }
+  closeChat(); (CHAT_ACT[id] || (()=>{}))();
+}
+async function chatWelcome(){
+  chatBubble('bot', md("Hi! I'm the SendEZ helper. Ask me anything, like **how to connect Gmail** or **why an email didn't arrive**."));
+  try { chatExtras(await post('/api/assistant', {message:''})); } catch {}
+}
+function chatReset(){ chatHist = []; $('#chatLog').innerHTML = ''; chatWelcome(); }
+function openChat(){
+  closeSheet();
+  const c = $('#chat'); c.classList.add('open'); c.setAttribute('aria-hidden', 'false'); setTabbar('help');
+  if (!$('#chatLog').children.length) chatWelcome();
+  if (matchMedia('(hover:hover)').matches) setTimeout(() => $('#chatText').focus(), 150);
+}
+function closeChat(){ const c = $('#chat'); c.classList.remove('open'); c.setAttribute('aria-hidden', 'true'); $('#chatText').blur(); setTabbar(batch ? 'events' : 'new'); }
+async function chatAsk(text){
+  text = (text || '').trim(); if (!text || chatBusy) return;
+  chatBusy = true; $('#chatSend').disabled = true; $('#chatText').value = '';
+  document.querySelectorAll('#chatLog .sugg').forEach(e => e.remove());
+  const mine = chatBubble('me', esc(text));
+  const typing = chatBubble('bot typing', '<span></span><span></span><span></span>');
+  try {
+    const r = await post('/api/assistant', {message:text, history:chatHist.slice(-6), batch_id: batch ? batch.id : null});
+    typing.remove(); chatBubble('bot', md(r.answer)); chatExtras(r);
+    const log = $('#chatLog'); log.scrollTop = Math.min(log.scrollHeight, mine.offsetTop - 8);
+    $('#chatSub').textContent = r.engine === 'claude' ? 'Answers by Claude' : 'Ask me anything about SendEZ';
+    chatHist.push({role:'user', content:text}, {role:'assistant', content:r.answer});
+  } catch(e){ typing.remove(); chatBubble('bot', esc(e.message || 'Something went wrong. Please try again.')); }
+  finally { chatBusy = false; $('#chatSend').disabled = false; }
+}
+$('#chatForm').onsubmit = e => { e.preventDefault(); chatAsk($('#chatText').value); };
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && $('#chat').classList.contains('open')) closeChat(); });
 
 // ---------- live updates
 async function syncPoll(){

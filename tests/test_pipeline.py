@@ -519,6 +519,52 @@ def test_copilot_offline_and_claude(client, monkeypatch):
     assert out["engine"] == "offline" and "Claude unavailable" in out["notes"][0]
 
 
+def test_help_assistant_offline_state_and_claude(client, monkeypatch):
+    assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
+    login(client)
+    ask = lambda m, **kw: client.post("/api/assistant", json={"message": m, **kw}).json()
+    r = ask("what is the app passweord")  # typo on purpose
+    assert "App Password" in r["answer"] and [a["id"] for a in r["actions"]] == ["open_settings"] and r["engine"] == "offline"
+    r = ask("conect gmial account")
+    assert r["answer"].startswith("Right now **no email account is connected**")  # knows the app is in test mode
+    assert ask("how many emails can I send per day")["answer"].startswith("You’re in **test mode**")
+    r = ask("how do I add the Roboverse logo")
+    assert "Mahindra University logos" in r["answer"] and "open_settings" in [a["id"] for a in r["actions"]]
+    unknown = ask("tell me about the weather")
+    assert unknown["actions"] == [] and unknown["suggestions"]
+    assert ask("")["suggestions"]
+    b = upload(client)
+    assert client.post("/api/assistant", json={"message": "how do I send", "batch_id": b["id"],
+                                               "history": [{"role": "user", "content": "hello"}, "junk"]}).status_code == 200
+
+    import anthropic
+    seen = {}
+
+    class Block:
+        type = "text"
+        text = json.dumps({"answer": "Open **Settings** and choose Gmail.", "actions": ["open_settings", "not_a_real_action"]})
+
+    class Fake:
+        def __init__(self, **kw):
+            self.beta = self
+            self.messages = self
+        def create(self, **kw):
+            seen.update(kw)
+            return type("R", (), {"stop_reason": "end_turn", "content": [Block()]})()
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test")
+    monkeypatch.setattr(anthropic, "Anthropic", Fake)
+    r = client.post("/api/assistant", json={"message": "how do I connect", "batch_id": b["id"],
+                                            "history": [{"role": "assistant", "content": "Hi"}, {"role": "user", "content": "hello"},
+                                                        {"role": "assistant", "content": "Hello!"}]}).json()
+    assert r["engine"] == "claude" and [a["id"] for a in r["actions"]] == ["open_settings"]
+    assert seen["messages"][0]["role"] == "user" and seen["messages"][-1]["content"].endswith("how do I connect")
+    assert '"mail_mode": "sandbox"' in seen["system"] and "AI Hackathon 2026" in seen["system"]
+    monkeypatch.setattr(Fake, "create", lambda self, **kw: (_ for _ in ()).throw(anthropic.APIConnectionError(request=None)))
+    r = ask("what is the app password")
+    assert r["engine"] == "offline" and "App Password" in r["answer"]
+
+
 def test_chaos_test_contains_every_fault(client):
     login(client)
     bid = client.post("/api/chaos").json()["batch_id"]
