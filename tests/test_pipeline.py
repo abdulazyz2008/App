@@ -557,6 +557,45 @@ def test_reuse_settings_from_a_past_event(client):
                        data={"reuse": "9999"}).status_code == 400
 
 
+def test_google_sheets_link_import(client, monkeypatch):
+    import urllib.error
+    from sealsend import gsheets
+    sid = "1AbCdEfGhIjKlMnOpQrStUvWxYz0123456789"
+    for url in (f"https://docs.google.com/spreadsheets/d/{sid}/edit#gid=0", f"https://docs.google.com/spreadsheets/d/{sid}/edit?usp=sharing",
+                f"https://docs.google.com/spreadsheets/d/{sid}"):
+        assert gsheets.sheet_id(url) == sid
+    for bad in ("https://evil.example/spreadsheets/d/" + sid, "https://docs.google.com/document/d/" + sid, "file:///etc/passwd", ""):
+        with pytest.raises(gsheets.SheetError):
+            gsheets.sheet_id(bad)
+    assert client.post("/api/batches/from-url", json={"url": "x"}).status_code == 401
+    login(client)
+    xlsx = (ROOT / "sample" / "tech_fest_2026.xlsx").read_bytes()
+    fetched = []
+
+    def fake_fetch(url, limit):
+        fetched.append(url)
+        return xlsx, "attachment; filename*=UTF-8''Tech%20Fest%20Registrations.xlsx"
+
+    monkeypatch.setattr(gsheets, "_fetch", fake_fetch)
+    r = client.post("/api/batches/from-url", json={"url": f"https://docs.google.com/spreadsheets/d/{sid}/edit#gid=0", "name": "Tech Fest"})
+    assert r.status_code == 200, r.text
+    b = r.json()
+    assert fetched == [f"https://docs.google.com/spreadsheets/d/{sid}/export?format=xlsx"]  # built by the app, not taken from the link
+    assert b["filename"] == "Tech Fest Registrations.xlsx" and b["counts"] == {"Invalid": 2, "Pending": 14, "Total": 16}
+    assert b["config"]["source_url"].startswith("https://docs.google.com/")
+
+    monkeypatch.setattr(gsheets, "_fetch", lambda url, limit: (b"<!doctype html><title>Sign in</title>", ""))
+    r = client.post("/api/batches/from-url", json={"url": f"https://docs.google.com/spreadsheets/d/{sid}/edit"})
+    assert r.status_code == 400 and "Anyone with the link" in r.json()["detail"]
+
+    def http_404(url, limit):
+        raise urllib.error.HTTPError(url, 404, "Not Found", {}, None)
+    monkeypatch.setattr(gsheets, "_fetch", http_404)
+    assert "doesn't exist" in client.post("/api/batches/from-url", json={"url": f"https://docs.google.com/spreadsheets/d/{sid}"}).json()["detail"]
+    r = client.post("/api/batches/from-url", json={"url": "http://169.254.169.254/latest/meta-data"})
+    assert r.status_code == 400 and "Google Sheets link" in r.json()["detail"]
+
+
 def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
     login(client)

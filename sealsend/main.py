@@ -15,7 +15,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, mailer, pipeline, settings, tunnel
+from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, gsheets, mailer, pipeline, settings, tunnel
 from . import templates_lib as T
 from .data import STYLES, suggest_categories
 
@@ -219,6 +219,35 @@ async def create_batch(file: UploadFile = File(...), name: str = Form(""), club:
     path.write_bytes(data)
     try:
         batch_id = pipeline.create_batch(path, file.filename or path.name, name.strip(), club=club, reuse_from=reuse or None)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+    except Exception as e:
+        raise HTTPException(400, f"Could not read the spreadsheet: {e}")
+    return batch_detail(batch_id)
+
+
+class SheetLinkIn(BaseModel):
+    url: str
+    name: str = ""
+    club: str = ""
+    reuse: int = 0
+
+
+@app.post("/api/batches/from-url", dependencies=[Depends(require_auth)])
+def create_batch_from_sheet_link(body: SheetLinkIn):
+    if body.club and body.club not in clubs.CLUB_BY_ID:
+        raise HTTPException(400, "Unknown club")
+    if body.reuse and not db.get_batch(body.reuse):
+        raise HTTPException(400, "The event to copy settings from no longer exists")
+    try:
+        data, filename = gsheets.download(body.url)
+    except gsheets.SheetError as e:
+        raise HTTPException(400, str(e))
+    path = config.UPLOAD_DIR / f"{secrets.token_hex(8)}.xlsx"
+    path.write_bytes(data)
+    try:
+        batch_id = pipeline.create_batch(path, filename, body.name.strip(), club=body.club, reuse_from=body.reuse or None,
+                                         cfg_overrides={"source_url": body.url.strip()[:500]})
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception as e:

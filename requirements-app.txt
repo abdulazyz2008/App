@@ -9,3 +9,4 @@ pymupdf>=1.24
 pillow>=10.0
 cryptography>=42
 anthropic>=0.40
+truststore>=0.9  # HTTPS with the computer's own certificates (Google Sheets import)

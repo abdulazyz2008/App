@@ -352,6 +352,8 @@ body:not([data-view=app]) .tabbar,body:not([data-view=app]) .fab,body:not([data-
       <div class="cap">Student list</div>
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload Excel or CSV"></div>
       <input type="file" id="file" accept=".csv,.xlsx,.xlsm,.tsv,.xls" hidden>
+      <form class="row" id="gsForm" style="margin-top:10px;flex-wrap:nowrap"><input type="url" id="gsUrl" placeholder="Or paste a Google Sheets link" aria-label="Google Sheets link" style="flex:1;min-width:0;background:var(--card);box-shadow:0 0 0 1px var(--line2)"><button class="btn" id="gsBtn">Import</button></form>
+      <p class="foot">Works with Google Form responses. The sheet must be shared as “Anyone with the link can view”.</p>
       <p class="foot">Want to try first? <a href="#" onclick="useSample('tech_fest_2026.xlsx','National Tech Fest 2026');return false"><b>Use a sample Excel file</b></a> (messy on purpose: title rows, typos, missing emails, mixed categories).</p>
       <div class="cap">How it works</div>
       <div class="how">
@@ -659,6 +661,17 @@ async function upload(file){
   catch(err){ toast(err.message); }
   finally { drop.innerHTML = DROP_HTML; }
 }
+$('#gsForm').onsubmit = async e => {
+  e.preventDefault();
+  const url = $('#gsUrl').value.trim(); if (!url) return toast('Paste the link of your Google Sheet');
+  const btn = $('#gsBtn'); btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Importing…';
+  try {
+    const b = await post('/api/batches/from-url', {url, name: $('#batchName').value, club: selectedClub, reuse: +($('#reuseFrom').value || 0)});
+    $('#gsUrl').value = ''; $('#batchName').value = ''; $('#reuseFrom').value = ''; tab = 'students';
+    await openBatch(b.id); toast('Sheet imported. Check what we found, then press Next.');
+  } catch(err){ toast(err.message); }
+  finally { btn.disabled = false; btn.textContent = 'Import'; }
+};
 async function useSample(name, label){
   const r = await fetch('/sample/'+name,{credentials:'same-origin'});
   if (!$('#batchName').value) $('#batchName').value = label;
@@ -687,7 +700,7 @@ async function openBatch(id){
 function renderHeader(){
   const c = batch.counts;
   const club = cfg && cfg.club && clubData ? clubData.clubs.find(x => x.id === cfg.club) : null;
-  $('#bSub').textContent = `${club ? `${club.name} · ` : ''}${batch.filename}${batch.sheet?` · sheet “${batch.sheet}”`:''} · ${c.Total} students`;
+  $('#bSub').textContent = `${club ? `${club.name} · ` : ''}${cfg && cfg.source_url ? 'Google Sheets · ' : ''}${batch.filename}${batch.sheet?` · sheet “${batch.sheet}”`:''} · ${c.Total} students`;
   $('#pauseBanner').innerHTML = batch.pause_reason ? `<div class="banner dark"><span class="ico">!</span><div class="grow"><b>Sending paused</b><div class="sm" style="opacity:.85">${esc(batch.pause_reason)}</div></div><button class="btn sm" onclick="showTab('review')">Review</button></div>` : '';
   const t = batch.is_chaos ? [['chaos','Chaos Report',0], ...TABS] : TABS;
   const doneUpTo = {students:1, certs:2, email:3, review:4}[tab] || 0;
