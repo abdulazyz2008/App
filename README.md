@@ -6,7 +6,25 @@ SendEZ reads any reasonable Excel or CSV file, works out who each student is and
 
 ---
 
-## Free public link (no account, no card)
+## Download the app (Mac or Windows, nothing else to install)
+
+| Computer | Download | Then |
+|---|---|---|
+| **Mac** (2020 or newer, macOS 11+) | [**SendEZ-Mac.zip**](https://github.com/abdulazyz2008/App/releases/latest/download/SendEZ-Mac.zip) | Unzip, drag **SendEZ** into **Applications**, open it |
+| **Windows 10 / 11** | [**SendEZ-Windows.zip**](https://github.com/abdulazyz2008/App/releases/latest/download/SendEZ-Windows.zip) | Unzip, open the **SendEZ** folder, double-click **SendEZ.exe** |
+
+These links never change; they always give the newest version. SendEZ opens in its own window. No Python, no Terminal.
+
+**The first time only**, your computer may warn you because the app isn't from the App Store:
+- **Mac:** *“Apple could not verify SendEZ…”* → press **Done**, open **System Settings → Privacy & Security**, scroll down, press **Open Anyway**.
+- **Windows:** *“Windows protected your PC”* → press **More info** → **Run anyway**.
+
+To let your operator or your phone use it: in the app press **Share online** → **Start sharing**, and send them the link.
+
+Making a new version: push a tag such as `v1.0.1`. GitHub builds both apps, checks that each one really works
+(it sends a sample batch in test mode and verifies the seal), and publishes them at the links above.
+
+## Free public link without the app (no account, no card)
 
 Double-click **`start-online-windows.bat`** / **`start-online-mac.command`** / **`start-online-linux.sh`**.
 SendEZ starts on your computer and prints a public link like `https://some-words.trycloudflare.com`, using Cloudflare's free Quick Tunnel.
@@ -22,7 +40,7 @@ Anyone can open that link on any device, anywhere. The first time, it downloads 
 
 Press the button, sign in to Render, type a password for **ADMIN_PASSWORD**, and press **Deploy Blueprint**. A few minutes later you get a permanent link like `https://sendez-xxxx.onrender.com` that works on any phone, tablet or computer. It uses a paid Render instance with a 1 GB disk, because free instances block email ports and delete data on restart. Check the exact price on Render before confirming.
 
-## Or run it on your own computer
+## Or run it from the source code (advanced)
 
 **You need Python 3.10 or newer** (free from [python.org](https://www.python.org/downloads/); on Windows tick *“Add Python to PATH”* during install).
 
@@ -110,14 +128,15 @@ pip install -r requirements.txt
 python -m pytest -q
 ```
 
-26 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot (offline and Claude), the full Chaos Test, and a 120-student parallel batch.
+28 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot and the in-app Help assistant (offline and Claude), Mahindra University club branding, the full Chaos Test, and a 120-student parallel batch.
 
 `sample/tech_fest_2026.xlsx` is a deliberately messy workbook for trying everything.
 
 ## Files
 
 ```
-run.py, start-*.{bat,command,sh}   one-click start on Windows / macOS / Linux
+desktop.py                         the desktop app (own window; packaged with packaging/sealsend.spec)
+run.py, start-*.{bat,command,sh}   one-click start from source on Windows / macOS / Linux
 sealsend/
   data.py           spreadsheet reading, column + category detection, validation, email self-healing
   templates_lib.py  the 14 designs, fonts, text layout, imported (Canva) templates
@@ -127,8 +146,11 @@ sealsend/
   settings.py       in-app settings (App Password encrypted at rest), admin password
   crypto.py         Ed25519, Mapping Lock, Merkle seal
   copilot.py        plain-English rules (Claude or offline)
+  assistant.py      in-app Help chat (offline answers, or Claude when a key is set)
+  clubs.py          Mahindra University clubs and combined logos
+  tunnel.py         Share online (Cloudflare Quick Tunnel)
   chaos.py          Chaos Test
   main.py           web server, public /verify and /claim pages
-  static/           the app (black-and-white, iOS-style, works on phones)
+  static/           the app (iOS-style, light and dark, iPhone and iPad layouts)
   fonts/            bundled open-licensed fonts (SIL OFL), so certificates look identical everywhere
 ```

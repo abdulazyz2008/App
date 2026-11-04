@@ -44,11 +44,18 @@
 - **Full history of every student:** tap a name to see it.
 
 ### Works everywhere
-- **Mac, Windows and Linux**, with a double-click to start.
-- **Phones and iPads** through the link, installable to the home screen.
+- **A real app for Mac and Windows** (download, open, done), plus Linux from source.
+- **iPhone and iPad** through the Share online link, with layouts made for each. Use *Share → Add to Home Screen* to install it like an app.
 - **Free public link** with the online start file, or a permanent website on a paid host.
-- **Light and dark mode**, with a clean black-and-white design.
+- **Light and dark mode**, with a clean iOS-style design.
 - **Password protected.** Gmail passwords are stored encrypted.
+
+### Help
+- **Ask for help:** tap **Help** (bottom right, or the Help tab on iPhone) and ask in your own words, like "how do I connect Gmail?". It answers, and gives you a button that takes you straight to the right screen.
+
+### Mahindra University clubs
+- **Pick the club** when you start a new event (Kalakriti, Roboverse, Synolo, Outreach Club, The Erudite, Coding Ninjas, Art Felt, Palaestro, Celeste, AeiForia). Every certificate then shows "Mahindra University · Club" with the university and club logos side by side.
+- **Logos** are uploaded once in **Settings → Mahindra University logos**.
 
 ### Demo
 - **Chaos Test:** one button injects 15 real problems (broken names, typos, swapped files, a server that fails) and shows the system catching every one.
@@ -59,8 +66,12 @@
 
 ### First time only
 
-1. **Start SendEZ.** In the SendEZ folder, right-click **start-online-mac.command** (Mac) or double-click **start-online-windows.bat** (Windows) and choose **Open**. Wait a few minutes.
-2. **Create a password** when the window asks (the letters stay hidden while you type). Your browser opens SendEZ.
+1. **Get SendEZ.** Download it:
+   - Mac: https://github.com/abdulazyz2008/App/releases/latest/download/SendEZ-Mac.zip → unzip → drag **SendEZ** into **Applications** → open it.
+     If the Mac says it can't verify the app: **System Settings → Privacy & Security → Open Anyway** (first time only).
+   - Windows: https://github.com/abdulazyz2008/App/releases/latest/download/SendEZ-Windows.zip → unzip → open the **SendEZ** folder → double-click **SendEZ.exe**.
+     If you see "Windows protected your PC": **More info → Run anyway** (first time only).
+2. **Create a password** when SendEZ asks. It protects your student data and your email account.
 3. **Connect Gmail.** Click **Settings** in the left menu:
    - Choose **Gmail**.
    - Type your Gmail address.
@@ -107,11 +118,12 @@
 | Retry failed emails | Step 4 → **Retry Failed** |
 | Use your own Canva design | Left menu → **Templates** → **Import from Canva** → follow the 4 steps → drag the fields → **Save** |
 | Check a certificate is real | Scan its QR code, or left menu → **Verify a certificate** → upload the PDF |
-| Open SendEZ on your phone | Left menu → **Open on another device** → scan the QR code |
+| Open SendEZ on your phone or the operator's laptop | Left menu → **Share online** → **Start sharing** → send the link or scan the QR code |
+| Get help with anything | **Help** button → type your question |
 | Show the judges the safety checks | Left menu → **Run Chaos Test** |
 
 ### Good to know
-- **Keep the SendEZ window open** while you use the app. Closing it stops the app.
+- **Keep SendEZ open** while you (or your operator) use it. Closing it stops the app and the shared link.
 - **Gmail sends about 500 emails a day.** If you have more students, SendEZ pauses; press **Send** again the next day and it continues with the rest.
 - **Without Gmail connected**, SendEZ runs in **test mode**: certificates are saved on your computer, not emailed.
-- **With the free online link**, the link changes every time you start SendEZ.
+- **The Share online link** changes every time you start sharing.
