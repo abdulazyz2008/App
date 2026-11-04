@@ -18,11 +18,13 @@ def _load_dotenv(path: Path) -> None:
 ROOT = Path(__file__).resolve().parent.parent
 _load_dotenv(ROOT / ".env")
 
-DATA_DIR = Path(os.environ.get("CERTIFY_DATA_DIR", ROOT / "data")).resolve()
-DB_PATH = DATA_DIR / "certify.db"
+DATA_DIR = Path(os.environ.get("SEALSEND_DATA_DIR", ROOT / "data")).resolve()
+DB_PATH = DATA_DIR / "sealsend.db"
 UPLOAD_DIR = DATA_DIR / "uploads"
 CERT_DIR = DATA_DIR / "certificates"
 OUTBOX_DIR = DATA_DIR / "outbox"
+KEY_DIR = DATA_DIR / "keys"
+SIGNING_KEY_PATH = Path(os.environ.get("SEALSEND_SIGNING_KEY", KEY_DIR / "ed25519_private.pem"))
 
 ADMIN_USER = os.environ.get("ADMIN_USER", "admin")
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "")
@@ -32,18 +34,29 @@ SMTP_PORT = int(os.environ.get("SMTP_PORT", "587"))
 SMTP_USER = os.environ.get("SMTP_USER", "")
 SMTP_PASSWORD = os.environ.get("SMTP_PASSWORD", "")
 SMTP_SECURITY = os.environ.get("SMTP_SECURITY", "starttls").lower()  # starttls | ssl | none
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY", "")
 MAIL_FROM = os.environ.get("MAIL_FROM", SMTP_USER or "certificates@example.org")
-MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "Certificate Desk")
+MAIL_FROM_NAME = os.environ.get("MAIL_FROM_NAME", "SealSend Certificates")
+ISSUER_NAME = os.environ.get("ISSUER_NAME", "Event Organizing Committee")
 
 SEND_DELAY_SECONDS = float(os.environ.get("SEND_DELAY_SECONDS", "0"))
 MAX_SEND_ATTEMPTS = int(os.environ.get("MAX_SEND_ATTEMPTS", "3"))
+RETRY_BASE_SECONDS = float(os.environ.get("RETRY_BASE_SECONDS", "1"))
 MAX_UPLOAD_MB = int(os.environ.get("MAX_UPLOAD_MB", "20"))
 PUBLIC_BASE_URL = os.environ.get("PUBLIC_BASE_URL", "http://localhost:8000")
 
+# AI rules copilot: "auto" uses Claude when ANTHROPIC_API_KEY is set, else the offline parser.
+COPILOT_ENGINE = os.environ.get("COPILOT_ENGINE", "auto").lower()  # auto | claude | local
+COPILOT_MODEL = os.environ.get("COPILOT_MODEL", "claude-opus-5-5")
+
 
 def mail_mode() -> str:
-    return "smtp" if SMTP_HOST else "outbox"
+    if SMTP_HOST:
+        return "smtp"
+    if RESEND_API_KEY:
+        return "resend"
+    return "sandbox"
 
 
-for d in (DATA_DIR, UPLOAD_DIR, CERT_DIR, OUTBOX_DIR):
+for d in (DATA_DIR, UPLOAD_DIR, CERT_DIR, OUTBOX_DIR, KEY_DIR):
     d.mkdir(parents=True, exist_ok=True)
