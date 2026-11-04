@@ -776,6 +776,47 @@ def test_event_feedback_stars(client):
     assert "/feedback/" not in newest.read_text(errors="ignore")
 
 
+def test_club_report(client):
+    from datetime import date, timedelta
+    login(client)
+
+    def event(csv_text, name, club):
+        r = client.post("/api/batches", files={"file": ("list.csv", csv_text.encode())}, data={"name": name, "club": club})
+        assert r.status_code == 200, r.text
+        send(client, r.json()["id"])
+        return r.json()["id"]
+
+    robo = event("Name,Student ID,Email,Department,Category\nAsha Rao,MU101,asha@mu.example.edu,CSE,Winner\n"
+                 "Ben Thomas,MU102,ben@mu.example.edu,CSE,Participant\nChitra Iyer,MU103,chitra@mu.example.edu,ECE,Participant\n",
+                 "Robo Day", "roboverse")
+    event("Name,Student ID,Email,Department,Category\nAsha Rao,MU101,asha@mu.example.edu,CSE,Volunteer\n"
+          "Dev Patel,MU104,dev@mu.example.edu,Mechanical,Participant\n", "Kala Night", "kalakriti")
+    event_tf = upload(client, name="tech_fest_2026.xlsx", event="Tech Fest")["id"]
+    send(client, event_tf)
+    from sealsend import db as _db
+    token = _db.one("SELECT feedback_token FROM records WHERE batch_id=? AND feedback_token!='' LIMIT 1", (robo,))["feedback_token"]
+    client.post(f"/feedback/{token}", data={"stars": "4"})
+
+    r = client.get("/api/reports").json()
+    assert r["totals"]["events"] == 3 and r["totals"]["repeat"] == 1  # Asha came to two club events
+    assert r["totals"]["participants"] == 4 + 14 and r["totals"]["certificates"] == 3 + 2 + 14
+    one = client.get("/api/reports", params={"club": "roboverse"}).json()
+    assert one["title"] == "Mahindra University · Roboverse" and [e["name"] for e in one["events"]] == ["Robo Day"]
+    assert one["totals"]["rating"] == 4 and {d["name"]: d["count"] for d in one["departments"]} == {"CSE": 2, "ECE": 1}
+    assert {c["key"] for c in one["categories"]} == {"winner", "participation"}
+    assert [e["name"] for e in client.get("/api/reports", params={"club": "other"}).json()["events"]] == ["Tech Fest"]
+    later = (date.today() + timedelta(days=1)).isoformat()
+    assert client.get("/api/reports", params={"start": later}).json()["totals"]["events"] == 0
+    assert client.get("/api/reports", params={"club": "chess"}).status_code == 400
+    assert client.get("/api/reports", params={"start": "1st July"}).status_code == 400
+    pdf = client.get("/api/reports.pdf", params={"club": "roboverse"})
+    assert pdf.content[:4] == b"%PDF" and "Roboverse" in pdf.headers["content-disposition"]
+    rows = client.get("/api/reports.csv").text.strip().splitlines()
+    assert len(rows) == 1 + 3 and rows[0].lstrip("\ufeff").startswith("Date,Event,Club")
+    client.post("/api/logout")
+    assert client.get("/api/reports").status_code == 401
+
+
 def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
     login(client)

@@ -125,6 +125,22 @@ KB = [
      "In **Settings → Second sending account**, choose Gmail or Outlook, enter the address and its App Password, then **Save & Test**. "
      "When the first account reaches its daily limit, SendEZ continues from the second one. Replies still go to your first address.",
      ["open_settings"]),
+    ("reports", ["report for", "club report", "semester report", "statistics", "stats", "how many students", "analytics",
+                 "summary for faculty", "pdf report", "annual report", "how many certificates"],
+     "Open **Reports** in the menu, pick the **club** and the **period** (this semester, last semester, this year or all time). "
+     "You see events, certificates issued, students reached, students who came to 2+ events, categories, departments and ratings. "
+     "Press **Download PDF** for a report you can give to faculty, or **CSV** for Excel.",
+     []),
+    ("feedback", ["feedback", "rating", "ratings", "rate the event", "stars", "survey", "what students thought", "reviews"],
+     "In step **3 · Email**, turn on **Ask for feedback (1–5 stars)** (on by default). The email then ends with five stars; "
+     "students tap one to rate the event and can add a comment. Results show in **Review & Send → Feedback**, without names, "
+     "with a CSV download.",
+     ["goto_email"]),
+    ("linkedin", ["linkedin", "add to profile", "share certificate", "share on", "instagram", "whatsapp status", "post my certificate"],
+     "When a student opens their certificate's verify page (the QR code or the link in the email), they can press "
+     "**Add to LinkedIn profile**: name, issuer, date and certificate ID are filled in for them. **Share** sends the link with a "
+     "preview card. You can also put the LinkedIn link in the email with **{{LINKEDIN_URL}}**.",
+     ["goto_email"]),
     ("alerts", ["notification", "notifications", "notify", "alert", "sound", "chime", "when it finishes", "when done", "vibrate",
                 "vibration", "haptic"],
      "When sending finishes or pauses, SendEZ shows a message and plays a short sound. If you’re in another window, you also get a "

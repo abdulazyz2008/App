@@ -182,6 +182,7 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 2px var(--accent)}
 .fbbar div{height:8px;background:var(--track);border-radius:4px;overflow:hidden}.fbbar i{display:block;height:100%;background:#f5a623;border-radius:4px}
 .fbcomments{margin-top:16px;border-top:1px solid var(--line)}
 .fbc{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}.fbc:last-child{border-bottom:0}
+.fbc .fbstars{flex:none;width:74px}
 .progress{height:6px;background:var(--track);border-radius:9px;overflow:hidden}
 .progress div{height:100%;background:var(--accent);border-radius:9px;transition:width .4s}
 .feed .item{align-items:flex-start;padding:10px 16px}
@@ -335,6 +336,7 @@ body:not([data-view=app]) .tabbar,body:not([data-view=app]) .fab,body:not([data-
       <button onclick="openChat()"><span class="ico" data-ic="help"></span><span>Ask for help</span></button>
       <button onclick="openSettings()"><span class="ico" data-ic="gear"></span><span>Settings</span></button>
       <button onclick="openTemplates()"><span class="ico" data-ic="grid"></span><span>Templates</span></button>
+      <button onclick="openReports()"><span class="ico" data-ic="chart"></span><span>Reports</span></button>
       <a href="/verify" target="_blank"><span class="ico" data-ic="seal"></span><span>Verify a certificate</span></a>
       <button onclick="openPhone()"><span class="ico" data-ic="share"></span><span>Share online</span></button>
       <button id="browserBtn" class="hidden" onclick="openInBrowser()"><span class="ico" data-ic="out"></span><span>Open in your browser</span></button>
@@ -558,6 +560,7 @@ const IC = {
   tray:'<path d="M3.5 13.5h5l1.5 2.5h4l1.5-2.5h5"/><path d="M5.5 5.5h13l2 8v4a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2v-4z"/>',
   chev:'<path d="M9.5 6l6 6-6 6"/>',
   clock:'<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  chart:'<path d="M4 20h16"/><path d="M7 16.5V11M12 16.5V6.5M17 16.5v-4"/>',
 };
 const icon = k => `<svg class="i" viewBox="0 0 24 24" aria-hidden="true">${IC[k]||''}</svg>`;
 const GMAIL = '<svg class="mi" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M6 38h7V21L4 14.5V35a3 3 0 0 0 2 3z"/><path fill="#34A853" d="M35 38h7a3 3 0 0 0 2-3V14.5L35 21z"/><path fill="#FBBC04" d="M35 12v9l9-6.5V12c0-3.7-4.2-5.8-7.2-3.6z"/><path fill="#EA4335" d="M13 21v-9l11 8.2L35 12v9l-11 8.2z"/><path fill="#C5221F" d="M4 12v2.5L13 21v-9l-1.8-1.6C8.2 8.2 4 10.3 4 12z"/></svg>';
@@ -1075,6 +1078,40 @@ async function loadFeed(sel, limit){
     <span class="lv lv-${e.level}">${LV[e.level]||'·'}</span><div class="grow"><div class="msg">${e.name?`<b>${esc(e.name)}</b> · `:''}${esc(e.message)}</div><div class="when">${when(e.at)}</div></div></div>`).join('')
     || '<div class="empty">Nothing has happened yet.</div>';
 }
+// ---------- club report
+function semester(offset = 0){
+  const d = new Date(); let y = d.getFullYear(), h = d.getMonth() < 6 ? 0 : 1;
+  h += offset; while (h < 0){ h += 2; y--; } while (h > 1){ h -= 2; y++; }
+  return h === 0 ? [`${y}-01-01`, `${y}-06-30`] : [`${y}-07-01`, `${y}-12-31`];
+}
+const REPORT_PERIODS = {sem: ['This semester', () => semester(0)], last: ['Last semester', () => semester(-1)],
+  year: ['This year', () => { const y = new Date().getFullYear(); return [`${y}-01-01`, `${y}-12-31`]; }], all: ['All time', () => ['', '']]};
+let reportState = {club: 'all', period: 'sem'};
+async function openReports(){
+  if (!clubData) { try { clubData = await api('/api/clubs'); } catch {} }
+  const clubOpts = [['all', 'All clubs'], ...((clubData && clubData.clubs) || []).map(c => [c.id, c.name]), ['other', 'Events without a club']];
+  $('#sheet').className = 'sheet wide';
+  $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>Club report</h2><button class="btn sm plain" onclick="closeSheet()"><b>Done</b></button></div>
+    <div class="group"><div class="item"><span class="grow lbl">Club</span><select id="repClub" onchange="reportState.club=this.value;loadReport()">${clubOpts.map(([v, l]) => `<option value="${v}" ${v===reportState.club?'selected':''}>${esc(l)}</option>`).join('')}</select></div>
+      <div class="item"><span class="grow lbl">Period</span><select id="repPeriod" onchange="reportState.period=this.value;loadReport()">${Object.entries(REPORT_PERIODS).map(([k, [l]]) => `<option value="${k}" ${k===reportState.period?'selected':''}>${l}</option>`).join('')}</select></div></div>
+    <div id="repBody"><div class="empty"><span class="spin"></span></div></div>`;
+  openSheet(); loadReport();
+}
+function reportQuery(){ const [start, end] = REPORT_PERIODS[reportState.period][1](); return new URLSearchParams({club: reportState.club, start, end}).toString(); }
+async function loadReport(){
+  const q = reportQuery();
+  let r; try { r = await api(`/api/reports?${q}`); } catch(e){ $('#repBody').innerHTML = `<p class="foot">${esc(e.message)}</p>`; return; }
+  const t = r.totals, tile = (n, l) => `<div class="stat" style="cursor:default"><div class="n">${n}</div><div class="l">${l}</div></div>`;
+  $('#repBody').innerHTML = `<p class="foot" style="margin-top:12px"><b>${esc(r.title)}</b> · ${esc(r.start ? `${r.start} to ${r.end}` : 'All time')}</p>
+    <div class="stats" style="margin-top:10px">${tile(t.events, 'Events')}${tile(t.certificates, 'Certificates issued')}${tile(t.participants, 'Students reached')}${tile(t.repeat, 'Came to 2+ events')}${tile(t.rating != null ? `${t.rating.toFixed(1)}<span class="fbstars" style="font-size:16px"> ★</span>` : '–', 'Average rating')}</div>
+    <div class="cap">Events</div>
+    <div class="group">${r.events.length ? r.events.map(e => `<div class="item tap" onclick="closeSheet();openBatch(${e.id})"><div class="grow"><div class="lbl">${esc(e.name)}</div><div class="desc">${esc(e.date)}${e.club_name && r.club === 'all' ? ` · ${esc(e.club_name)}` : ''} · ${e.students} students · ${e.issued} certificates${e.rating != null ? ` · ${e.rating.toFixed(1)} ★ (${e.ratings})` : ''}</div></div><span class="ter">${icon('chev')}</span></div>`).join('') : '<div class="empty">No events in this period.</div>'}</div>
+    ${r.categories.length ? `<div class="cap">Certificates by category</div><div class="group">${r.categories.map(c => `<div class="item"><span class="grow">${esc(c.label)}</span><span class="val">${c.count}</span></div>`).join('')}</div>` : ''}
+    ${r.departments.length ? `<div class="cap">Top departments</div><div class="group">${r.departments.map(d => `<div class="item"><span class="grow">${esc(d.name)}</span><span class="val">${d.count}</span></div>`).join('')}</div>` : ''}
+    <div class="row" style="margin-top:16px"><a class="btn fill" href="/api/reports.pdf?${q}">⬇ Download PDF</a><a class="btn" href="/api/reports.csv?${q}">⬇ CSV</a></div>
+    <p class="foot">Students are counted once per student ID (or email). Certificates issued = emailed + claim links.</p>`;
+}
+
 // ---------- feedback results
 const starText = n => '★'.repeat(Math.round(n)) + '☆'.repeat(5 - Math.round(n));
 async function loadFeedback(){
@@ -1410,7 +1447,7 @@ function openMore(){
   const row = (ic, label, js, sub='') => `<div class="item tap" onclick="${js}"><span style="color:var(--accent);display:flex">${icon(ic)}</span><div class="grow"><div class="lbl">${label}</div>${sub?`<div class="desc">${sub}</div>`:''}</div><span class="ter">${icon('chev')}</span></div>`;
   $('#sheet').className = 'sheet';
   $('#sheet').innerHTML = `<div class="grabber"></div><div class="sheethead"><h2>More</h2><button class="btn sm plain" onclick="closeSheet()"><b>Done</b></button></div>
-    <div class="group">${row('share','Share online','openPhone()','A link for your operator or your phone')}${row('grid','Templates','openTemplates()','14 designs, or import from Canva')}
+    <div class="group">${row('share','Share online','openPhone()','A link for your operator or your phone')}${row('grid','Templates','openTemplates()','14 designs, or import from Canva')}${row('chart','Reports','openReports()','Club report for a semester, as PDF')}
       ${row('seal','Verify a certificate',"closeSheet();openLink('/verify')")}${row('bolt','Run Chaos Test','closeSheet();runChaos()','Demo of every safety check')}
       ${me.desktop?row('out','Open in your browser','openInBrowser()'):''}${row('signout','Sign out','closeSheet();logout()')}</div>
     <p class="foot">${esc($('#sideStatus').textContent)}</p>`;

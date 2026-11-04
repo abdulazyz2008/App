@@ -16,7 +16,7 @@ from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, PlainTex
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, gsheets, mailer, pipeline, settings, sharecard, tunnel
+from . import assistant, certificate, chaos, clubs, config, copilot, crypto, db, gsheets, mailer, pipeline, reports, settings, sharecard, tunnel
 from . import templates_lib as T
 from .data import STYLES, suggest_categories
 
@@ -1198,6 +1198,44 @@ def batch_feedback_csv(batch_id: int):
     name = "".join(ch if ch.isalnum() or ch in " -_" else "_" for ch in b["name"]).strip() or "event"
     return Response("\ufeff" + out.getvalue(), media_type="text/csv; charset=utf-8",
                     headers={"Content-Disposition": f'attachment; filename="{name} - feedback.csv"'})
+
+
+def _report(club: str, start: str, end: str) -> dict:
+    from datetime import date as _date
+    for d in (start, end):
+        if d:
+            try:
+                _date.fromisoformat(d)
+            except ValueError:
+                raise HTTPException(400, "Dates must look like 2026-07-01")
+    try:
+        return reports.build(club or "all", start, end)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+
+def _report_filename(rep: dict, ext: str) -> str:
+    name = "".join(ch if ch.isalnum() or ch in " -_" else " " for ch in rep["title"]).split()
+    return f"{' '.join(name)} - {reports.period_text(rep['start'], rep['end']).replace('–', 'to')}.{ext}".replace("  ", " ")
+
+
+@app.get("/api/reports", dependencies=[Depends(require_auth)])
+def club_report(club: str = "all", start: str = "", end: str = ""):
+    return _report(club, start, end)
+
+
+@app.get("/api/reports.pdf", dependencies=[Depends(require_auth)])
+def club_report_pdf(club: str = "all", start: str = "", end: str = ""):
+    rep = _report(club, start, end)
+    return Response(reports.to_pdf(rep), media_type="application/pdf",
+                    headers={"Content-Disposition": f'attachment; filename="{_report_filename(rep, "pdf")}"'})
+
+
+@app.get("/api/reports.csv", dependencies=[Depends(require_auth)])
+def club_report_csv(club: str = "all", start: str = "", end: str = ""):
+    rep = _report(club, start, end)
+    return Response(reports.to_csv(rep), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{_report_filename(rep, "csv")}"'})
 
 
 def _feedback_rec(token: str) -> dict:

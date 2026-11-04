@@ -140,7 +140,7 @@ pip install -r requirements.txt
 python -m pytest -q
 ```
 
-37 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, Share online (with a stand-in tunnel tool), Google Sheets import, reusing a past event, scheduled sending, automatic continue after the daily limit, a second sending account, the LinkedIn button and share card, event feedback stars, the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot and the in-app Help assistant (offline and Claude), Mahindra University club branding, the full Chaos Test, and a 120-student parallel batch.
+38 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, Share online (with a stand-in tunnel tool), Google Sheets import, reusing a past event, scheduled sending, automatic continue after the daily limit, a second sending account, the LinkedIn button and share card, event feedback stars, the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot and the in-app Help assistant (offline and Claude), Mahindra University club branding, the full Chaos Test, and a 120-student parallel batch.
 
 `sample/tech_fest_2026.xlsx` is a deliberately messy workbook for trying everything.
 
