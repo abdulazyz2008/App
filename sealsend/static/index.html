@@ -565,7 +565,7 @@ async function api(path, opts={}){
   if (r.status === 401 && !path.startsWith('/api/login')){ showLogin(); throw new Error('Please sign in'); }
   const ct = r.headers.get('content-type') || '';
   const data = ct.includes('json') ? await r.json() : await r.text();
-  if (!r.ok) throw new Error((data && data.detail) || r.statusText);
+  if (!r.ok) { if (opts.method && opts.method !== 'GET') haptic('error'); throw new Error((data && data.detail) || r.statusText); }
   return data;
 }
 const put = (p, b) => api(p, {method:'PUT', body: JSON.stringify(b)});
@@ -625,6 +625,7 @@ async function refreshMe(){ me = await api('/api/me'); renderSide(); }
 
 async function loadBatches(){
   const list = await api('/api/batches');
+  noteJobs(list);
   $('#batches').innerHTML = list.map(b => `<div class="item tap ${batch&&batch.id===b.id?'sel':''}" onclick="openBatch(${b.id})">
     <div class="grow"><div class="bname">${b.is_chaos?'⚡ ':''}${esc(b.name)}</div>
     <div class="bmeta">${b.job?'<span class="spin" style="width:10px;height:10px"></span> working · ':''}${b.counts.Total||0} students · ${(b.counts.Sent||0)} sent${b.counts.Failed?` · ${b.counts.Failed} failed`:''}${b.send_at?sendMeta(b):(b.pause_reason?' · paused':'')}</div></div></div>`).join('')
@@ -1068,7 +1069,8 @@ async function sendAll(){
   const n = (c.Pending||0)+(c.Generated||0)+(c.Failed||0);
   const how = batch.is_chaos || me.mail_mode==='sandbox' ? 'save them on this computer (email not connected)' : `email them from ${me.mail.address}`;
   if (!confirm(`Create ${n} certificates and ${how}?\n\nEach attachment is checked against its student right before sending. Students who already received this certificate are skipped automatically.`)) return;
-  try { await post(`/api/batches/${batch.id}/send`, {confirm:true}); await refreshBatch(); await loadSend(); syncPoll(); toast('Sending started. You can keep using the app'); } catch(e){ toast(e.message); }
+  askNotify();
+  try { await post(`/api/batches/${batch.id}/send`, {confirm:true}); haptic('success'); await refreshBatch(); await loadSend(); syncPoll(); loadBatches(); toast('Sending started. You can keep using the app'); } catch(e){ toast(e.message); }
 }
 // ---------- scheduled sending
 const localInput = dt => new Date(dt.getTime() - dt.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -1092,7 +1094,8 @@ async function confirmSchedule(){
   const v = $('#schedAt').value; if (!v) return toast('Pick a date and time');
   const when = new Date(v); if (when - Date.now() < 60000) return toast('Pick a time in the future');
   try {
-    await post(`/api/batches/${batch.id}/schedule`, {at: when.toISOString(), confirm: true});
+    askNotify();
+    await post(`/api/batches/${batch.id}/schedule`, {at: when.toISOString(), confirm: true}); haptic('success');
     closeSheet(); await refreshBatch(); if (tab === 'review') await loadSend(); loadBatches();
     toast(`Scheduled for ${fmtWhen(when.toISOString())}`);
   } catch(e){ toast(e.message); }
@@ -1192,7 +1195,7 @@ async function openRecord(id){
 function openSheet(){ $('#sheetWrap').classList.add('open'); document.body.style.overflow='hidden'; }
 function closeSheet(){ $('#sheetWrap').classList.remove('open'); document.body.style.overflow=''; galleryCb = null; if (me) setTabbar(batch ? 'events' : 'new'); }
 document.addEventListener('keydown', e => { if (e.key==='Escape') closeSheet(); });
-async function copyText(t){ try { await navigator.clipboard.writeText(t); toast('Copied'); } catch { prompt('Copy this link', t); } }
+async function copyText(t){ try { await navigator.clipboard.writeText(t); haptic('success'); toast('Copied'); } catch { prompt('Copy this link', t); } }
 async function previewRec(id){ $('#pvCat').value=''; await showTab('review'); const i = pvList.findIndex(x=>x.id===id); if (i>=0){ pvIndex=i; showPreview(); } }
 async function resend(id){
   if (!confirm('This student already has this certificate. Send it again?')) return;
@@ -1466,9 +1469,70 @@ async function tick(){
   if (tab==='review') await loadSend(); else if (tab==='chaos') await loadChaos(); else if (tab==='students') await loadStats(); else if (tab==='proof') await loadProof();
   loadBatches();
   const busy = !!batch.job || (batch.is_chaos && (batch.chaos||{}).phase !== 'done');
-  if (!busy){ stopPoll(); refreshMe(); if (was) toast(batch.pause_reason ? 'Sending paused. See the message at the top' : 'All done'); if (tab==='review') loadReview(); if (tab==='chaos') loadChaos(); }
+  if (!busy){ stopPoll(); refreshMe(); if (tab==='review') loadReview(); if (tab==='chaos') loadChaos(); }
 }
 function stopPoll(){ clearInterval(pollTimer); pollTimer = null; }
+
+// ---------- done / paused alerts
+let jobState = null;
+function noteJobs(list){
+  const prev = jobState; jobState = {};
+  list.forEach(b => { jobState[b.id] = {job: b.job, send_at: b.send_at}; });
+  if (prev) list.forEach(b => { if (prev[b.id] && prev[b.id].job && !b.job) jobFinished(b); });
+}
+function jobFinished(b){
+  const c = b.counts, paused = !!b.pause_reason, problem = paused || c.Failed;
+  const title = `${paused ? 'Paused' : 'Done'}: ${b.name}`;
+  const text = paused ? (b.send_at ? `Daily limit reached. Continues automatically ${fmtWhen(b.send_at)}.` : b.pause_reason)
+    : `${c.Sent||0} sent${(c.Claim||0) ? ` · ${c.Claim} claim link${c.Claim===1?'':'s'}` : ''}${c.Failed ? ` · ${c.Failed} need a retry` : ''}`;
+  toast(`${title}. ${text}`);
+  chime(problem ? 'warn' : 'ok'); haptic(problem ? 'warning' : 'success');
+  if (document.hidden){ notify(title, text); document.title = `${paused ? '!' : '✓'} SendEZ`; }
+}
+document.addEventListener('visibilitychange', () => { if (!document.hidden) document.title = 'SendEZ'; });
+setInterval(() => {  // background check, so sends that start or finish by themselves still alert
+  if (!me || !jobState || document.body.dataset.view !== 'app') return;
+  if (Object.values(jobState).some(j => j.job || j.send_at)) loadBatches().catch(() => {});
+}, 10000);
+function askNotify(){ try { if ('Notification' in window && Notification.permission === 'default') Notification.requestPermission(); } catch {} }
+function notify(title, body){ try { if ('Notification' in window && Notification.permission === 'granted') new Notification(title, {body, icon: '/static/icon-192.png'}); } catch {} }
+let audioCtx = null;
+document.addEventListener('pointerdown', () => {  // browsers only allow sound after a first tap or click
+  try { audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)(); if (audioCtx.state === 'suspended') audioCtx.resume(); } catch {}
+}, {passive: true});
+function chime(kind){
+  try {
+    if (!audioCtx) return;
+    const t0 = audioCtx.currentTime;
+    (kind === 'ok' ? [880, 1318.5] : [660, 494]).forEach((f, i) => {
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain(), t = t0 + i * 0.16;
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.16, t + 0.02); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      o.connect(g).connect(audioCtx.destination); o.start(t); o.stop(t + 0.4);
+    });
+  } catch {}
+}
+// ---------- haptics: phones only (computers have no vibration motor)
+let hapticEl = null;
+const IS_IOS = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function haptic(kind = 'light'){
+  try {
+    if (navigator.vibrate){ navigator.vibrate({light: 8, success: [12, 60, 18], warning: [30, 60, 30], error: [40, 50, 40, 50, 40]}[kind] || 8); return; }
+    if (!IS_IOS) return;
+    if (!hapticEl){  // iOS 18+ Safari gives a tap of haptic feedback when a switch control is toggled
+      hapticEl = document.createElement('label');
+      hapticEl.setAttribute('aria-hidden', 'true');
+      hapticEl.style.cssText = 'position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0;pointer-events:none';
+      hapticEl.innerHTML = '<input type="checkbox" switch tabindex="-1">';
+      document.body.appendChild(hapticEl);
+    }
+    const taps = {success: 2, warning: 2, error: 3}[kind] || 1;
+    for (let i = 0; i < taps; i++) setTimeout(() => hapticEl.click(), i * 90);
+  } catch {}
+}
+document.addEventListener('click', e => {  // a light tap on the controls you touch most
+  if (e.target.closest && e.target.closest('.tabbar button, .switch, .club, .chipb, .steps button, .btn.fill')) haptic('light');
+}, true);
 
 start().catch(showLogin);
 </script>

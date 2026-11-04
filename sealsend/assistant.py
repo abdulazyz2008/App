@@ -93,10 +93,43 @@ KB = [
      "Go to step **4 · Review & Send**: read the checklist, use **Previous / Next** to preview a few students, then press **Send**. "
      "Each attachment is checked against its student right before sending. You can keep using the app while it works.",
      ["goto_review"]),
-    ("limit", ["limit", "500", "paused", "quota", "daily", "too many", "pause", "per day", "a day", "how many emails"],
-     "Gmail lets you send about **500 emails a day**. SendEZ stops safely at your limit, and the rest stay queued. "
-     "Press **Send** again the next day and it continues. Nobody gets two emails.",
+    ("limit", ["limit", "500", "paused", "quota", "daily", "too many", "pause", "per day", "a day", "how many emails",
+               "more than 500", "over 500", "1000 students", "thousand students"],
+     "Gmail lets you send about **500 emails a day**. SendEZ stops safely at your limit and the rest stay queued. "
+     "It **continues automatically** once the limit resets (keep SendEZ open), or press **Send** again yourself. Nobody gets two emails.\n"
+     "To send about twice as many a day, add a **Second sending account** in **Settings**.",
+     ["goto_review", "open_settings"]),
+    ("sheets", ["google sheet", "google sheets", "google form", "google forms", "form responses", "sheet link", "spreadsheet link",
+                "import link", "paste a link", "from google"],
+     "On **New Event**, paste the link of your Google Sheet into **Or paste a Google Sheets link** and press **Import**. "
+     "It works great with Google Form responses.\nThe sheet must be shared: in Google Sheets press **Share → General access → "
+     "Anyone with the link (Viewer)**.",
+     ["new_event"]),
+    ("reuse", ["reuse", "same settings", "copy settings", "last event", "previous event", "same design again", "last time",
+               "same as before", "repeat event"],
+     "On **New Event**, choose the earlier event under **Copy settings from** before you upload the list. "
+     "Its designs, certificate titles, emails, signatories and logos are copied; only the students change.",
+     ["new_event"]),
+    ("schedule", ["schedule", "send later", "later", "tomorrow", "send at", "specific time", "set a time", "timer", "morning"],
+     "In **Review & Send**, press **Schedule…**, pick the date and time, then **Schedule**. SendEZ starts sending by itself at that time.\n"
+     "Keep SendEZ open and the computer awake (lid open). To change or cancel it, use the banner at the top of the event.",
      ["goto_review"]),
+    ("auto_continue", ["continue automatically", "auto continue", "automatically continue", "resume", "continue tomorrow",
+                       "limit resets", "after the limit", "keeps going"],
+     "When the daily limit is reached, SendEZ waits and **continues automatically** when the limit resets, about 24 hours later. "
+     "The time shows in the banner on the event, with **Send now** and **Don’t continue**. You can turn this off in **Settings → Continue after the daily limit**.",
+     ["open_settings"]),
+    ("second_account", ["second account", "two accounts", "another gmail", "second gmail", "two gmail", "extra account",
+                        "another account", "more emails", "double the limit", "more per day",
+                        "send more emails", "more emails a day", "more emails per day"],
+     "In **Settings → Second sending account**, choose Gmail or Outlook, enter the address and its App Password, then **Save & Test**. "
+     "When the first account reaches its daily limit, SendEZ continues from the second one. Replies still go to your first address.",
+     ["open_settings"]),
+    ("alerts", ["notification", "notifications", "notify", "alert", "sound", "chime", "when it finishes", "when done", "vibrate",
+                "vibration", "haptic"],
+     "When sending finishes or pauses, SendEZ shows a message and plays a short sound. If you’re in another window, you also get a "
+     "notification (allow it when your browser asks). On phones it gives a small vibration.",
+     []),
     ("failed", ["failed", "bounce", "bounced", "retry", "didn't get", "didnt get", "not delivered"],
      "In **Review & Send**, press **Retry Failed** to try again. If an address bounced, SendEZ already tried the backup email column. "
      "For anyone still failing, tap their name and **Copy** their claim link to send it another way.",
@@ -148,6 +181,7 @@ KB = [
      ["new_event"]),
 ]
 SUGGESTIONS = ["How do I connect Gmail?", "What is an App Password?", "How do I share the app?", "Why didn't my test email arrive?",
+               "How do I schedule sending?", "Can I import a Google Sheet?", "How do I send more emails a day?",
                "How do I give winners a different certificate?", "How do I use my own Canva design?"]
 
 

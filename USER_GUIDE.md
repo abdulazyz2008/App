@@ -27,7 +27,10 @@
 - **Sends from your own Gmail** (Outlook and other email services also supported).
 - **A ready-written personal email per category:** winner congratulations, thank-you for participating, appreciation, completion. All of them can be edited.
 - **Each student receives only their own certificate**, checked right before sending.
-- **Daily limit protection:** stops safely at Gmail's limit and continues when you press Send again.
+- **Daily limit protection:** stops safely at Gmail's limit and continues by itself when the limit resets (keep SendEZ open).
+- **Second sending account:** add another Gmail or Outlook account in Settings to send about twice as many a day.
+- **Schedule sending:** pick a date and time and SendEZ sends by itself.
+- **Alerts:** a message, a short sound and a notification when sending finishes or pauses.
 - **Never emails anyone twice**, even if you press Send again or upload the same sheet again.
 - **Automatic retries** if the internet hiccups, and **switches to the backup email** if an address bounces.
 - **Clear messages** if the Gmail password is wrong, without marking any student as failed.
@@ -49,6 +52,10 @@
 - **Free public link** with the online start file, or a permanent website on a paid host.
 - **Light and dark mode**, with a clean iOS-style design.
 - **Password protected.** Gmail passwords are stored encrypted.
+
+### Saving time
+- **Google Sheets:** paste the link of a Google Sheet or Google Form responses instead of uploading a file.
+- **Reuse a past event:** start a new event with the same designs, emails, signatories and logos as an earlier one.
 
 ### Help
 - **Ask for help:** tap **Help** (bottom right, or the Help tab on iPhone) and ask in your own words, like "how do I connect Gmail?". It answers, and gives you a button that takes you straight to the right screen.
@@ -120,10 +127,14 @@
 | Check a certificate is real | Scan its QR code, or left menu → **Verify a certificate** → upload the PDF |
 | Open SendEZ on your phone or the operator's laptop | Left menu → **Share online** → **Start sharing** → send the link or scan the QR code |
 | Get help with anything | **Help** button → type your question |
+| Use a Google Sheet or Google Form responses | **New Event** → paste the link → **Import** (share the sheet as "Anyone with the link can view") |
+| Start with last event's designs and emails | **New Event** → **Copy settings from** → pick the event |
+| Send at a set time | Step 4 → **Schedule…** → pick date and time (keep SendEZ open, computer awake) |
+| Send more than ~500 a day | **Settings** → **Second sending account** → Gmail address + App Password → **Save & Test** |
 | Show the judges the safety checks | Left menu → **Run Chaos Test** |
 
 ### Good to know
 - **Keep SendEZ open** while you (or your operator) use it. Closing it stops the app and the shared link.
-- **Gmail sends about 500 emails a day.** If you have more students, SendEZ pauses; press **Send** again the next day and it continues with the rest.
+- **Gmail sends about 500 emails a day.** If you have more students, SendEZ pauses and continues by itself when the limit resets, as long as SendEZ stays open. A second sending account doubles this.
 - **Without Gmail connected**, SendEZ runs in **test mode**: certificates are saved on your computer, not emailed.
 - **The Share online link** changes every time you start sharing.

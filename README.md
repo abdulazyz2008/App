@@ -95,6 +95,18 @@ Until Gmail is connected, SendEZ runs in **test mode**: emails and certificates 
 
 **Your own design from Canva:** Templates → *Import from Canva*. Design or pick a certificate in your Canva account, delete the sample name, then download it as **PDF Standard** or PNG and drop it in. Drag the name, description and QR code to where they belong, then press Save. Canva’s own template library can’t be bundled into another app (their license forbids it), but anything you export from your account works.
 
+## Time-savers
+
+| Feature | Where |
+|---|---|
+| **Google Sheets / Google Forms** | New Event → paste the sheet's link → Import (share the sheet as "Anyone with the link can view") |
+| **Reuse a past event** | New Event → *Copy settings from* → pick the earlier event: designs, emails, signatories and logos come along |
+| **Schedule sending** | Review & Send → **Schedule…** → pick a date and time (keep SendEZ open; it keeps the computer awake) |
+| **Automatic continue** | After the daily limit, sending continues by itself when the limit resets (Settings switch) |
+| **Second sending account** | Settings → Second sending account: used when the first reaches its daily limit; replies still go to the first |
+| **Done / paused alerts** | A message, a short sound, a notification if you're in another window, and a small vibration on phones |
+| **Help chat** | The **Help** button answers how-to questions and takes you to the right screen |
+
 ## Handling the messy cases
 
 | Problem in the sheet | What SendEZ does |
@@ -106,7 +118,7 @@ Until Gmail is connected, SendEZ runs in **test mode**: emails and certificates 
 | `#REF!`, `N/A`, digits in a name, blank name | Blocks that row and shows why |
 | Same student twice | Blocks the duplicate (by ID, or by name + email) |
 | ALL CAPS names | Optional switch: *ROHAN MEHTA → Rohan Mehta* |
-| Gmail daily limit (~500/day) | Stops safely at your limit; press Send again the next day and it continues with the rest. Nobody gets two emails. |
+| Gmail daily limit (~500/day) | Stops safely at your limit and **continues by itself** when the limit resets (keep SendEZ open). Add a **second sending account** to send about twice as many a day. Nobody gets two emails. |
 | Wrong App Password | Refuses to start and tells you exactly what to fix, without marking anyone as failed |
 | Network blocks port 587 | Falls back to port 465 automatically |
 | A mailbox bounces | Retries with the student’s backup email |
@@ -128,7 +140,7 @@ pip install -r requirements.txt
 python -m pytest -q
 ```
 
-29 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, Share online (with a stand-in tunnel tool), the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot and the in-app Help assistant (offline and Claude), Mahindra University club branding, the full Chaos Test, and a 120-student parallel batch.
+35 tests cover the messy Excel reader, the email and name rules, all 14 designs, Canva import and the field editor, branding, the full send flow (with an audit of every delivered email), claim links, swapped and tampered files, database tampering, Gmail login failure, the port 465 fallback, Share online (with a stand-in tunnel tool), Google Sheets import, reusing a past event, scheduled sending, automatic continue after the daily limit, a second sending account, the daily limit with pause and resume, provider quota errors, bounces with a switch to the backup email, retries, Resend, the copilot and the in-app Help assistant (offline and Claude), Mahindra University club branding, the full Chaos Test, and a 120-student parallel batch.
 
 `sample/tech_fest_2026.xlsx` is a deliberately messy workbook for trying everything.
 
@@ -149,6 +161,8 @@ sealsend/
   assistant.py      in-app Help chat (offline answers, or Claude when a key is set)
   clubs.py          Mahindra University clubs and combined logos
   tunnel.py         Share online (Cloudflare Quick Tunnel)
+  gsheets.py        import a student list from a Google Sheets link
+  keepawake.py      keeps the computer awake while sending or a send is scheduled
   chaos.py          Chaos Test
   main.py           web server, public /verify and /claim pages
   static/           the app (iOS-style, light and dark, iPhone and iPad layouts)
