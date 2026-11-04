@@ -118,3 +118,21 @@ jobs:
 
             **Windows:** unzip, open the **SendEZ** folder, double-click **SendEZ.exe**. If you see
             "Windows protected your PC": **More info → Run anyway** (only once).
+      # Also publish to the public download repository (abdulazyz2008/SendEZ), so this code
+      # repository can be private. Needs the SENDEZ_RELEASE_TOKEN secret (a token that can write to SendEZ).
+      - name: Publish to the public SendEZ repository
+        if: env.HAS_PUBLIC_TOKEN == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          repository: abdulazyz2008/SendEZ
+          token: ${{ secrets.SENDEZ_RELEASE_TOKEN }}
+          tag_name: ${{ steps.tag.outputs.tag }}
+          name: SendEZ ${{ steps.tag.outputs.tag }}
+          files: out/*.zip
+          make_latest: "true"
+          body: |
+            **Download:** `SendEZ-Mac.zip` (Mac) or `SendEZ-Windows.zip` (Windows 10/11), below.
+            First time on Mac: System Settings → Privacy & Security → **Open Anyway**.
+            First time on Windows: **More info → Run anyway**.
+    env:
+      HAS_PUBLIC_TOKEN: ${{ secrets.SENDEZ_RELEASE_TOKEN != '' }}
