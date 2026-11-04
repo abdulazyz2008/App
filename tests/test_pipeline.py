@@ -519,6 +519,13 @@ def test_copilot_offline_and_claude(client, monkeypatch):
     assert out["engine"] == "offline" and "Claude unavailable" in out["notes"][0]
 
 
+def test_club_placeholder_survives_missing_font(tmp_path, monkeypatch):
+    from sealsend import clubs, config
+    monkeypatch.setattr(config, "PACKAGE_DIR", tmp_path)  # no fonts folder here
+    png = clubs.placeholder_png("coding-ninjas", 64)
+    assert png[:4] == b"\x89PNG"
+
+
 def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
     login(client)

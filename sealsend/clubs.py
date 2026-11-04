@@ -72,8 +72,11 @@ def placeholder_png(key: str, size: int = 256) -> bytes:
     initials = "".join(w[0] for w in words[:2]).upper() or "?"
     im = Image.new("RGBA", (size, size), (0, 0, 0, 0))
     d = ImageDraw.Draw(im)
-    d.rounded_rectangle([0, 0, size - 1, size - 1], radius=size // 4.5, fill=(28, 28, 30, 255))
-    font = ImageFont.truetype(str(config.PACKAGE_DIR / "fonts" / "Inter-ExtraBold.ttf"), int(size * 0.38))
+    d.rounded_rectangle([0, 0, size - 1, size - 1], radius=size // 4, fill=(28, 28, 30, 255))
+    try:
+        font = ImageFont.truetype(str(config.PACKAGE_DIR / "fonts" / "Inter-ExtraBold.ttf"), int(size * 0.38))
+    except OSError:  # font missing or unreadable: still draw the initials
+        font = ImageFont.load_default(size=int(size * 0.38))
     box = d.textbbox((0, 0), initials, font=font)
     d.text(((size - (box[2] - box[0])) / 2 - box[0], (size - (box[3] - box[1])) / 2 - box[1]), initials,
            font=font, fill=(255, 255, 255, 255))
