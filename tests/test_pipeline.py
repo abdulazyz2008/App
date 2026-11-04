@@ -526,6 +526,37 @@ def test_club_placeholder_survives_missing_font(tmp_path, monkeypatch):
     assert png[:4] == b"\x89PNG"
 
 
+def test_reuse_settings_from_a_past_event(client):
+    login(client)
+    a = upload(client, event="Hackathon 2025")
+    cfg = client.get(f"/api/batches/{a['id']}").json()["config"]
+    assert cfg["rules"], "sample sheet should have categories"
+    first = cfg["rules"][0]["label"]
+    cfg["rules"][0].update(template="corporate-modern", title="Champion of the Year")
+    cfg.update(template_id="mono-minimal", email_subject="Well done {{NAME}}!", qr=False, filename_pattern="{{NAME}}_cert",
+               branding={**cfg["branding"], "signer1_name": "Dr. Reuse", "org_name": "Reuse College"})
+    assert client.put(f"/api/batches/{a['id']}/config", json=cfg).status_code == 200
+
+    with open(ROOT / "sample" / "students.csv", "rb") as f:
+        r = client.post("/api/batches", files={"file": ("students.csv", f)}, data={"name": "Hackathon 2026", "reuse": str(a["id"])})
+    assert r.status_code == 200, r.text
+    b = r.json()["config"]
+    assert (b["template_id"], b["email_subject"], b["qr"], b["filename_pattern"]) == ("mono-minimal", "Well done {{NAME}}!", False, "{{NAME}}_cert")
+    assert b["branding"]["signer1_name"] == "Dr. Reuse" and b["branding"]["org_name"] == "Reuse College"
+    rule = next(x for x in b["rules"] if x["label"] == first)
+    assert (rule["template"], rule["title"]) == ("corporate-modern", "Champion of the Year")
+    assert b["mapping"]["EVENT"] == {"type": "column", "value": "Event"}  # event name comes from the new sheet, not the old event
+    ev = client.get(f"/api/batches/{r.json()['id']}/events", params={"limit": 50}).json()
+    assert any("copied from “Hackathon 2025”" in e["message"] for e in ev)
+
+    # a very different sheet: rules for categories it doesn't have are simply not used
+    with open(ROOT / "sample" / "tech_fest_2026.xlsx", "rb") as f:
+        r = client.post("/api/batches", files={"file": ("tech_fest_2026.xlsx", f)}, data={"name": "Tech Fest", "reuse": str(a["id"])})
+    assert r.status_code == 200 and r.json()["config"]["template_id"] == "mono-minimal"
+    assert client.post("/api/batches", files={"file": ("students.csv", b"Name,Email\nA,a@b.co\n")},
+                       data={"reuse": "9999"}).status_code == 400
+
+
 def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
     login(client)

@@ -62,6 +62,52 @@ def default_config(columns: list[str], rows: list[dict], event_name: str, filena
     return cfg
 
 
+REUSED_KEYS = ("template_id", "qr", "email_subject", "email_body", "filename_pattern", "auto_fix_emails", "claim_links", "fix_caps")
+RULE_KEYS = ("template", "style", "title", "email", "description", "email_subject", "email_body")
+
+
+def reuse_settings(cfg: dict, old: dict, columns: list[str], club: str = "") -> dict:
+    """Start a new event with an earlier event's choices: designs, titles and emails per category,
+    email text, branding and signatories, clean-up switches and column choices that still apply."""
+    from . import clubs
+    old = normalize_config(json.loads(json.dumps(old)))
+    for k in REUSED_KEYS:
+        if k in old:
+            cfg[k] = old[k]
+    if not T.get_template(cfg["template_id"]):  # a custom design deleted since
+        cfg["template_id"] = certificate.DEFAULT_TEMPLATE_ID
+    for key in ("email_column", "fallback_column"):
+        if old.get(key) and old[key] in columns:
+            cfg[key] = old[key]
+    for ph, src in (old.get("mapping") or {}).items():
+        if ph == "EVENT" or not isinstance(src, dict):
+            continue  # the event name always comes from the new event
+        kind = src.get("type")
+        used = src.get("value") if kind == "combine" else [src.get("value")] if kind == "column" else []
+        if (kind in ("column", "combine") and used and all(c in columns for c in used)) or kind == "text":
+            cfg["mapping"][ph] = src
+    if old.get("category_column"):  # same category names get the same design, title and email
+        prev = {r["label"].strip().lower(): r for r in old.get("rules", [])}
+        for r in cfg.get("rules", []):
+            match = prev.get(r["label"].strip().lower())
+            if match:
+                r.update({k: match[k] for k in RULE_KEYS if k in match})
+                if not T.get_template(r["template"]):
+                    r["template"] = cfg["template_id"]
+    elif old.get("rules"):  # plain-English rules: keep those whose column exists here
+        kept = [r for r in old["rules"] if (r.get("match") or {}).get("column") in columns]
+        if kept:
+            cfg["category_column"], cfg["rules"] = "", kept
+    club = club or old.get("club", "")
+    cfg["club"] = club if club in clubs.CLUB_BY_ID else ""
+    branding = {**{k: "" for k in settings.DEFAULT["org"]}, **(old.get("branding") or {})}
+    if cfg["club"]:  # fresh club logo in case it was uploaded since
+        cb = clubs.branding_for(cfg["club"])
+        branding.update(org_name=cb["org_name"], logo=cb["logo"])
+    cfg["branding"] = branding
+    return cfg
+
+
 def normalize_config(cfg: dict) -> dict:
     """Upgrade configs saved by earlier versions (single theme dict) to template ids."""
     if "template_id" not in cfg:
@@ -103,9 +149,12 @@ def all_placeholders(cfg: dict) -> dict:
 
 
 def create_batch(src: Path, original_name: str, batch_name: str, cfg_overrides: dict | None = None,
-                 chaos: dict | None = None, sheet: str | None = None, club: str = "") -> int:
+                 chaos: dict | None = None, sheet: str | None = None, club: str = "", reuse_from: int | None = None) -> int:
     table = read_table(src, sheet)
     cfg = default_config(table["columns"], table["rows"], batch_name, original_name, club)
+    reused = db.get_batch(reuse_from) if reuse_from else None
+    if reused:
+        cfg = reuse_settings(cfg, reused["config"], table["columns"], club)
     cfg.update({"source_file": src.name, "sheets": table["sheets"], "header_row": table["header_row"]})
     cfg.update(cfg_overrides or {})
     with db.tx() as c:
@@ -117,6 +166,8 @@ def create_batch(src: Path, original_name: str, batch_name: str, cfg_overrides: 
         _insert_rows(c, batch_id, table)
     where = f" (sheet “{table['sheet']}”, header on row {table['header_row']})" if table["sheet"] else f" (header on row {table['header_row']})"
     db.log(batch_id, None, "info", "upload", f"Read {original_name}{where}: {len(table['rows'])} rows, {len(table['columns'])} columns")
+    if reused:
+        db.log(batch_id, None, "info", "reuse", f"Designs, emails and certificate details copied from “{reused['name']}”")
     log_validation(batch_id, revalidate(batch_id))
     return batch_id
 

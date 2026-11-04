@@ -346,7 +346,8 @@ body:not([data-view=app]) .tabbar,body:not([data-view=app]) .fab,body:not([data-
       <div class="clubs" id="clubPick"></div>
       <p class="foot">Certificates show Mahindra University and the club’s logo. Logos are managed in Settings.</p>
       <div class="cap">Event name</div>
-      <div class="group"><div class="item"><input type="text" id="batchName" placeholder="e.g. National Tech Fest 2026" style="background:transparent;padding:0"></div></div>
+      <div class="group"><div class="item"><input type="text" id="batchName" placeholder="e.g. National Tech Fest 2026" style="background:transparent;padding:0"></div>
+        <div class="item hidden" id="reuseRow"><div class="grow"><div class="lbl">Copy settings from</div><div class="desc">Designs, emails, signatories and logos from an earlier event</div></div><select id="reuseFrom" aria-label="Copy settings from"></select></div></div>
       <p class="foot">Used on the certificates and in the emails. It also helps choose a matching design.</p>
       <div class="cap">Student list</div>
       <div class="drop" id="drop" tabindex="0" role="button" aria-label="Upload Excel or CSV"></div>
@@ -619,6 +620,9 @@ async function loadBatches(){
     <div class="grow"><div class="bname">${b.is_chaos?'⚡ ':''}${esc(b.name)}</div>
     <div class="bmeta">${b.job?'<span class="spin" style="width:10px;height:10px"></span> working · ':''}${b.counts.Total||0} students · ${(b.counts.Sent||0)} sent${b.counts.Failed?` · ${b.counts.Failed} failed`:''}${b.pause_reason?' · paused':''}</div></div></div>`).join('')
     || '<p class="foot" style="margin:0 6px">No events yet.</p>';
+  const past = list.filter(b => !b.is_chaos), cur = $('#reuseFrom').value;
+  $('#reuseRow').classList.toggle('hidden', !past.length);
+  $('#reuseFrom').innerHTML = '<option value="">Nothing (fresh setup)</option>' + past.map(b => `<option value="${b.id}" ${String(b.id)===cur?'selected':''}>${esc(b.name)}</option>`).join('');
   return list;
 }
 let selectedClub = '', clubData = null, logoV = Date.now();
@@ -649,9 +653,9 @@ drop.ondragleave = () => drop.classList.remove('over');
 drop.ondrop = e => { e.preventDefault(); drop.classList.remove('over'); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); };
 $('#file').onchange = e => { if (e.target.files[0]) upload(e.target.files[0]); e.target.value=''; };
 async function upload(file){
-  const fd = new FormData(); fd.append('file', file); fd.append('name', $('#batchName').value); fd.append('club', selectedClub);
+  const fd = new FormData(); fd.append('file', file); fd.append('name', $('#batchName').value); fd.append('club', selectedClub); fd.append('reuse', $('#reuseFrom').value || '0');
   drop.innerHTML = '<span class="spin"></span> <span class="sub">Reading your sheet…</span>';
-  try { const b = await api('/api/batches',{method:'POST',body:fd}); $('#batchName').value=''; tab='students'; await openBatch(b.id); toast('Sheet read. Check what we found, then press Next.'); }
+  try { const b = await api('/api/batches',{method:'POST',body:fd}); $('#batchName').value=''; $('#reuseFrom').value=''; tab='students'; await openBatch(b.id); toast('Sheet read. Check what we found, then press Next.'); }
   catch(err){ toast(err.message); }
   finally { drop.innerHTML = DROP_HTML; }
 }

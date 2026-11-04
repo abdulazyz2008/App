@@ -208,15 +208,17 @@ def verify_url(rec: dict) -> str:
 
 # ---------------------------------------------------------------- batches
 @app.post("/api/batches", dependencies=[Depends(require_auth)])
-async def create_batch(file: UploadFile = File(...), name: str = Form(""), club: str = Form("")):
+async def create_batch(file: UploadFile = File(...), name: str = Form(""), club: str = Form(""), reuse: int = Form(0)):
     if club and club not in clubs.CLUB_BY_ID:
         raise HTTPException(400, "Unknown club")
+    if reuse and not db.get_batch(reuse):
+        raise HTTPException(400, "The event to copy settings from no longer exists")
     data = await _read_upload(file, (".xlsx", ".xlsm", ".csv", ".tsv", ".txt", ".xls"))
     suffix = Path(file.filename or "x.csv").suffix.lower()
     path = config.UPLOAD_DIR / f"{secrets.token_hex(8)}{suffix}"
     path.write_bytes(data)
     try:
-        batch_id = pipeline.create_batch(path, file.filename or path.name, name.strip(), club=club)
+        batch_id = pipeline.create_batch(path, file.filename or path.name, name.strip(), club=club, reuse_from=reuse or None)
     except ValueError as e:
         raise HTTPException(400, str(e))
     except Exception as e:
