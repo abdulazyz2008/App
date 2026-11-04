@@ -313,6 +313,7 @@ class ConfigIn(BaseModel):
     claim_links: bool = True
     fix_caps: bool = False
     branding: dict = {}
+    feedback: bool = False
 
 
 @app.put("/api/batches/{batch_id}/config", dependencies=[Depends(require_auth)])
@@ -468,6 +469,8 @@ def preview_email(batch_id: int, record_id: int | None = None):
     rec = _preview_record(batch_id, record_id)
     values = pipeline.record_values(rec, cfg)
     subject, body = pipeline.email_texts(rec, cfg, values)
+    if cfg.get("feedback"):
+        body = body.rstrip() + f"\n\n{pipeline.feedback_question(values)} ★ ★ ★ ★ ★"
     from_name, from_addr, _ = mailer.sender_identity(cfg.get("branding", {}).get("org_name", ""))
     to = f"{rec['name']} <{rec['email']}>" if rec["email"] else (
         "Claim link (no usable email)" if rec["delivery"] == "claim" else "(no valid email)")
@@ -1173,6 +1176,79 @@ def _share_actions(rec: dict, p: dict) -> str:
 <script>(function(){{var u={json.dumps(url)},t={json.dumps(text)},b=document.getElementById('shareBtn'),a=document.getElementById('shareAlt');
 b.onclick=function(){{if(navigator.share){{navigator.share({{title:document.title,text:t,url:u}}).catch(function(){{}});}}else{{b.hidden=true;a.hidden=false;}}}};
 document.getElementById('copyBtn').onclick=function(){{var c=this;(navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(function(){{c.textContent='Copied';}},function(){{prompt('Copy this link',u);}});}};}})();</script>"""
+
+
+@app.get("/api/batches/{batch_id}/feedback", dependencies=[Depends(require_auth)])
+def batch_feedback(batch_id: int):
+    b = get_batch_or_404(batch_id)
+    asked = db.one("SELECT COUNT(*) n FROM records WHERE batch_id=? AND feedback_token!=''", (batch_id,))["n"]
+    return {**pipeline.feedback_summary(batch_id), "enabled": bool(b["config"].get("feedback")), "asked": asked}
+
+
+@app.get("/api/batches/{batch_id}/feedback.csv", dependencies=[Depends(require_auth)])
+def batch_feedback_csv(batch_id: int):
+    b = get_batch_or_404(batch_id)
+    rows = db.query("SELECT f.stars, f.comment, f.at, r.rule_label FROM feedback f JOIN records r ON r.id = f.record_id "
+                    "WHERE f.batch_id=? ORDER BY f.at", (batch_id,))
+    out = io.StringIO()
+    w = csv.writer(out)
+    w.writerow(["Stars", "Comment", "Category", "Date"])  # no names: feedback is shown anonymously
+    for r in rows:
+        w.writerow([r["stars"], r["comment"], r["rule_label"], r["at"][:10]])
+    name = "".join(ch if ch.isalnum() or ch in " -_" else "_" for ch in b["name"]).strip() or "event"
+    return Response("\ufeff" + out.getvalue(), media_type="text/csv; charset=utf-8",
+                    headers={"Content-Disposition": f'attachment; filename="{name} - feedback.csv"'})
+
+
+def _feedback_rec(token: str) -> dict:
+    rec = db.one("SELECT * FROM records WHERE feedback_token=?", (token,)) if token else None
+    if not rec:
+        raise HTTPException(404, "Unknown feedback link")
+    return rec
+
+
+STAR_CSS = """<style>.stars{display:flex;flex-direction:row-reverse;justify-content:center;gap:6px;margin:6px 0 18px}
+.stars input{position:absolute;opacity:0;width:0;height:0}.stars label{font-size:46px;line-height:1;color:var(--line);cursor:pointer;
+padding:2px}.stars input:checked~label,.stars label:hover,.stars label:hover~label{color:#f5a623}
+textarea{width:100%;font:inherit;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--card);
+color:var(--ink);min-height:90px;margin-bottom:12px;resize:vertical}</style>"""
+
+
+@app.get("/feedback/{token}", response_class=HTMLResponse)
+def feedback_page(token: str, stars: int = 0):
+    try:
+        rec = _feedback_rec(token)
+    except HTTPException:
+        return page("Not found", '<div class="icon bad">✕</div><h1>Link not found</h1><p class="lead">This feedback link is not valid.</p>')
+    prev = db.one("SELECT stars, comment FROM feedback WHERE record_id=?", (rec["id"],))
+    chosen = stars if 1 <= stars <= 5 else (prev["stars"] if prev else 0)
+    event = json.loads(rec["payload_json"] or "{}").get("event", "") or "the event"
+    radios = "".join(f'<input type="radio" name="stars" id="s{n}" value="{n}" {"checked" if n == chosen else ""} required>'
+                     f'<label for="s{n}" title="{n} out of 5">★</label>' for n in range(5, 0, -1))
+    return page("Rate the event", f"""{STAR_CSS}<h1>How was it?</h1>
+<p class="lead">Your rating for <b>{html.escape(event)}</b> helps the organizers make the next one better.</p>
+<form class="group" style="padding:16px" method="post"><div class="stars">{radios}</div>
+<textarea name="comment" maxlength="1000" placeholder="Anything to add? (optional)">{html.escape(prev["comment"] if prev else "")}</textarea>
+<button class="btn">{"Update my rating" if prev else "Send rating"}</button></form>
+<p class="note">Your feedback is shared with the organizers without your name.</p>""")
+
+
+@app.post("/feedback/{token}", response_class=HTMLResponse)
+def feedback_submit(token: str, stars: int = Form(0), comment: str = Form("")):
+    try:
+        rec = _feedback_rec(token)
+    except HTTPException:
+        return page("Not found", '<div class="icon bad">✕</div><h1>Link not found</h1><p class="lead">This feedback link is not valid.</p>')
+    if not 1 <= stars <= 5:
+        return HTMLResponse(page("Pick a rating", '<div class="icon bad">!</div><h1>Pick 1 to 5 stars</h1>'
+                                 f'<a class="btn" href="/feedback/{html.escape(token)}">Back</a>').body, status_code=400)
+    with db.tx() as c:
+        c.execute("INSERT INTO feedback (record_id, batch_id, stars, comment, at) VALUES (?,?,?,?,?) "
+                  "ON CONFLICT(record_id) DO UPDATE SET stars=excluded.stars, comment=excluded.comment, at=excluded.at",
+                  (rec["id"], rec["batch_id"], stars, comment.strip()[:1000], db.now()))
+    return page("Thank you", f"""<div class="icon ok">✓</div><h1>Thank you!</h1>
+<p class="lead">You rated it <b>{"★" * stars}{"☆" * (5 - stars)}</b></p>
+<p class="note"><a href="/feedback/{html.escape(token)}" style="color:inherit">Change my rating</a></p>""")
 
 
 @app.get("/verify/{code}/card.png")

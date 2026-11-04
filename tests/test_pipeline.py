@@ -737,6 +737,45 @@ def test_linkedin_button_and_share_card(client):
     assert "https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME" in e["body"]
 
 
+def test_event_feedback_stars(client):
+    import re as _re
+    from sealsend import config as _config
+    login(client)
+    b = upload(client)
+    bid = b["id"]
+    assert b["config"]["feedback"] is True  # on for new events
+    send(client, bid)
+    emls = sorted(Path(_config.OUTBOX_DIR).glob("*.eml"))
+    msg = email.message_from_bytes(emls[-1].read_bytes(), policy=policy.default)
+    text = msg.get_body(("plain",)).get_content()
+    html_part = msg.get_body(("html",)).get_content()
+    link = _re.search(r"(http\S+/feedback/[\w-]+)", text).group(1)
+    assert "Tap a star to rate it" in text and html_part.count("?stars=") == 5
+    token = link.rsplit("/", 1)[1]
+    client.post("/api/logout")  # students aren't signed in
+    assert "AI Hackathon 2026" in client.get(f"/feedback/{token}?stars=4").text
+    assert client.post(f"/feedback/{token}", data={"stars": "6"}).status_code == 400
+    assert "Thank you" in client.post(f"/feedback/{token}", data={"stars": "5", "comment": "Loved the robots"}).text
+    assert client.post(f"/feedback/{token}", data={"stars": "3", "comment": "Changed my mind"}).status_code == 200  # replaces
+    assert client.get("/feedback/not-a-real-token").status_code == 200 and "not valid" in client.get("/feedback/nope").text
+    login(client)
+    f = client.get(f"/api/batches/{bid}/feedback").json()
+    assert f["count"] == 1 and f["average"] == 3 and f["distribution"] == [0, 0, 1, 0, 0] and f["asked"] >= 10
+    assert f["comments"][0]["comment"] == "Changed my mind"
+    csv_text = client.get(f"/api/batches/{bid}/feedback.csv").text
+    names = [r["name"] for r in records(client, bid)]
+    assert "Changed my mind" in csv_text and not any(n and n in csv_text for n in names)  # anonymous
+
+    cfg = client.get(f"/api/batches/{bid}").json()["config"]
+    cfg["feedback"] = False
+    save(client, bid, cfg)
+    rec = records(client, bid, "Sent")[0]
+    assert client.post(f"/api/records/{rec['id']}/resend").status_code == 200
+    wait_idle(client, bid)
+    newest = max(Path(_config.OUTBOX_DIR).glob("*.eml"), key=lambda p: p.stat().st_mtime)
+    assert "/feedback/" not in newest.read_text(errors="ignore")
+
+
 def test_help_assistant_offline_state_and_claude(client, monkeypatch):
     assert client.post("/api/assistant", json={"message": "hi"}).status_code == 401
     login(client)

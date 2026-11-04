@@ -79,6 +79,14 @@ CREATE TABLE IF NOT EXISTS events (
 );
 CREATE INDEX IF NOT EXISTS idx_events_batch ON events(batch_id, id);
 CREATE INDEX IF NOT EXISTS idx_events_record ON events(record_id, id);
+CREATE TABLE IF NOT EXISTS feedback (
+    record_id INTEGER PRIMARY KEY,
+    batch_id INTEGER NOT NULL,
+    stars INTEGER NOT NULL,
+    comment TEXT NOT NULL DEFAULT '',
+    at TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_feedback_batch ON feedback(batch_id);
 CREATE TABLE IF NOT EXISTS templates (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -99,7 +107,8 @@ MIGRATIONS = {
                 "seal_json": "TEXT NOT NULL DEFAULT ''", "is_chaos": "INTEGER NOT NULL DEFAULT 0",
                 "chaos_json": "TEXT NOT NULL DEFAULT ''", "send_at": "TEXT NOT NULL DEFAULT ''",
                 "send_kind": "TEXT NOT NULL DEFAULT ''"},
-    "records": {"category": "TEXT NOT NULL DEFAULT ''", "title": "TEXT NOT NULL DEFAULT ''"},
+    "records": {"category": "TEXT NOT NULL DEFAULT ''", "title": "TEXT NOT NULL DEFAULT ''",
+                "feedback_token": "TEXT NOT NULL DEFAULT ''"},
     "send_log": {"account": "TEXT NOT NULL DEFAULT ''"},
 }
 
@@ -110,6 +119,7 @@ def _migrate(c: sqlite3.Connection) -> None:
         for col, ddl in cols.items():
             if col not in have:
                 c.execute(f"ALTER TABLE {table} ADD COLUMN {col} {ddl}")
+    c.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_records_feedback ON records(feedback_token) WHERE feedback_token != ''")
     c.commit()
 
 

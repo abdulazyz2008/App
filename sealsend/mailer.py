@@ -119,7 +119,8 @@ def sender_identity(org_name: str = "", account: dict | None = None) -> tuple[st
 
 def build_message(to_addr: str, to_name: str, subject: str, body: str,
                   attachment: bytes, attachment_name: str, cert_code: str, org_name: str = "",
-                  account: dict | None = None) -> EmailMessage:
+                  account: dict | None = None, feedback: tuple[str, str] | None = None) -> EmailMessage:
+    """feedback: (question, link) adds a "rate this event" line; in the HTML version, five tappable stars."""
     from_name, from_addr, reply_to = sender_identity(org_name, account)
     msg = EmailMessage()
     msg["From"] = formataddr((from_name, from_addr))
@@ -129,9 +130,14 @@ def build_message(to_addr: str, to_name: str, subject: str, body: str,
         msg["Reply-To"] = reply_to
     msg["Message-ID"] = make_msgid(domain=from_addr.split("@")[-1] or "localhost")
     msg["X-SealSend-Certificate"] = cert_code
-    msg.set_content(body)
+    msg.set_content(body.rstrip() + (f"\n\n{feedback[0]} {feedback[1]}\n" if feedback else ""))
     paragraphs = "".join(
         f"<p style=\"margin:0 0 14px\">{html.escape(p).replace(chr(10), '<br>')}</p>" for p in body.split("\n\n") if p.strip())
+    if feedback:
+        stars = "".join(f'<a href="{html.escape(feedback[1])}?stars={n}" title="{n} out of 5" style="font-size:32px;line-height:1;'
+                        f'color:#f5a623;text-decoration:none;padding:0 3px">&#9733;</a>' for n in range(1, 6))
+        paragraphs += ('<div style="margin:24px 0 4px;padding:16px 18px;border-radius:12px;background:#f6f7f9">'
+                       f'<div style="font-weight:600;margin-bottom:8px">{html.escape(feedback[0])}</div>{stars}</div>')
     msg.add_alternative(
         '<div style="font-family:-apple-system,Segoe UI,Roboto,Arial,sans-serif;font-size:15px;line-height:1.55;'
         f'color:#111;max-width:560px">{paragraphs}</div>', subtype="html")

@@ -58,11 +58,13 @@ def default_config(columns: list[str], rows: list[dict], event_name: str, filena
         "fix_caps": caps > len(rows) * 0.3,
         "branding": clubs.branding_for(club) if club else {k: org.get(k, "") for k in settings.DEFAULT["org"]},
         "club": club,
+        "feedback": True,  # ask students to rate the event (1-5 stars) in the certificate email
     })
     return cfg
 
 
-REUSED_KEYS = ("template_id", "qr", "email_subject", "email_body", "filename_pattern", "auto_fix_emails", "claim_links", "fix_caps")
+REUSED_KEYS = ("template_id", "qr", "email_subject", "email_body", "filename_pattern", "auto_fix_emails", "claim_links", "fix_caps",
+               "feedback")
 RULE_KEYS = ("template", "style", "title", "email", "description", "email_subject", "email_body")
 
 
@@ -259,6 +261,30 @@ def certificate_title(rule: dict | None, values: dict, style: str, tpl: dict) ->
 def assets_for(cfg: dict) -> dict:
     b = cfg.get("branding", {})
     return {"logo": b.get("logo", ""), "signer1_sig": b.get("signer1_sig", ""), "signer2_sig": b.get("signer2_sig", "")}
+
+
+def feedback_link(rec: dict) -> str:
+    """The student's private "rate this event" link (the token is created the first time it's needed)."""
+    token = rec.get("feedback_token") or ""
+    if not token:
+        token = secrets.token_urlsafe(12)
+        db.update_record(rec["id"], feedback_token=token)
+        rec["feedback_token"] = token
+    return f"{config.public_base_url()}/feedback/{token}"
+
+
+def feedback_question(values: dict) -> str:
+    return f"How was {values.get('EVENT') or 'the event'}? Tap a star to rate it."
+
+
+def feedback_summary(batch_id: int) -> dict:
+    rows = db.query("SELECT f.stars, f.comment, f.at, r.rule_label FROM feedback f JOIN records r ON r.id = f.record_id "
+                    "WHERE f.batch_id=? ORDER BY f.at DESC", (batch_id,))
+    dist = [sum(1 for r in rows if r["stars"] == n) for n in range(1, 6)]
+    return {"count": len(rows), "average": round(sum(r["stars"] for r in rows) / len(rows), 2) if rows else None,
+            "distribution": dist,
+            "comments": [{"stars": r["stars"], "comment": r["comment"], "category": r["rule_label"], "at": r["at"]}
+                         for r in rows if r["comment"].strip()][:100]}
 
 
 def email_texts(rec: dict, cfg: dict, values: dict) -> tuple[str, str]:
@@ -763,8 +789,9 @@ def _deliver(sender: mailer.Sender, rec: dict, cfg: dict, pdf: bytes) -> dict:
         values = record_values(rec, cfg)
         subject, body = email_texts(rec, cfg, values)
         fname = Path(rec["cert_file"]).name
+        feedback = (feedback_question(values), feedback_link(rec)) if cfg.get("feedback") else None
         msg = mailer.build_message(rec["email"], rec["name"], subject, body, pdf, fname, rec["cert_code"],
-                                   cfg.get("branding", {}).get("org_name", ""), account=sender.account)
+                                   cfg.get("branding", {}).get("org_name", ""), account=sender.account, feedback=feedback)
         attempt += 1
         attempts += 1
         try:
