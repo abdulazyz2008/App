@@ -172,8 +172,11 @@ def test_first_run_setup_is_local_only(client, monkeypatch):
     assert client.post("/api/setup", json={"password": "another-password"}).status_code == 400  # only once
     assert client.post("/api/login", json={"password": "long-enough-pw"}).status_code == 200
     assert "long-enough-pw" not in config.SETTINGS_PATH.read_text()
-    remote = type("R", (), {"client": type("C", (), {"host": "192.168.1.50"})()})()
-    assert not main._is_local(remote)
+    req = lambda host, headers: type("R", (), {"client": type("C", (), {"host": host})(), "headers": headers})()  # noqa: E731
+    assert not main._is_local(req("192.168.1.50", {}))
+    assert main._is_local(req("127.0.0.1", {}))
+    assert not main._is_local(req("127.0.0.1", {"cf-connecting-ip": "203.0.113.9"}))  # came through the public tunnel
+    assert not main._is_local(req("127.0.0.1", {"x-forwarded-for": "203.0.113.9"}))
 
 
 # ---------------------------------------------------------------- workflow

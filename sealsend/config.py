@@ -63,6 +63,7 @@ def lan_ip() -> str:
 
 _PUBLIC_ENV = os.environ.get("PUBLIC_BASE_URL", "")
 HOSTED_URL = os.environ.get("RENDER_EXTERNAL_URL", "") or os.environ.get("SEALSEND_HOSTED_URL", "")  # set by the host
+TEMPORARY_URL = os.environ.get("SEALSEND_TEMPORARY_URL", "") == "1"  # free tunnel link: changes on every start
 WORKERS = int(os.environ.get("SEALSEND_WORKERS", "0")) or min(os.cpu_count() or 1, 8)
 
 

@@ -66,6 +66,9 @@ def _start_session(request: Request, response: Response) -> None:
 
 
 def _is_local(request: Request) -> bool:
+    """Only someone sitting at this computer. Requests relayed by a tunnel or proxy are not local."""
+    if any(h in request.headers for h in ("cf-connecting-ip", "cf-ray", "x-forwarded-for", "forwarded", "x-real-ip")):
+        return False
     host = request.client.host if request.client else ""
     return host in ("127.0.0.1", "::1", "localhost", "testclient")
 
@@ -148,7 +151,7 @@ def me():
     return {"mail_mode": config.mail_mode(), "mail": settings.public_mail(), "quota": pipeline.quota_status(),
             "key_fingerprint": crypto.fingerprint(), "copilot": _copilot_label(),
             "public_base_url": config.public_base_url(), "lan_url": config.app_url(), "hosted": bool(config.HOSTED_URL),
-            "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
+            "temporary_url": config.TEMPORARY_URL, "org": settings.org(), "providers": {k: v["label"] for k, v in settings.PROVIDERS.items()},
             "presets": {k: v["label"] for k, v in mailer.PRESETS.items()},
             "styles": {k: v["title"] for k, v in STYLES.items()},
             "fonts": T.FONT_LABELS, "niches": T.NICHES + ["My templates"]}
@@ -663,7 +666,7 @@ def remove_template(template_id: str):
 def get_settings():
     return {"mail": settings.public_mail(), "org": settings.org(), "public_base_url": config.public_base_url(),
             "public_base_url_custom": settings.get("public_base_url", ""), "lan_url": config.app_url(), "hosted": bool(config.HOSTED_URL),
-            "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
+            "temporary_url": config.TEMPORARY_URL, "providers": settings.PROVIDERS, "quota": pipeline.quota_status(), "mode": config.mail_mode(),
             "admin_from_env": bool(config.ADMIN_PASSWORD)}
 
 

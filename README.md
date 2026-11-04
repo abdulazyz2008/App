@@ -6,7 +6,17 @@ SealSend reads any reasonable Excel or CSV file, works out who each student is a
 
 ---
 
-## Put it online (one link)
+## Free public link (no account, no card)
+
+Double-click **`start-online-windows.bat`** / **`start-online-mac.command`** / **`start-online-linux.sh`**.
+SealSend starts on your computer and prints a public link like `https://some-words.trycloudflare.com`, using Cloudflare's free Quick Tunnel.
+Anyone can open that link on any device, anywhere. The first time, it downloads Cloudflare's tool (once) and asks you to set a password.
+
+- Free and instant, but **your computer must stay on with the window open**.
+- **The link changes each time you start.** QR codes on certificates made in one session stop verifying after you restart.
+  For permanent links, use the paid option below.
+
+## Permanent website (one link, paid)
 
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/abdulazyz2008/App)
 
