@@ -42,7 +42,8 @@ def ensure_environment() -> None:
     marker = VENV / ".installed"
     if not marker.exists() or marker.read_text() != REQ.read_text():
         print("Installing components...")
-        subprocess.check_call([str(venv_python()), "-m", "pip", "install", "--disable-pip-version-check", "-q", "-r", str(REQ)])
+        subprocess.check_call([str(venv_python()), "-m", "pip", "install", "--disable-pip-version-check", "-q",
+                               "--timeout", "60", "--retries", "10", "-r", str(REQ)])
         marker.write_text(REQ.read_text())
     sys.exit(subprocess.call([str(venv_python()), str(ROOT / "run.py"), *sys.argv[1:]]))
 
