@@ -1,6 +1,6 @@
 # Skills catalog
 
-302 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+343 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
 
 
 ## Founder pack (start a business) (11)
@@ -394,3 +394,49 @@
 | `/verification-before-completion` | Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always |
 | `/writing-plans` | Use when you have a spec or requirements for a multi-step task, before touching code |
 | `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
+
+## Marketing skills by Corey Haines (41)
+
+| Skill | What it's for |
+|---|---|
+| `/ab-testing` | When the user wants to plan, design, or implement an A/B test or experiment, or build a growth experimentation program. |
+| `/ads` | When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. |
+| `/ai-seo` | When the user wants to optimize content for AI search engines, get cited by LLMs, or appear in AI-generated answers. |
+| `/analytics` | When the user wants to set up, improve, or audit analytics tracking and measurement. |
+| `/aso` | When the user wants to audit or optimize an App Store or Google Play listing. |
+| `/attribution` | When the user wants to figure out which marketing actually drives conversions and revenue, choose or interpret an attribution model, or reconcile conflicting numbers across tools. |
+| `/co-marketing` | When the user wants to find co-marketing partners, plan joint campaigns, or brainstorm partnership opportunities. |
+| `/community-marketing` | Build and leverage online communities to drive product growth and brand loyalty. |
+| `/competitor-profiling` | When the user wants to research, profile, or analyze competitors from their URLs. |
+| `/competitors` | When the user wants to create competitor comparison or alternative pages for SEO and buyer-facing use. |
+| `/conversion-tracking` | Set up, audit, verify, or fix website conversion tracking. |
+| `/cro` | When the user wants to optimize, improve, or increase conversions on any marketing page or form — including homepage, landing pages, pricing pages, feature pages, lead capture forms, or contact forms. |
+| `/customer-research` | When the user wants to conduct, analyze, or synthesize customer research. |
+| `/directory-submissions` | When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. |
+| `/emails` | When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. |
+| `/events` | When the user wants to plan, run, sponsor, speak at, or get pipeline from events — webinars, conferences, trade shows, meetups, dinners, workshops, virtual summits, or user conferences. |
+| `/free-tools` | When the user wants to plan, evaluate, or build a free tool for marketing purposes — lead generation, SEO value, or brand awareness. |
+| `/image` | When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. |
+| `/influencer-marketing` | When the user wants to run influencer, creator, or ambassador partnerships to promote their product — finding and vetting partners, structuring deals, briefing creators, disclosure compliance, and measuring ROI. |
+| `/launch` | When the user wants to plan a product launch, feature announcement, or release strategy. |
+| `/lead-magnets` | When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. |
+| `/link-building` | When the user wants to earn backlinks or third-party mentions that lift rankings and AI citations. |
+| `/marketing-council` | When the user wants multiple expert perspectives on a marketing question — a simulated board of advisors staffed by legendary marketers (Seth Godin, David Ogilvy, Eugene Schwartz, April Dunford, Rory Sutherland, Alex… |
+| `/marketing-loops` | When the user wants to set up a recurring, self-running marketing workflow — a repeatable loop an AI agent runs on a cadence (weekly, daily, on a trigger) rather than a one-off task. |
+| `/marketing-plan` | When the user needs a comprehensive marketing plan for a client, a company they advise, or their own product. |
+| `/offers` | When the user wants to design, construct, or improve an offer — the thing they actually sell — including value framing, bonus stacking, guarantee design, scarcity/urgency, naming, and payment structure. |
+| `/onboarding` | When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. |
+| `/paywalls` | When the user wants to create or optimize in-app paywalls, upgrade screens, upsell modals, or feature gates. |
+| `/popups` | When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. |
+| `/product-marketing` | When the user wants to create or update their product marketing context document. |
+| `/prospecting` | When the user wants to find, qualify, and build a list of prospects to reach out to, across B2B SaaS, general B2B, or local small businesses. |
+| `/public-relations` | When the user wants help with public relations, earned media, press coverage, journalist outreach, or media strategy (not pull requests). |
+| `/referrals` | When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. |
+| `/reverse-engineer-marketing` | When the user wants to reverse engineer how another company grew and copy what worked. |
+| `/revops` | When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. |
+| `/sales-enablement` | When the user wants to create sales collateral, pitch decks, one-pagers, objection handling docs, or demo scripts. |
+| `/schema` | When the user wants to add, fix, or optimize schema markup and structured data on their site. |
+| `/signup` | When the user wants to optimize signup, registration, account creation, or trial activation flows. |
+| `/sms` | When the user wants to plan, build, or optimize SMS, MMS, or WhatsApp marketing — including welcome flows, abandoned cart texts, post-purchase, win-back, promotional sends, or transactional/auth SMS. |
+| `/social` | When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, or Facebook, or wants to do social listening and engagement triage. |
+| `/video` | When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. |
