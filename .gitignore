@@ -10,3 +10,6 @@ SendEZ.zip
 build/
 dist/
 *.spec.bak
+
+# Lead lists with business phone numbers - keep out of the repo
+leads/
