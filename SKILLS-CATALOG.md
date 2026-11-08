@@ -1,43 +1,55 @@
 # Skills catalog
 
-290 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+**290 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
 
+Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fastapi-review`, `/test-coverage`) and 25 helper agents (22 `gsd-*`, `planner`, `python-reviewer`, `fastapi-reviewer`).
 
-## Founder pack (start a business) (11)
+## Overview
 
-| Skill | What it's for |
+| Group | Skills | What it's for |
+|---|---|---|
+| Founder pack | 11 | Test, plan and launch a business idea end to end. |
+| Whale pack | 11 | Find customers and get them to pay before you build. |
+| Marketing (Corey Haines) | 41 | Modern marketing playbooks: CRO, ads, SEO, prospecting, offers, launches. |
+| Marketing (original pack) | 26 | Copywriting, SEO audits, content and social skills. |
+| UI/UX Pro Max (design) | 7 | Design intelligence for websites and apps: styles, palettes, fonts, components, branding. |
+| Product | 14 | PRDs, UX research, roadmaps, landing pages. |
+| Business growth | 5 | Customer success, sales engineering, proposals and contracts. |
+| Finance | 6 | Valuation, SaaS metrics, month-end close. |
+| C-suite advisors | 34 | Executive-level advice: CEO, CFO, CMO, CTO, legal and board meetings. |
+| Replica pack | 11 | Reverse-engineer an app and build your own better version. |
+| Research | 1 | What people said online in the last 30 days. |
+| Writing & output style | 2 | Make text sound human, or make Claude's replies ADHD-friendly. |
+| Superpowers (coding workflow) | 15 | Careful coding habits: plan, test first, debug, verify. |
+| Engineering | 35 | Senior engineer roles: frontend, backend, security, cloud, QA. |
+| Advanced engineering | 49 | Agents, databases, CI/CD, MCP servers, releases, reliability. |
+| Playwright testing | 10 | Write, fix and run website tests. |
+| Browser & Python | 6 | Website automation, FastAPI and Python best practices. |
+| Self-improving memory | 6 | Save lessons so Claude remembers them across sessions. |
+
+## Founder pack (11)
+
+Test, plan and launch a business idea end to end.
+
+| Skill | What it does |
 |---|---|
-| `/founder-board` | Your board of directors. Puts a business idea in front of a three-member board, each a sub-agent reading the idea through one published framework: the Offers lens (from Alex Hormozi's $100M Offers), the Monopoly lens… |
-| `/founder-brand` | Your brand designer. Names the business (with the trademark, domain and handle checks to run before falling in love with a name), writes the voice, a one-line promise and a tagline, and briefs the look: colours, type… |
-| `/founder-cfo` | Your CFO. Builds the unit economics of a business before money is spent: what one unit earns after its direct costs, the real profit margin at the planned volume, the break-even point in units a day, year 1 month by… |
-| `/founder-competitors` | Maps every competitor and the gap they leave. |
-| `/founder-consumer` | The consumer panel. Spins up a swarm of buyer sub-agents (default 100, --quick for 20) trained on the user's target customer, each with a different income, age, buying behaviour and objection, shows every one the same… |
-| `/founder-launch` | Your launch lead. Builds a dated, step-by-step launch plan: a cheap real-world test first (a waitlist, a pre-sale or a pop-up with a real price, so real buyers confirm what the simulated panel said), then the countdown… |
-| `/founder-marketing` | Your marketing director. Turns the buyer panel and the competitor map into positioning, the channels the target customer actually uses, a 30-day launch campaign with dated posts and ads, the first ten hooks, a budget… |
-| `/founder-offer` | Builds an offer too good to refuse. Lists every problem the buyer hits on the way to the result they want, turns each into a solution, trims to what is cheap to deliver and valuable to the buyer, and stacks it with… |
-| `/founder-ops` | Your operations manager. Works out how the business actually runs on day one: suppliers and what they cost, who works when, the step-by-step routines for opening, serving or shipping and closing, the tools to run it… |
-| `/founder-plan` | Your business planner. Compiles everything the other founder skills wrote (the board's verdict, the competitors, the buyer panel, pricing, the offer, the CFO's numbers, marketing, brand, operations and the launch plan)… |
-| `/founder-pricing` | Finds the price buyers will actually pay. |
+| `/founder-board` | Your board of directors. Puts a business idea in front of a three-member board, each a sub-agent reading the idea through one published framework: the Offers lens (from Alex Hormozi's $100M Offers), the Monopoly lens (from Peter Thiel's Zero to One) and the Product lens (from Walter Isaacson's… |
+| `/founder-brand` | Your brand designer. Names the business (with the trademark, domain and handle checks to run before falling in love with a name), writes the voice, a one-line promise and a tagline, and briefs the look: colours, type, logo and the first things a customer sees, so they match the positioning the… |
+| `/founder-cfo` | Your CFO. Builds the unit economics of a business before money is spent: what one unit earns after its direct costs, the real profit margin at the planned volume, the break-even point in units a day, year 1 month by month, the cash needed before it pays for itself, how long the startup spend takes… |
+| `/founder-competitors` | Maps every competitor and the gap they leave. Finds the direct competitors, indirect ones and the substitutes a buyer would use instead, from public sources only, and records what each sells, at what price, how they position themselves and what their customers complain about in public reviews… |
+| `/founder-consumer` | The consumer panel. Spins up a swarm of buyer sub-agents (default 100, --quick for 20) trained on the user's target customer, each with a different income, age, buying behaviour and objection, shows every one the same pitch, and runs the business through 100 buyer scenarios to see who buys, who… |
+| `/founder-launch` | Your launch lead. Builds a dated, step-by-step launch plan: a cheap real-world test first (a waitlist, a pre-sale or a pop-up with a real price, so real buyers confirm what the simulated panel said), then the countdown to opening day with owners and deadlines, the launch-day run sheet, and the… |
+| `/founder-marketing` | Your marketing director. Turns the buyer panel and the competitor map into positioning, the channels the target customer actually uses, a 30-day launch campaign with dated posts and ads, the first ten hooks, a budget split and the numbers to watch. |
+| `/founder-offer` | Builds an offer too good to refuse. Lists every problem the buyer hits on the way to the result they want, turns each into a solution, trims to what is cheap to deliver and valuable to the buyer, and stacks it with honest bonuses, a guarantee the CFO can afford, real urgency and a clear name. |
+| `/founder-ops` | Your operations manager. Works out how the business actually runs on day one: suppliers and what they cost, who works when, the step-by-step routines for opening, serving or shipping and closing, the tools to run it, the licences and permits to check, and a risk register with what to do when each… |
+| `/founder-plan` | Your business planner. Compiles everything the other founder skills wrote (the board's verdict, the competitors, the buyer panel, pricing, the offer, the CFO's numbers, marketing, brand, operations and the launch plan) into one business plan with a verdict at the top that is computed from the… |
+| `/founder-pricing` | Finds the price buyers will actually pay. Reads the consumer panel's four price answers per buyer into a Van Westendorp price-sensitivity range (too cheap, a bargain, getting expensive, too expensive), sets it against what competitors really charge and against the CFO's margin, and recommends a… |
 
-## Replica pack (clone & improve an app) (11)
+## Whale pack (11)
 
-| Skill | What it's for |
-|---|---|
-| `/replica-architect` | Plans the stack, database schema and API for an app clone, from the recon map replica-recon wrote. |
-| `/replica-backend` | Builds the backend of an app clone: auth, database migrations and access rules, payments with Stripe, email, background jobs and third-party integrations through official APIs only, plus a security checklist. |
-| `/replica-brand` | Names and rebrands an app clone so it is the user's own: name candidates with the trademark, domain, store and handle checks to run, a new palette checked for contrast, a logo brief, a voice guide, and a sweep tool that… |
-| `/replica-build` | Rebuilds an app screen by screen from the recon map: app shell first, then the core flow as a vertical slice, then every screen with all its states, ticking off the feature matrix as it goes. |
-| `/replica-deploy` | Ships an app clone live on the user's own domain: a preflight gate (tests green, parity must-haves done, rebrand sweep clean, listing linted, legal pages up), production database and env vars, the host, DNS records for… |
-| `/replica-design` | Rebuilds an app's design system for a clone: colour roles, type scale, spacing, radius, shadows and every component with its states, as design tokens plus component specs, with original assets instead of the target's… |
-| `/replica-diff` | Compares an app clone against the original: a feature parity score from the feature matrix (weighted by must, should, could) with the missing list in build order, plus a screenshot layout diff that ignores colour so a… |
-| `/replica-entrepreneur` | Researches the app being cloned and reads what its real users say in public reviews (App Store, Google Play, G2, Capterra, Trustpilot, Reddit, Hacker News, its own feature-request board), then ranks what they hate, what… |
-| `/replica-launch` | Writes the launch for an app clone: the landing page built on the positioning angle, pricing set against the original's public pricing and its users' complaints, and the App Store and Google Play listing linted against… |
-| `/replica-recon` | Reverse-engineers any app into a recon map: screen inventory, user flows, component list, inferred data model and a feature matrix, from public pages, screenshots, app store listings, help docs and the user's own… |
-| `/replica-test` | Clicks through every flow of an app clone and tests it for bugs: a test plan generated from the recon flows with happy paths and edge cases, Playwright end-to-end tests where possible, a browser click-through where not… |
+Find customers and get them to pay before you build.
 
-## Whale pack (pre-sell to customers) (11)
-
-| Skill | What it's for |
+| Skill | What it does |
 |---|---|
 | `/case-study` | Case Study. Turns the first customer into proof, with their permission. |
 | `/demo-builder` | Demo Builder. Builds a demo showing how your product solves the problem, before the product exists. |
@@ -51,105 +63,165 @@
 | `/requirements` | Requirements. Turns what paying customers asked for into the build list. |
 | `/whale-hunter` | Whale Hunter. Finds the decision makers and pitches them. |
 
-## Research (1)
+## Marketing (Corey Haines) (41)
 
-| Skill | What it's for |
+Modern marketing playbooks: CRO, ads, SEO, prospecting, offers, launches.
+
+| Skill | What it does |
 |---|---|
-| `/last30days` | Research what people actually say about any topic in the last 30 days. |
+| `/ab-testing` | When the user wants to plan, design, or implement an A/B test or experiment, or build a growth experimentation program. |
+| `/ads` | When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. |
+| `/ai-seo` | When the user wants to optimize content for AI search engines, get cited by LLMs, or appear in AI-generated answers. |
+| `/analytics` | When the user wants to set up, improve, or audit analytics tracking and measurement. Also use when the user mentions "set up tracking," "GA4," "Google Analytics," "event tracking," "UTM parameters," "tag manager," "GTM," "analytics implementation," "tracking plan," "how do I measure this,"… |
+| `/aso` | When the user wants to audit or optimize an App Store or Google Play listing. Also use when the user mentions 'ASO audit,' 'app store optimization,' 'optimize my app listing,' 'improve app visibility,' 'app store ranking,' 'audit my listing,' 'why aren't people downloading my app,' 'improve my app… |
+| `/attribution` | When the user wants to figure out which marketing actually drives conversions and revenue, choose or interpret an attribution model, or reconcile conflicting numbers across tools. |
+| `/co-marketing` | When the user wants to find co-marketing partners, plan joint campaigns, or brainstorm partnership opportunities. |
+| `/community-marketing` | Build and leverage online communities to drive product growth and brand loyalty. Use when the user wants to create a community strategy, grow a Discord or Slack community, manage a forum or subreddit, build brand advocates, increase word-of-mouth, drive community-led growth, engage users… |
+| `/competitor-profiling` | When the user wants to research, profile, or analyze competitors from their URLs. Also use when the user mentions 'competitor profile,' 'competitor research,' 'competitor analysis,' 'profile this competitor,' 'analyze competitor,' 'competitive intelligence,' 'competitor deep dive,' 'who are my… |
+| `/competitors` | When the user wants to create competitor comparison or alternative pages for SEO and buyer-facing use. |
+| `/conversion-tracking` | Set up, audit, verify, or fix website conversion tracking. Use when the conversion is a form submission, booked meeting, chat, phone call, signup, or purchase; when conversions must reach Google Ads, Meta, GA4, LinkedIn, TikTok, or Microsoft Ads; when the work involves GTM tags and dataLayer… |
+| `/cro` | When the user wants to optimize, improve, or increase conversions on any marketing page or form — including homepage, landing pages, pricing pages, feature pages, lead capture forms, or contact forms. |
+| `/customer-research` | When the user wants to conduct, analyze, or synthesize customer research. Use when the user mentions "customer research," "ICP research," "talk to customers," "analyze transcripts," "customer interviews," "survey analysis," "support ticket analysis," "voice of customer," "VOC," "build personas,"… |
+| `/directory-submissions` | When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. |
+| `/emails` | When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. |
+| `/events` | When the user wants to plan, run, sponsor, speak at, or get pipeline from events — webinars, conferences, trade shows, meetups, dinners, workshops, virtual summits, or user conferences. |
+| `/free-tools` | When the user wants to plan, evaluate, or build a free tool for marketing purposes — lead generation, SEO value, or brand awareness. |
+| `/image` | When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. |
+| `/influencer-marketing` | When the user wants to run influencer, creator, or ambassador partnerships to promote their product — finding and vetting partners, structuring deals, briefing creators, disclosure compliance, and measuring ROI. |
+| `/launch` | When the user wants to plan a product launch, feature announcement, or release strategy. Also use when the user mentions 'launch,' 'Product Hunt,' 'feature release,' 'announcement,' 'go-to-market,' 'beta launch,' 'early access,' 'waitlist,' 'product update,' 'how do I launch this,' 'site launch,'… |
+| `/lead-magnets` | When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. |
+| `/link-building` | When the user wants to earn backlinks or third-party mentions that lift rankings and AI citations. |
+| `/marketing-council` | When the user wants multiple expert perspectives on a marketing question — a simulated board of advisors staffed by legendary marketers (Seth Godin, David Ogilvy, Eugene Schwartz, April Dunford, Rory Sutherland, Alex Hormozi, Byron Sharp, and more). |
+| `/marketing-loops` | When the user wants to set up a recurring, self-running marketing workflow — a repeatable loop an AI agent runs on a cadence (weekly, daily, on a trigger) rather than a one-off task. |
+| `/marketing-plan` | When the user needs a comprehensive marketing plan for a client, a company they advise, or their own product. |
+| `/offers` | When the user wants to design, construct, or improve an offer — the thing they actually sell — including value framing, bonus stacking, guarantee design, scarcity/urgency, naming, and payment structure. |
+| `/onboarding` | When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. |
+| `/paywalls` | When the user wants to create or optimize in-app paywalls, upgrade screens, upsell modals, or feature gates. |
+| `/popups` | When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. |
+| `/product-marketing` | When the user wants to create or update their product marketing context document. Also use when the user mentions 'product context,' 'marketing context,' 'set up context,' 'positioning,' 'who is my target audience,' 'describe my product,' 'ICP,' 'ideal customer profile,' 'brand voice,' 'tone of… |
+| `/prospecting` | When the user wants to find, qualify, and build a list of prospects to reach out to, across B2B SaaS, general B2B, or local small businesses. |
+| `/public-relations` | When the user wants help with public relations, earned media, press coverage, journalist outreach, or media strategy (not pull requests). |
+| `/referrals` | When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. |
+| `/reverse-engineer-marketing` | When the user wants to reverse engineer how another company grew and copy what worked. Also use when the user mentions 'reverse engineer,' 'how did X grow,' 'how does X get customers,' 'growth teardown,' 'marketing teardown,' 'GTM teardown,' 'what is X doing for marketing,' 'what made X take off,'… |
+| `/revops` | When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. |
+| `/sales-enablement` | When the user wants to create sales collateral, pitch decks, one-pagers, objection handling docs, or demo scripts. |
+| `/schema` | When the user wants to add, fix, or optimize schema markup and structured data on their site. |
+| `/signup` | When the user wants to optimize signup, registration, account creation, or trial activation flows. |
+| `/sms` | When the user wants to plan, build, or optimize SMS, MMS, or WhatsApp marketing — including welcome flows, abandoned cart texts, post-purchase, win-back, promotional sends, or transactional/auth SMS. |
+| `/social` | When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, or Facebook, or wants to do social listening and engagement triage. |
+| `/video` | When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. |
 
-## Browser & Python (ECC) (6)
+## Marketing (original pack) (26)
 
-| Skill | What it's for |
+Copywriting, SEO audits, content and social skills.
+
+| Skill | What it does |
 |---|---|
-| `/agent-browser` | Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating… |
-| `/api-design` | REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs. |
-| `/fastapi-patterns` | FastAPI best practices covering project structure, Pydantic v2 schemas, dependency injection, async handlers, authentication, authorization, transactional service layers, and testing with httpx and pytest. |
-| `/python-patterns` | Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications. |
-| `/python-testing` | Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements. |
-| `/verification-loop` | Run a six-phase verification of a Claude Code session's work — build, type check, lint, tests with coverage, security grep, and diff review — then produce a PASS/FAIL verification report. |
+| `/ad-creative` | Use for any ad copy request (RSA headlines, Meta, LinkedIn or TikTok ads, bulk variations), before writing. |
+| `/ai-decision-authority` | Use before letting AI or an agent act on a marketing or GTM task without human review, or when writing an AI review policy. |
+| `/brand-guidelines` | Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. |
+| `/business-name-fit` | Use when naming a company, brand or product, or checking whether a name works abroad, before committing to one. |
+| `/campaign-analytics` | Analyze campaign performance on the user's numbers: ROAS, CPA, ROI, multi-touch attribution and funnel drop-off. |
+| `/churn-prevention` | Use when designing a cancel flow, save offers, exit surveys or dunning emails, or cutting failed-payment churn. |
+| `/cold-email` | Use for any cold outreach or SDR email or follow-up sequence to prospects who did not opt in, before drafting. |
+| `/content-production` | Write a blog post, article or guide end to end: research, outline, draft, SEO pass and quality gates. |
+| `/content-strategy` | Use when deciding what content to create (topics, clusters, a blog or content plan), before listing ideas. |
+| `/copy-editing` | Edit, proofread and tighten existing marketing copy in focused passes: clarity, voice, proofreading, specificity, readability and AI tells. |
+| `/copywriting` | Use for any headline, tagline, CTA, landing, pricing or about-page copy request, before drafting. |
+| `/local-seo-manager` | Use for any local business's Google Business Profile, Maps ranking, service-area pages, citations or review replies, before writing. |
+| `/marketing-demand-acquisition` | Use when planning demand generation, paid acquisition across Google, LinkedIn and Meta, or a marketing budget, before allocating spend. |
+| `/marketing-ideas` | Use when asked for marketing or growth ideas for a SaaS or software product. Picks from 139 tactics by stage, budget and channel instead of a generic list. |
+| `/marketing-ops` | Use when a marketing request spans several skills (a campaign across content, SEO, CRO and channels) or it is unclear which skill fits. |
+| `/marketing-psychology` | Apply persuasion and behavioral science ethically to a page, offer or campaign, from 70+ mental models. |
+| `/marketing-strategy-pmm` | Use for product positioning, ICP, competitive battlecards or a go-to-market plan, before drafting. |
+| `/pricing-strategy` | Use for SaaS pricing tiers, value metric, packaging, a pricing page or a price increase, before proposing numbers. |
+| `/programmatic-seo` | Use when building many SEO pages from a template and data (location, integration, comparison or directory pages), before generating them. |
+| `/prompt-engineer-toolkit` | Use when a marketing team's AI prompts need testing, versioning or governance, before shipping a prompt. |
+| `/seo-audit` | Find why a site is not ranking: technical SEO, on-page issues, meta tags, site health. Use whenever the user asks why a page is not on Google, why traffic dropped or for an SEO audit. |
+| `/site-architecture` | Use for URL structure, navigation, internal linking, hub pages or orphan pages, or when SEO problems are structural. |
+| `/social-media-analyzer` | Score social performance: engagement rate, reach, ROI per platform, benchmarks. Load whenever the user asks which platform performs best, if posts are working, or shares social metrics to compare. |
+| `/social-media-manager` | Plan social media: strategy, content calendar, community management, follower growth. Use whenever the user asks what to post and when, or how to grow followers. |
+| `/x-twitter-growth` | Use for growing on X/Twitter: tweets, threads, profile audit, competitors or posting plan. |
+| `/youtube-full` | Use for any YouTube URL, video ID or @handle, or a request for transcripts, video search, channel, playlist or new-upload monitoring. |
+## UI/UX Pro Max (design) (7)
 
-## Claude-skills: Advanced engineering (49)
+Design intelligence for websites and apps: styles, palettes, fonts, components, branding.
 
-| Skill | What it's for |
+| Skill | What it does |
 |---|---|
-| `/agent-designer` | Design multi-agent systems (supervisor, swarm, pipeline) and tool schemas; find bottlenecks in run logs. |
-| `/agent-regression-evals` | Use before shipping any agent, prompt, model or tool change, or when a pass-rate drop needs a verdict. |
-| `/agent-run-forensics` | Use when asked why an agent did something, what a past session or run changed, whether tests really passed, or to verify a session summary. |
-| `/agent-workflow-designer` | Use when architecting a multi-step LLM or agent pipeline, choosing single vs multi-agent, or fixing context bloat and broken handoffs. |
-| `/api-design-reviewer` | Use for any PR or spec that adds or changes REST endpoints, before approving it. |
-| `/api-test-suite-builder` | Use when asked to write API, integration or contract tests for REST endpoints. |
-| `/boost-asio-pro` | Use for any C++ networking code with Boost.Asio or standalone Asio (TCP/UDP, SSL, timers, strands, io_context, co_spawn, awaitable, completion handlers), before writing or reviewing it. |
-| `/browser-automation` | Automate a browser: scrape websites, fill forms, pull structured data from web pages. |
-| `/changelog-generator` | Write release notes and CHANGELOG.md from commits and pick the next semver version. |
-| `/chaos-engineering` | Use before running a chaos experiment, gameday or fault injection, or after one to write it up. |
-| `/ci-cd-pipeline-builder` | Generate a CI/CD workflow for a repo from its detected stack: lint, test, build, deploy. |
-| `/codebase-onboarding` | Explain an unfamiliar repo: architecture brief and onboarding docs. |
-| `/coding-agent-rollout` | Roll out Claude Code to a team: shared or managed settings, MCP and plugin approval, layered CLAUDE.md, adoption. |
-| `/commit-craft` | Turn a mix of changes into clean, reviewable commits with good messages, blocking staged secrets and .env files. |
-| `/database-designer` | Design a database schema: tables, relationships, indexes, normalization, SQL vs NoSQL, migration plans. |
-| `/database-schema-designer` | Use when asked for an ERD, table relationships, normalization or a schema migration plan. |
-| `/dependency-auditor` | Audit project dependencies for CVEs and licenses and plan safe upgrades. |
-| `/engineering-advanced-skills` | Pick the right advanced engineering skill: agents, RAG, MCP, CI/CD, databases, observability, release. |
-| `/env-secrets-manager` | Use when auditing .env files, planning credential rotation, chasing a missing env var in production or hardening a repo against leaked secrets. |
-| `/feature-flags-architect` | Use before adding, rolling out or retiring a feature flag or kill switch, or when flag debt piles up. |
-| `/focused-fix` | Use when a whole feature or module is broken and needs fixing end to end ('make X work', 'the Y module is broken'). |
-| `/full-page-screenshot` | Use when asked for a full-page or long screenshot of a web page. |
-| `/git-worktree-manager` | Use when running several branches or agents in parallel on one repo. |
-| `/grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
-| `/i18n-localization` | Use when adding UI text, adding or shipping a language, reviewing translation files, or building i18n into an app. |
-| `/interview-system-designer` | Use when designing a hiring loop, competency matrix, scoring rubric or question bank, or checking interviewer calibration. |
-| `/karpathy-coder` | Check a diff for overbuilt code: hidden assumptions, needless abstraction, non-surgical changes, unverified goals (Karpathy's four principles). |
-| `/kubernetes-operator` | Use when building a Kubernetes operator or CRD (controller-runtime, kubebuilder, operator-sdk, KOPF), before writing the controller. |
-| `/mcp-oauth-triage` | Use when an MCP connector that used to authenticate now fails (tool calls 401 after a good token exchange, breaks after refresh, returns another account's data), before changing code. |
-| `/mcp-server-builder` | Use when exposing an API as an MCP server or scaffolding a new MCP server in Python or TypeScript, before hand-writing tool wrappers. |
-| `/migration-architect` | Plan a migration with zero or minimal downtime: phased plan, compatibility check, rollback scripts, for schemas, databases and services. |
-| `/minimalist` | Write the least code: no over-engineering, fewer dependencies. |
-| `/monorepo-navigator` | Use for Turborepo, Nx, pnpm-workspace or Lerna setup, affected-only builds, remote caching or a multi-repo to monorepo move. |
-| `/observability-designer` | Use when adding metrics, logs and traces to a service, fixing noisy alerts or designing dashboards. |
-| `/performance-profiler` | Use for a slow endpoint, memory leak, CPU spike, large bundle or performance budget in Node.js, Python or Go, before optimizing. |
-| `/pr-review-expert` | File-by-file pull request review for bugs, security and quality, with a merge verdict. |
-| `/rag-architect` | Design a RAG pipeline: chunk size, embedding model, vector database and retrieval quality metrics. |
-| `/runbook-generator` | Use when a service needs runbooks for deploy, incident response, maintenance or rollback, before launch. |
-| `/secrets-vault-manager` | Use when setting up HashiCorp Vault, AWS Secrets Manager, Azure Key Vault or GCP Secret Manager, rotating secrets or auditing secret access. |
-| `/self-eval` | Grade finished work honestly on two axes with a devil's-advocate pass against inflation. |
-| `/ship-gate` | Use before deploying or going live ('am I ready to ship', 'can I deploy', 'preflight check'). |
-| `/skill-security-auditor` | Use before installing any skill or plugin from an untrusted source, or when asked if a skill is safe. |
-| `/skill-tester` | Use when authoring or auditing a skill in this ecosystem, before release. |
-| `/slo-architect` | Use when defining or reviewing SLOs, SLIs, error budgets or burn-rate alerts. |
-| `/spec-driven-workflow` | Use when a feature should be specified before coding (acceptance criteria, spec-first, tests from specs). |
-| `/sql-database-assistant` | Write, fix and speed up SQL: slow queries, EXPLAIN plans, indexes, ORM migrations (Prisma, Drizzle, SQLAlchemy). |
-| `/strict-api` | Use when the user says 'no hallucinations', 'verify APIs' or 'don't invent functions', or code depends on a library version you have not checked. |
-| `/tc-tracker` | Use when tracking technical changes as records, or handing work between AI sessions with a change record. |
-| `/tech-debt-tracker` | Find, rank and track tech debt in a codebase. |
+| `/banner-design` | Design banners for social media, ads, website heroes, creative assets, and print. Multiple art direction options with optional generated or supplied visuals. |
+| `/brand` | Brand voice, visual identity, messaging frameworks, asset management, brand consistency. Activate for branded content, tone of voice, marketing assets, brand compliance, style guides. |
+| `/design` | Comprehensive design skill: brand identity, design tokens, UI styling, logo generation (55 styles, Gemini, Atlas Cloud, or MuAPI AI), corporate identity program (50 deliverables, CIP mockups), HTML presentations (Chart.js), banner design (22 styles, social/ads/web/print), icon design (15 styles… |
+| `/design-system` | Token architecture, component specifications, and slide generation. Three-layer tokens (primitive→semantic→component), CSS variables, spacing/typography scales, component specs, strategic slide creation. |
+| `/slides` | Create strategic HTML presentations with Chart.js, design tokens, responsive layouts, copywriting formulas, and contextual slide strategies. |
+| `/ui-styling` | Create beautiful, accessible user interfaces with shadcn/ui components (built on Radix UI + Tailwind), Tailwind CSS utility-first styling, and canvas-based visual designs. |
+| `/ui-ux-pro-max` | UI/UX design intelligence for web, mobile, and desktop. This skill should be used when designing, building, reviewing, or fixing interfaces, including pages, components, design systems, accessibility, interaction, responsive layout, typography, color, charts, and stack-specific UI implementation. |
 
-## Claude-skills: Business growth (5)
+## Product (14)
 
-| Skill | What it's for |
+PRDs, UX research, roadmaps, landing pages.
+
+| Skill | What it does |
+|---|---|
+| `/competitive-teardown` | Deep competitor teardown: pricing, reviews, hiring, SEO, UX, scored across 12 dimensions with SWOT and positioning maps. |
+| `/design-qa` | Use when a UI screen, page or component is about to be called done, handed off or shipped, or when generated UI looks generic or half-finished. |
+| `/experiment-designer` | Plan A/B tests and product experiments: hypotheses, sample size, priority, reading results. |
+| `/landing-page-generator` | Use when asked for a landing, marketing or campaign page as a Next.js TSX component with Tailwind. |
+| `/product-analytics` | Use when defining product KPIs, building metric dashboards, running cohort or retention analysis, or interpreting feature adoption trends across product stages. |
+| `/product-discovery` | Validate product ideas: map assumptions, plan discovery sprints, test problem-solution fit. |
+| `/product-manager-toolkit` | PM toolkit: RICE prioritization, customer interview synthesis, PRDs and go-to-market. Use whenever the user asks what to build next, to rank features, write a PRD or sum up interview notes. |
+| `/product-skills` | Use when a product request needs routing across the product-team skills (prioritization, OKRs, UX research, experiments, discovery, roadmaps), or to run the continuous discovery loop. |
+| `/product-strategist` | Head of Product: quarterly OKRs cascaded from company to team, product vision, roadmap, team structure. |
+| `/roadmap-communicator` | Write roadmap narratives, release notes, changelogs, stakeholder updates. Use whenever the user explains plans to execs, engineers or customers. |
+| `/saas-scaffolder` | Use when starting a new SaaS app with auth, database, Stripe billing and a dashboard (Next.js App Router, TypeScript, Tailwind, shadcn/ui, Drizzle). |
+| `/spec-to-repo` | Use when the user says 'build me an app', 'create a project from this spec', 'scaffold a new repo', 'generate a starter', 'turn this idea into code', 'bootstrap a project', 'I have requirements and need a codebase', or provides a natural-language project specification and expects a complete… |
+| `/ui-design-system` | Use when building a design system: tokens, component docs, responsive scales or developer handoff. |
+| `/ux-researcher-designer` | UX research: personas, journey maps, usability test plans, synthesis. Use whenever the user asks who their users are or why they struggle. |
+
+## Business growth (5)
+
+Customer success, sales engineering, proposals and contracts.
+
+| Skill | What it does |
 |---|---|
 | `/business-growth-skills` | Use when a growth request needs routing between customer-success-manager, sales-engineer, revenue-operations and contract-and-proposal-writer. |
 | `/contract-and-proposal-writer` | Use when drafting a freelance contract, proposal, SOW, NDA or MSA for US, EU, UK or DACH jurisdictions. |
-| `/customer-success-manager` | Use when reviewing customer accounts for health, churn risk or expansion. |
+| `/customer-success-manager` | Use when reviewing customer accounts for health, churn risk or expansion. Scores health with health_score_calculator.py, churn with churn_risk_analyzer.py and upsell with expansion_opportunity_scorer.py. |
 | `/revenue-operations` | Check sales pipeline and forecasts: pipeline coverage, forecast accuracy, magic number, CAC payback. |
 | `/sales-engineer` | Use for pre-sales work: RFP coverage gaps, competitive feature matrices or planning and scoring a proof of concept. |
 
-## Claude-skills: C-suite advisors (34)
+## Finance (6)
 
-| Skill | What it's for |
+Valuation, SaaS metrics, month-end close.
+
+| Skill | What it does |
 |---|---|
-| `/founder-coach` | Use when a founder is the bottleneck, can't delegate, is burning out or is moving from IC to CEO. |
-| `/agent-protocol` | Use when C-suite advisor agents need to call each other or run a multi-role meeting. |
+| `/finance-skills` | Pick the right finance skill: ratios, DCF, forecasts (financial-analyst), ARR, churn, CAC, LTV (saas-metrics-coach), month-end-close. |
+| `/financial-analyst` | Analyze financial statements, value a company with a DCF, explain budget variance, build rolling forecasts. |
+| `/month-end-close` | Use when running, planning or speeding up a month-end (or quarter-end) close — building or reviewing the close checklist and calendar, reconciling a bank statement or sub-ledger to the general ledger, writing or reviewing flux (variance) explanations, or finding why the close takes too many days. |
+| `/passive-deal-screener` | Use when a passive investor shares a private deal (syndication, preferred equity, bridge fund, private credit) to screen as an LP. |
+| `/saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
+| `/stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
+
+## C-suite advisors (34)
+
+Executive-level advice: CEO, CFO, CMO, CTO, legal and board meetings.
+
+| Skill | What it does |
+|---|---|
+| `/agent-protocol` | Use when C-suite advisor agents need to call each other or run a multi-role meeting. Defines invocation syntax, loop prevention, isolation and response formats. |
 | `/arquiteto-de-empresa` | Use when a founder wants to document or design a whole company as version-controlled markdown (company as code, a company wiki agents can read, an OKF bundle). |
-| `/board-deck-builder` | Use when building a board deck, investor update or QBR from all C-suite perspectives. |
+| `/board-deck-builder` | Use when building a board deck, investor update or QBR from all C-suite perspectives. Structures the narrative and how to deliver bad news. |
 | `/board-meeting` | Use for /c-level-agents:boardroom or a strategic question that needs a structured multi-executive deliberation. |
 | `/c-level-skills` | Find which C-level advisor fits a question: 14 C-suite roles, board meetings, culture, M&A. |
 | `/ceo-advisor` | Advice for a CEO or founder on running the company: board and investor trouble, raise or cut, strategy bets, org and culture. |
 | `/cfo-advisor` | Startup finance: runway and burn, unit economics (LTV, CAC, payback), fundraising and dilution. |
-| `/change-management` | Use when rolling out a reorg, pivot, tool switch, leadership change or product kill. |
+| `/change-management` | Use when rolling out a reorg, pivot, tool switch, leadership change or product kill. Plans it with ADKAR, communication templates and resistance patterns. |
 | `/chief-ai-officer-advisor` | Use for AI strategy decisions: API vs fine-tune vs build, EU AI Act or US state risk classification, when self-hosting pays off, or AI hiring order. |
 | `/chief-customer-officer-advisor` | Use for retention strategy, customer segmentation or CS team sizing decisions (GRR vs NRR, churn causes, pooled vs named CSMs). |
 | `/chief-data-officer-advisor` | Use for data strategy decisions: training models on customer data, warehouse vs lakehouse vs mesh, valuing data for a raise or M&A, or data hiring order. |
 | `/chief-of-staff` | Use when a founder question needs routing to the right C-suite advisor, or a cross-functional decision needs a board meeting convened. |
-| `/chro-advisor` | People strategy: hiring plans, comp bands, org structure, performance, retention. |
+| `/chro-advisor` | People strategy: hiring plans, comp bands, org structure, performance, retention. Use whenever the user asks who to hire, what to pay, how to structure teams or why staff leave. |
 | `/ciso-advisor` | Use for security leadership decisions: a security program, budget justification in dollars, SOC 2 vs ISO 27001 vs HIPAA roadmap, or board security reporting. |
 | `/cmo-advisor` | Marketing leadership: positioning, product-led vs sales-led vs community-led growth, budget split across channels, marketing team design. |
 | `/company-os` | Use when choosing or setting up how the company runs: EOS, Scaling Up or OKRs, accountability chart, scorecard, meeting rhythm, quarterly rocks. |
@@ -162,18 +234,78 @@
 | `/cto-advisor` | CTO decisions: tech debt, architecture direction, scaling the engineering team, technology evaluation, DORA metrics. |
 | `/culture-architect` | Use when defining company values, turning them into behaviors, assessing culture health or designing rituals. |
 | `/decision-logger` | Use when logging a decision after a board meeting, reviewing past decisions or checking overdue actions. |
+| `/founder-coach` | Use when a founder is the bottleneck, can't delegate, is burning out or is moving from IC to CEO. |
 | `/general-counsel-advisor` | Legal review of contracts and term sheets (MSA, SaaS, NDA, DPA, employment), IP strategy and regulatory exposure (HIPAA, GDPR, FDA, fintech). |
 | `/internal-narrative` | Use when preparing an all-hands, investor update, recruiting pitch or crisis message, or when stories told to different audiences drift apart. |
 | `/intl-expansion` | Use when expanding to a new country: market selection, entry mode, localization, regulation and regional go-to-market. |
-| `/ma-playbook` | Buy a company or sell yours: diligence, valuation, terms, integration. |
+| `/ma-playbook` | Buy a company or sell yours: diligence, valuation, terms, integration. Use whenever M&A or an exit comes up. |
 | `/org-health-diagnostic` | Use for a whole-company health check before a board review or when functions seem at risk. |
 | `/scenario-war-room` | Use for compound what-if questions ('what if X and Y both happen?') with major downside across functions. |
 | `/strategic-alignment` | Use when teams pull in different directions, OKRs don't connect or departments optimize locally. |
 | `/vpe-advisor` | Use when delivery is slowing, eng hiring is broken, team structure is unclear or you need to decide when to add an eng manager. |
 
-## Claude-skills: Engineering (35)
+## Replica pack (11)
 
-| Skill | What it's for |
+Reverse-engineer an app and build your own better version.
+
+| Skill | What it does |
+|---|---|
+| `/replica-architect` | Plans the stack, database schema and API for an app clone, from the recon map replica-recon wrote. |
+| `/replica-backend` | Builds the backend of an app clone: auth, database migrations and access rules, payments with Stripe, email, background jobs and third-party integrations through official APIs only, plus a security checklist. |
+| `/replica-brand` | Names and rebrands an app clone so it is the user's own: name candidates with the trademark, domain, store and handle checks to run, a new palette checked for contrast, a logo brief, a voice guide, and a sweep tool that finds anything of the original left in the codebase. |
+| `/replica-build` | Rebuilds an app screen by screen from the recon map: app shell first, then the core flow as a vertical slice, then every screen with all its states, ticking off the feature matrix as it goes. |
+| `/replica-deploy` | Ships an app clone live on the user's own domain: a preflight gate (tests green, parity must-haves done, rebrand sweep clean, listing linted, legal pages up), production database and env vars, the host, DNS records for the domain and for email, Stripe live mode, OAuth redirects, monitoring, and… |
+| `/replica-design` | Rebuilds an app's design system for a clone: colour roles, type scale, spacing, radius, shadows and every component with its states, as design tokens plus component specs, with original assets instead of the target's logos, icons, illustrations or licensed fonts. |
+| `/replica-diff` | Compares an app clone against the original: a feature parity score from the feature matrix (weighted by must, should, could) with the missing list in build order, plus a screenshot layout diff that ignores colour so a rebrand does not count against you. |
+| `/replica-entrepreneur` | Researches the app being cloned and reads what its real users say in public reviews (App Store, Google Play, G2, Capterra, Trustpilot, Reddit, Hacker News, its own feature-request board), then ranks what they hate, what is missing and what is unsolved, turns it into a fix plan for the clone and a… |
+| `/replica-launch` | Writes the launch for an app clone: the landing page built on the positioning angle, pricing set against the original's public pricing and its users' complaints, and the App Store and Google Play listing linted against the stores' limits and copycat rules. |
+| `/replica-recon` | Reverse-engineers any app into a recon map: screen inventory, user flows, component list, inferred data model and a feature matrix, from public pages, screenshots, app store listings, help docs and the user's own account. |
+| `/replica-test` | Clicks through every flow of an app clone and tests it for bugs: a test plan generated from the recon flows with happy paths and edge cases, Playwright end-to-end tests where possible, a browser click-through where not, and bug reports in a fixed format with severity, steps and evidence. |
+
+## Research (1)
+
+What people said online in the last 30 days.
+
+| Skill | What it does |
+|---|---|
+| `/last30days` | Research what people actually say about any topic in the last 30 days. Pulls posts and engagement from Reddit, X, YouTube, TikTok, Hacker News, Polymarket, GitHub, and the web. |
+
+## Writing & output style (2)
+
+Make text sound human, or make Claude's replies ADHD-friendly.
+
+| Skill | What it does |
+|---|---|
+| `/humanizer` | Rewrite AI-sounding text so it reads like the writer without changing what it says. Use when editing or reviewing prose for AI tells: not-X-but-Y contrasts, one-line closers, staged openers, forced triads, dashes everywhere, inflated claims, sales language, stock AI words, bold labels, or filler. |
+| `/i-have-adhd` | Shape output for a reader with ADHD: lead with the next action, number multi-step work, restate state across turns, suppress tangents, give specific time estimates, make wins visible. |
+
+## Superpowers (coding workflow) (15)
+
+Careful coding habits: plan, test first, debug, verify.
+
+| Skill | What it does |
+|---|---|
+| `/brainstorming` | You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation). |
+| `/diagnosing-superpowers` | Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, "it took too long", "why is it so expensive", "what is it doing" — or wants to build a bug report for the superpowers maintainers, for… |
+| `/dispatching-parallel-agents` | Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies |
+| `/executing-plans` | Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available |
+| `/finishing-a-development-branch` | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work |
+| `/receiving-code-review` | Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation |
+| `/requesting-code-review` | Use when completing tasks, implementing major features, or before merging to verify work meets requirements |
+| `/subagent-driven-development` | Use when executing implementation plans with independent tasks in the current session |
+| `/systematic-debugging` | Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes |
+| `/test-driven-development` | Use when implementing any feature or bugfix, before writing implementation code |
+| `/using-git-worktrees` | Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback |
+| `/using-superpowers` | Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions |
+| `/verification-before-completion` | Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always |
+| `/writing-plans` | Use when you have a spec or requirements for a multi-step task, before touching code |
+| `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
+
+## Engineering (35)
+
+Senior engineer roles: frontend, backend, security, cloud, QA.
+
+| Skill | What it does |
 |---|---|
 | `/adversarial-reviewer` | Tough, critical review of a diff or PR before merge, through hostile reviewer personas that catch shared blind spots. |
 | `/ai-security` | Use when assessing an AI/ML system or LLM agent for prompt injection, jailbreaks, model inversion, data poisoning or tool abuse. |
@@ -190,13 +322,13 @@
 | `/incident-response` | Handle a suspected security breach: triage, SEV1-SEV4 severity, escalation and forensic evidence, per NIST SP 800-61. |
 | `/ms365-tenant-manager` | Use for Microsoft 365 tenant administration (Entra ID users, Exchange Online, Teams, licenses, Conditional Access, compliance reports). |
 | `/named-persona-adversarial-review` | Use when a PR has architectural or UX impact, or automated review feels generic, and you want it reviewed through named engineers' documented views (Torvalds, Thompson, Carmack, Beck, Jobs, Cagan). |
-| `/red-green-proof` | Turns a suspected bug into a proven one. |
-| `/red-team` | Use when planning or running an authorized red team engagement or attack path analysis. |
+| `/red-green-proof` | Turns a suspected bug into a proven one. Verify the cause against reality before claiming it, write a test that FAILS on the current code, apply the fix, watch it pass — then revert the fix and confirm the test goes red again, because a test that passes both ways proves nothing. |
+| `/red-team` | Use when planning or running an authorized red team engagement or attack path analysis. Plans the kill chain with engagement_planner.py: MITRE ATT&CK techniques, choke points, OPSEC risk and crown jewels. |
 | `/security-pen-testing` | Authorized penetration testing of an app or API: vulnerability scans, OWASP Top 10 checks, dependency audits and a pentest report. |
 | `/senior-architect` | System architecture decisions with a written rationale: monolith vs microservices, database choice, scaling limits, ADRs, Mermaid diagrams. |
 | `/senior-backend` | Build and fix backend services: REST or GraphQL APIs, auth, microservices, PostgreSQL queries, migrations and load tests. |
 | `/senior-computer-vision` | Computer vision models: object detection, segmentation, training a custom model, and optimizing or deploying inference (YOLO, DETR, SAM, ONNX, TensorRT). |
-| `/senior-data-engineer` | Data pipelines: Airflow DAGs, Spark, dbt, Kafka, ETL/ELT, data quality checks. |
+| `/senior-data-engineer` | Data pipelines: Airflow DAGs, Spark, dbt, Kafka, ETL/ELT, data quality checks. Load whenever a DAG or batch job times out or fails, data arrives wrong, or the user designs an ingestion pipeline. |
 | `/senior-data-scientist` | Design experiments and analyze tabular data: A/B tests, causal inference, feature engineering, model evaluation. |
 | `/senior-devops` | Set up CI/CD pipelines, infrastructure as code, containers and deployments on AWS, GCP or Azure. |
 | `/senior-frontend` | Build and review React, Next.js, TypeScript or Tailwind frontends: components, scaffolding, performance and bundle size. |
@@ -209,57 +341,73 @@
 | `/stripe-integration-expert` | Use for any Stripe integration: subscriptions, trials, proration, checkout, usage billing, webhooks, customer portal or invoicing in Next.js, Express or Django. |
 | `/tdd-guide` | Test-first development and test generation for Jest, Pytest, JUnit, Vitest or Mocha: red-green-refactor, fixtures and mocks, coverage gaps. |
 | `/tech-stack-evaluator` | Compare frameworks or tech stacks before committing: side-by-side scoring, total cost of ownership, ecosystem health and migration risk. |
-| `/threat-detection` | Use when hunting threats, sweeping IOCs or looking for anomalies in logs and telemetry. |
+| `/threat-detection` | Use when hunting threats, sweeping IOCs or looking for anomalies in logs and telemetry. Ranks ATT&CK-mapped signals and z-score anomalies with threat_signal_analyzer.py. |
 
-## Claude-skills: Finance (6)
+## Advanced engineering (49)
 
-| Skill | What it's for |
+Agents, databases, CI/CD, MCP servers, releases, reliability.
+
+| Skill | What it does |
 |---|---|
-| `/finance-skills` | Pick the right finance skill: ratios, DCF, forecasts (financial-analyst), ARR, churn, CAC, LTV (saas-metrics-coach), month-end-close. |
-| `/financial-analyst` | Analyze financial statements, value a company with a DCF, explain budget variance, build rolling forecasts. |
-| `/month-end-close` | Use when running, planning or speeding up a month-end (or quarter-end) close — building or reviewing the close checklist and calendar, reconciling a bank statement or sub-ledger to the general ledger, writing or… |
-| `/passive-deal-screener` | Use when a passive investor shares a private deal (syndication, preferred equity, bridge fund, private credit) to screen as an LP. |
-| `/saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
-| `/stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
+| `/agent-designer` | Design multi-agent systems (supervisor, swarm, pipeline) and tool schemas; find bottlenecks in run logs. |
+| `/agent-regression-evals` | Use before shipping any agent, prompt, model or tool change, or when a pass-rate drop needs a verdict. |
+| `/agent-run-forensics` | Use when asked why an agent did something, what a past session or run changed, whether tests really passed, or to verify a session summary. |
+| `/agent-workflow-designer` | Use when architecting a multi-step LLM or agent pipeline, choosing single vs multi-agent, or fixing context bloat and broken handoffs. |
+| `/api-design-reviewer` | Use for any PR or spec that adds or changes REST endpoints, before approving it. Lints conventions with api_linter.py, detects breaking changes with breaking_change_detector.py and scores the design with api_scorecard.py. |
+| `/api-test-suite-builder` | Use when asked to write API, integration or contract tests for REST endpoints. Builds the suite from the routes: happy paths, auth, validation errors and edge cases per endpoint. |
+| `/boost-asio-pro` | Use for any C++ networking code with Boost.Asio or standalone Asio (TCP/UDP, SSL, timers, strands, io_context, co_spawn, awaitable, completion handlers), before writing or reviewing it. |
+| `/browser-automation` | Automate a browser: scrape websites, fill forms, pull structured data from web pages. Use whenever the user wants to grab data from a site, fill a web form or extract a table. |
+| `/changelog-generator` | Write release notes and CHANGELOG.md from commits and pick the next semver version. Use whenever the user is cutting a release, asks what changed since the last one or what version comes next, or wants commits linted first. |
+| `/chaos-engineering` | Use before running a chaos experiment, gameday or fault injection, or after one to write it up. |
+| `/ci-cd-pipeline-builder` | Generate a CI/CD workflow for a repo from its detected stack: lint, test, build, deploy. Load whenever the user says the repo has no CI, wants tests run on push, or needs a pipeline YAML. |
+| `/codebase-onboarding` | Explain an unfamiliar repo: architecture brief and onboarding docs. Use whenever someone is new to a codebase, asks how a project is structured or where to start reading. |
+| `/coding-agent-rollout` | Roll out Claude Code to a team: shared or managed settings, MCP and plugin approval, layered CLAUDE.md, adoption. |
+| `/commit-craft` | Turn a mix of changes into clean, reviewable commits with good messages, blocking staged secrets and .env files. |
+| `/database-designer` | Design a database schema: tables, relationships, indexes, normalization, SQL vs NoSQL, migration plans. |
+| `/database-schema-designer` | Use when asked for an ERD, table relationships, normalization or a schema migration plan. Produces the ERD and normalized DDL with migration steps. |
+| `/dependency-auditor` | Audit project dependencies for CVEs and licenses and plan safe upgrades. Use whenever the user asks if their packages are safe, before a release or major version bump, while chasing a CVE, or for a license review. |
+| `/engineering-advanced-skills` | Pick the right advanced engineering skill: agents, RAG, MCP, CI/CD, databases, observability, release. |
+| `/env-secrets-manager` | Use when auditing .env files, planning credential rotation, chasing a missing env var in production or hardening a repo against leaked secrets. |
+| `/feature-flags-architect` | Use before adding, rolling out or retiring a feature flag or kill switch, or when flag debt piles up. |
+| `/focused-fix` | Use when a whole feature or module is broken and needs fixing end to end ('make X work', 'the Y module is broken'). |
+| `/full-page-screenshot` | Use when asked for a full-page or long screenshot of a web page. Captures SPA scroll containers, lazy images and very tall pages through Chrome DevTools Protocol with no extra dependencies. |
+| `/git-worktree-manager` | Use when running several branches or agents in parallel on one repo. Creates worktrees with isolated ports and env via worktree_manager.py and removes stale ones with worktree_cleanup.py. |
+| `/grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
+| `/i18n-localization` | Use when adding UI text, adding or shipping a language, reviewing translation files, or building i18n into an app. |
+| `/interview-system-designer` | Use when designing a hiring loop, competency matrix, scoring rubric or question bank, or checking interviewer calibration. |
+| `/karpathy-coder` | Check a diff for overbuilt code: hidden assumptions, needless abstraction, non-surgical changes, unverified goals (Karpathy's four principles). |
+| `/kubernetes-operator` | Use when building a Kubernetes operator or CRD (controller-runtime, kubebuilder, operator-sdk, KOPF), before writing the controller. |
+| `/mcp-oauth-triage` | Use when an MCP connector that used to authenticate now fails (tool calls 401 after a good token exchange, breaks after refresh, returns another account's data), before changing code. |
+| `/mcp-server-builder` | Use when exposing an API as an MCP server or scaffolding a new MCP server in Python or TypeScript, before hand-writing tool wrappers. |
+| `/migration-architect` | Plan a migration with zero or minimal downtime: phased plan, compatibility check, rollback scripts, for schemas, databases and services. |
+| `/minimalist` | Write the least code: no over-engineering, fewer dependencies. Use whenever the user wants it simpler; applies a ladder first: YAGNI, reuse, stdlib, native platform, existing deps. |
+| `/monorepo-navigator` | Use for Turborepo, Nx, pnpm-workspace or Lerna setup, affected-only builds, remote caching or a multi-repo to monorepo move. |
+| `/observability-designer` | Use when adding metrics, logs and traces to a service, fixing noisy alerts or designing dashboards. |
+| `/performance-profiler` | Use for a slow endpoint, memory leak, CPU spike, large bundle or performance budget in Node.js, Python or Go, before optimizing. |
+| `/pr-review-expert` | File-by-file pull request review for bugs, security and quality, with a merge verdict. Load whenever the user asks to review, look over or check a PR or diff before merging. |
+| `/rag-architect` | Design a RAG pipeline: chunk size, embedding model, vector database and retrieval quality metrics. |
+| `/runbook-generator` | Use when a service needs runbooks for deploy, incident response, maintenance or rollback, before launch. |
+| `/secrets-vault-manager` | Use when setting up HashiCorp Vault, AWS Secrets Manager, Azure Key Vault or GCP Secret Manager, rotating secrets or auditing secret access. |
+| `/self-eval` | Grade finished work honestly on two axes with a devil's-advocate pass against inflation. Use whenever the user asks how well a task went, to rate the work or for an honest self-review. |
+| `/ship-gate` | Use before deploying or going live ('am I ready to ship', 'can I deploy', 'preflight check'). |
+| `/skill-security-auditor` | Use before installing any skill or plugin from an untrusted source, or when asked if a skill is safe. |
+| `/skill-tester` | Use when authoring or auditing a skill in this ecosystem, before release. Validates structure with skill_validator.py, runs its scripts with script_tester.py and grades quality and security with quality_scorer.py and security_scorer.py. |
+| `/slo-architect` | Use when defining or reviewing SLOs, SLIs, error budgets or burn-rate alerts. Designs SLOs with slo_designer.py, computes budgets and multi-window burn-rate thresholds with error_budget_calculator.py and catches common SLO bugs with slo_review.py. |
+| `/spec-driven-workflow` | Use when a feature should be specified before coding (acceptance criteria, spec-first, tests from specs). |
+| `/sql-database-assistant` | Write, fix and speed up SQL: slow queries, EXPLAIN plans, indexes, ORM migrations (Prisma, Drizzle, SQLAlchemy). |
+| `/strict-api` | Use when the user says 'no hallucinations', 'verify APIs' or 'don't invent functions', or code depends on a library version you have not checked. |
+| `/tc-tracker` | Use when tracking technical changes as records, or handing work between AI sessions with a change record. |
+| `/tech-debt-tracker` | Find, rank and track tech debt in a codebase. Use whenever the user asks what to refactor first, plans a cleanup sprint, modernizes legacy code or wants to know how messy the code is. |
 
-## Claude-skills: Marketing (26)
+## Playwright testing (10)
 
-| Skill | What it's for |
-|---|---|
-| `/ad-creative` | Use for any ad copy request (RSA headlines, Meta, LinkedIn or TikTok ads, bulk variations), before writing. |
-| `/ai-decision-authority` | Use before letting AI or an agent act on a marketing or GTM task without human review, or when writing an AI review policy. |
-| `/brand-guidelines` | Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. |
-| `/business-name-fit` | Use when naming a company, brand or product, or checking whether a name works abroad, before committing to one. |
-| `/campaign-analytics` | Analyze campaign performance on the user's numbers: ROAS, CPA, ROI, multi-touch attribution and funnel drop-off. |
-| `/churn-prevention` | Use when designing a cancel flow, save offers, exit surveys or dunning emails, or cutting failed-payment churn. |
-| `/cold-email` | Use for any cold outreach or SDR email or follow-up sequence to prospects who did not opt in, before drafting. |
-| `/content-production` | Write a blog post, article or guide end to end: research, outline, draft, SEO pass and quality gates. |
-| `/content-strategy` | Use when deciding what content to create (topics, clusters, a blog or content plan), before listing ideas. |
-| `/copy-editing` | Edit, proofread and tighten existing marketing copy in focused passes: clarity, voice, proofreading, specificity, readability and AI tells. |
-| `/copywriting` | Use for any headline, tagline, CTA, landing, pricing or about-page copy request, before drafting. |
-| `/local-seo-manager` | Use for any local business's Google Business Profile, Maps ranking, service-area pages, citations or review replies, before writing. |
-| `/marketing-demand-acquisition` | Use when planning demand generation, paid acquisition across Google, LinkedIn and Meta, or a marketing budget, before allocating spend. |
-| `/marketing-ideas` | Use when asked for marketing or growth ideas for a SaaS or software product. |
-| `/marketing-ops` | Use when a marketing request spans several skills (a campaign across content, SEO, CRO and channels) or it is unclear which skill fits. |
-| `/marketing-psychology` | Apply persuasion and behavioral science ethically to a page, offer or campaign, from 70+ mental models. |
-| `/marketing-strategy-pmm` | Use for product positioning, ICP, competitive battlecards or a go-to-market plan, before drafting. |
-| `/pricing-strategy` | Use for SaaS pricing tiers, value metric, packaging, a pricing page or a price increase, before proposing numbers. |
-| `/programmatic-seo` | Use when building many SEO pages from a template and data (location, integration, comparison or directory pages), before generating them. |
-| `/prompt-engineer-toolkit` | Use when a marketing team's AI prompts need testing, versioning or governance, before shipping a prompt. |
-| `/seo-audit` | Find why a site is not ranking: technical SEO, on-page issues, meta tags, site health. |
-| `/site-architecture` | Use for URL structure, navigation, internal linking, hub pages or orphan pages, or when SEO problems are structural. |
-| `/social-media-analyzer` | Score social performance: engagement rate, reach, ROI per platform, benchmarks. |
-| `/social-media-manager` | Plan social media: strategy, content calendar, community management, follower growth. |
-| `/x-twitter-growth` | Use for growing on X/Twitter: tweets, threads, profile audit, competitors or posting plan. |
-| `/youtube-full` | Use for any YouTube URL, video ID or @handle, or a request for transcripts, video search, channel, playlist or new-upload monitoring. |
+Write, fix and run website tests.
 
-## Claude-skills: Playwright testing (pw) (10)
-
-| Skill | What it's for |
+| Skill | What it does |
 |---|---|
 | `/browserstack` | Use when running Playwright tests on BrowserStack or across a browser matrix ('browserstack', 'cross-browser', 'test on safari or firefox', 'browser compatibility'). |
-| `/coverage` | Find what is not tested: map untested pages and flows and coverage gaps. |
-| `/fix` | Diagnose and fix a failing or flaky Playwright test. |
+| `/coverage` | Find what is not tested: map untested pages and flows and coverage gaps. Use whenever the user asks what needs tests, about missing tests or test coverage. |
+| `/fix` | Diagnose and fix a failing or flaky Playwright test. Use whenever a test fails, passes only sometimes, breaks intermittently or needs fixing. |
 | `/generate` | Use when asked to write Playwright or e2e tests for a page, component or feature ('write tests', 'add tests for', 'e2e test'). |
 | `/migrate` | Use when moving tests from Cypress or Selenium to Playwright ('migrate tests', 'convert tests', 'replace selenium'). |
 | `/pw` | Use for any Playwright or end-to-end browser testing work: writing tests, fixing flaky ones, migrating from Cypress or Selenium, CI setup, TestRail or BrowserStack. |
@@ -268,117 +416,28 @@
 | `/report` | Summarize Playwright results. Use whenever the user asks how tests went, for a test report or status. |
 | `/testrail` | Use when syncing Playwright tests with TestRail ('testrail', 'sync test cases', 'push results to testrail', 'import from testrail'). |
 
-## Claude-skills: Product (14)
+## Browser & Python (6)
 
-| Skill | What it's for |
+Website automation, FastAPI and Python best practices.
+
+| Skill | What it does |
 |---|---|
-| `/competitive-teardown` | Deep competitor teardown: pricing, reviews, hiring, SEO, UX, scored across 12 dimensions with SWOT and positioning maps. |
-| `/design-qa` | Use when a UI screen, page or component is about to be called done, handed off or shipped, or when generated UI looks generic or half-finished. |
-| `/experiment-designer` | Plan A/B tests and product experiments: hypotheses, sample size, priority, reading results. |
-| `/landing-page-generator` | Use when asked for a landing, marketing or campaign page as a Next.js TSX component with Tailwind. |
-| `/product-analytics` | Use when defining product KPIs, building metric dashboards, running cohort or retention analysis, or interpreting feature adoption trends across product stages. |
-| `/product-discovery` | Validate product ideas: map assumptions, plan discovery sprints, test problem-solution fit. |
-| `/product-manager-toolkit` | PM toolkit: RICE prioritization, customer interview synthesis, PRDs and go-to-market. |
-| `/product-skills` | Use when a product request needs routing across the product-team skills (prioritization, OKRs, UX research, experiments, discovery, roadmaps), or to run the continuous discovery loop. |
-| `/product-strategist` | Head of Product: quarterly OKRs cascaded from company to team, product vision, roadmap, team structure. |
-| `/roadmap-communicator` | Write roadmap narratives, release notes, changelogs, stakeholder updates. |
-| `/saas-scaffolder` | Use when starting a new SaaS app with auth, database, Stripe billing and a dashboard (Next.js App Router, TypeScript, Tailwind, shadcn/ui, Drizzle). |
-| `/spec-to-repo` | Use when the user says 'build me an app', 'create a project from this spec', 'scaffold a new repo', 'generate a starter', 'turn this idea into code', 'bootstrap a project', 'I have requirements and need a codebase', or… |
-| `/ui-design-system` | Use when building a design system: tokens, component docs, responsive scales or developer handoff. |
-| `/ux-researcher-designer` | UX research: personas, journey maps, usability test plans, synthesis. |
+| `/agent-browser` | Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. |
+| `/api-design` | REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs. |
+| `/fastapi-patterns` | FastAPI best practices covering project structure, Pydantic v2 schemas, dependency injection, async handlers, authentication, authorization, transactional service layers, and testing with httpx and pytest. |
+| `/python-patterns` | Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications. |
+| `/python-testing` | Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements. |
+| `/verification-loop` | Run a six-phase verification of a Claude Code session's work — build, type check, lint, tests with coverage, security grep, and diff review — then produce a PASS/FAIL verification report. |
 
-## Claude-skills: Self-improving memory (6)
+## Self-improving memory (6)
 
-| Skill | What it's for |
+Save lessons so Claude remembers them across sessions.
+
+| Skill | What it does |
 |---|---|
 | `/extract` | Turn a fix or pattern that keeps coming up into a reusable skill with SKILL.md, reference docs and examples. |
 | `/memory-review` | Review what the agent has learned in auto-memory: what to promote to permanent rules, stale entries to prune, duplicates to merge. |
 | `/memory-status` | Health check of agent auto-memory: line counts, topic files, capacity, stale entries and what to prune. |
 | `/promote` | Graduate a proven pattern from auto-memory (MEMORY.md) to CLAUDE.md or .claude/rules/ for permanent enforcement. |
-| `/remember` | Save something important to auto-memory with a timestamp and context. |
-| `/self-improving-agent` | Curate what the agent has learned into durable project knowledge. |
-
-## Superpowers (coding workflow) (15)
-
-| Skill | What it's for |
-|---|---|
-| `/brainstorming` | You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation). |
-| `/diagnosing-superpowers` | Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, "it took too long", "why is it so expensive", "what is it doing" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness. |
-| `/dispatching-parallel-agents` | Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies |
-| `/executing-plans` | Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available |
-| `/finishing-a-development-branch` | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work |
-| `/receiving-code-review` | Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation |
-| `/requesting-code-review` | Use when completing tasks, implementing major features, or before merging to verify work meets requirements |
-| `/subagent-driven-development` | Use when executing implementation plans with independent tasks in the current session |
-| `/systematic-debugging` | Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes |
-| `/test-driven-development` | Use when implementing any feature or bugfix, before writing implementation code |
-| `/using-git-worktrees` | Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback |
-| `/using-superpowers` | Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions |
-| `/verification-before-completion` | Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always |
-| `/writing-plans` | Use when you have a spec or requirements for a multi-step task, before touching code |
-| `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
-
-## Marketing skills by Corey Haines (41)
-
-| Skill | What it's for |
-|---|---|
-| `/ab-testing` | When the user wants to plan, design, or implement an A/B test or experiment, or build a growth experimentation program. |
-| `/ads` | When the user wants help with paid advertising campaigns on Google Ads, Meta (Facebook/Instagram), LinkedIn, Twitter/X, or other ad platforms. |
-| `/ai-seo` | When the user wants to optimize content for AI search engines, get cited by LLMs, or appear in AI-generated answers. |
-| `/analytics` | When the user wants to set up, improve, or audit analytics tracking and measurement. |
-| `/aso` | When the user wants to audit or optimize an App Store or Google Play listing. |
-| `/attribution` | When the user wants to figure out which marketing actually drives conversions and revenue, choose or interpret an attribution model, or reconcile conflicting numbers across tools. |
-| `/co-marketing` | When the user wants to find co-marketing partners, plan joint campaigns, or brainstorm partnership opportunities. |
-| `/community-marketing` | Build and leverage online communities to drive product growth and brand loyalty. |
-| `/competitor-profiling` | When the user wants to research, profile, or analyze competitors from their URLs. |
-| `/competitors` | When the user wants to create competitor comparison or alternative pages for SEO and buyer-facing use. |
-| `/conversion-tracking` | Set up, audit, verify, or fix website conversion tracking. |
-| `/cro` | When the user wants to optimize, improve, or increase conversions on any marketing page or form — including homepage, landing pages, pricing pages, feature pages, lead capture forms, or contact forms. |
-| `/customer-research` | When the user wants to conduct, analyze, or synthesize customer research. |
-| `/directory-submissions` | When the user wants to submit their product to startup, SaaS, AI, agent, MCP, no-code, or review directories for backlinks, domain rating, and discovery. |
-| `/emails` | When the user wants to create or optimize an email sequence, drip campaign, automated email flow, or lifecycle email program. |
-| `/events` | When the user wants to plan, run, sponsor, speak at, or get pipeline from events — webinars, conferences, trade shows, meetups, dinners, workshops, virtual summits, or user conferences. |
-| `/free-tools` | When the user wants to plan, evaluate, or build a free tool for marketing purposes — lead generation, SEO value, or brand awareness. |
-| `/image` | When the user wants to create, generate, edit, or optimize images for marketing — blog heroes, social graphics, product mockups, profile banners, listing visuals, or brand assets. |
-| `/influencer-marketing` | When the user wants to run influencer, creator, or ambassador partnerships to promote their product — finding and vetting partners, structuring deals, briefing creators, disclosure compliance, and measuring ROI. |
-| `/launch` | When the user wants to plan a product launch, feature announcement, or release strategy. |
-| `/lead-magnets` | When the user wants to create, plan, or optimize a lead magnet for email capture or lead generation. |
-| `/link-building` | When the user wants to earn backlinks or third-party mentions that lift rankings and AI citations. |
-| `/marketing-council` | When the user wants multiple expert perspectives on a marketing question — a simulated board of advisors staffed by legendary marketers (Seth Godin, David Ogilvy, Eugene Schwartz, April Dunford, Rory Sutherland, Alex… |
-| `/marketing-loops` | When the user wants to set up a recurring, self-running marketing workflow — a repeatable loop an AI agent runs on a cadence (weekly, daily, on a trigger) rather than a one-off task. |
-| `/marketing-plan` | When the user needs a comprehensive marketing plan for a client, a company they advise, or their own product. |
-| `/offers` | When the user wants to design, construct, or improve an offer — the thing they actually sell — including value framing, bonus stacking, guarantee design, scarcity/urgency, naming, and payment structure. |
-| `/onboarding` | When the user wants to optimize post-signup onboarding, user activation, first-run experience, or time-to-value. |
-| `/paywalls` | When the user wants to create or optimize in-app paywalls, upgrade screens, upsell modals, or feature gates. |
-| `/popups` | When the user wants to create or optimize popups, modals, overlays, slide-ins, or banners for conversion purposes. |
-| `/product-marketing` | When the user wants to create or update their product marketing context document. |
-| `/prospecting` | When the user wants to find, qualify, and build a list of prospects to reach out to, across B2B SaaS, general B2B, or local small businesses. |
-| `/public-relations` | When the user wants help with public relations, earned media, press coverage, journalist outreach, or media strategy (not pull requests). |
-| `/referrals` | When the user wants to create, optimize, or analyze a referral program, affiliate program, or word-of-mouth strategy. |
-| `/reverse-engineer-marketing` | When the user wants to reverse engineer how another company grew and copy what worked. |
-| `/revops` | When the user wants help with revenue operations, lead lifecycle management, or marketing-to-sales handoff processes. |
-| `/sales-enablement` | When the user wants to create sales collateral, pitch decks, one-pagers, objection handling docs, or demo scripts. |
-| `/schema` | When the user wants to add, fix, or optimize schema markup and structured data on their site. |
-| `/signup` | When the user wants to optimize signup, registration, account creation, or trial activation flows. |
-| `/sms` | When the user wants to plan, build, or optimize SMS, MMS, or WhatsApp marketing — including welcome flows, abandoned cart texts, post-purchase, win-back, promotional sends, or transactional/auth SMS. |
-| `/social` | When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, or Facebook, or wants to do social listening and engagement triage. |
-| `/video` | When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. |
-
-## Output style (2)
-
-| Skill | What it's for |
-|---|---|
-| `/i-have-adhd` | ADHD-friendly replies: next action first, numbered steps, no tangents. Stays on until you say "stop adhd mode". |
-| `/humanizer` | Rewrites AI-sounding text so it reads like a person wrote it, without changing the meaning. |
-
-## UI/UX Pro Max (design) (7)
-
-| Skill | What it's for |
-|---|---|
-| `/ui-ux-pro-max` | Design brain: 80 styles, 192 color palettes, 74 font pairings and UX rules for building or reviewing any page, app or component. |
-| `/design` | Logos, icons and corporate identity (CIP) ideas and assets. |
-| `/design-system` | Builds design tokens (colors, type, spacing) and checks pages and slides follow them. |
-| `/ui-styling` | Tailwind and shadcn/ui styling: configs, components, consistent look. |
-| `/brand` | Brand kit: colors, fonts and voice, synced into your design tokens. |
-| `/banner-design` | Banners for social media, ads and website headers. |
-| `/slides` | Presentation slides that follow your design system. |
+| `/remember` | Save something important to auto-memory with a timestamp and context. Use whenever the user says remember this, note it for next time or don't forget, wants you to stop repeating a mistake across sessions, or a discovery is too important for auto-capture. |
+| `/self-improving-agent` | Curate what the agent has learned into durable project knowledge. Reviews Claude Code auto-memory (MEMORY.md and its topic files) for learnings worth keeping, promotes proven ones into CLAUDE.md or .claude/rules/, records a correction as a lesson that persists across sessions, prunes stale or… |
