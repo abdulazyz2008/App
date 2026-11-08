@@ -1,6 +1,6 @@
 # Skills catalog
 
-284 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+291 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
 
 
 ## Founder pack (start a business) (11)
@@ -371,3 +371,15 @@
 |---|---|
 | `/i-have-adhd` | ADHD-friendly replies: next action first, numbered steps, no tangents. Stays on until you say "stop adhd mode". |
 | `/humanizer` | Rewrites AI-sounding text so it reads like a person wrote it, without changing the meaning. |
+
+## UI/UX Pro Max (design) (7)
+
+| Skill | What it's for |
+|---|---|
+| `/ui-ux-pro-max` | Design brain: 80 styles, 192 color palettes, 74 font pairings and UX rules for building or reviewing any page, app or component. |
+| `/design` | Logos, icons and corporate identity (CIP) ideas and assets. |
+| `/design-system` | Builds design tokens (colors, type, spacing) and checks pages and slides follow them. |
+| `/ui-styling` | Tailwind and shadcn/ui styling: configs, components, consistent look. |
+| `/brand` | Brand kit: colors, fonts and voice, synced into your design tokens. |
+| `/banner-design` | Banners for social media, ads and website headers. |
+| `/slides` | Presentation slides that follow your design system. |
