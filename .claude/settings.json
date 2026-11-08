@@ -10,7 +10,6 @@
   "enabledPlugins": {
     "product-skills@claude-code-skills": true,
     "marketing-skills@claude-code-skills": true,
-    "c-level-skills@claude-code-skills": true,
     "business-growth-skills@claude-code-skills": true,
     "finance-skills@claude-code-skills": true,
     "pw@claude-code-skills": true,

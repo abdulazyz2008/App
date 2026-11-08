@@ -1,6 +1,6 @@
 # Skills catalog
 
-**224 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
+**190 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
 
 Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fastapi-review`, `/test-coverage`) and 25 helper agents (22 `gsd-*`, `planner`, `python-reviewer`, `fastapi-reviewer`).
 
@@ -16,7 +16,6 @@ Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fast
 | Product | 14 | PRDs, UX research, roadmaps, landing pages. |
 | Business growth | 5 | Customer success, sales engineering, proposals and contracts. |
 | Finance | 6 | Valuation, SaaS metrics, month-end close. |
-| C-suite advisors | 34 | Executive-level advice: CEO, CFO, CMO, CTO, legal and board meetings. |
 | Replica pack | 11 | Reverse-engineer an app and build your own better version. |
 | Research | 1 | What people said online in the last 30 days. |
 | Writing & output style | 2 | Make text sound human, or make Claude's replies ADHD-friendly. |
@@ -202,47 +201,6 @@ Valuation, SaaS metrics, month-end close.
 | `/passive-deal-screener` | Use when a passive investor shares a private deal (syndication, preferred equity, bridge fund, private credit) to screen as an LP. |
 | `/saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
 | `/stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
-
-## C-suite advisors (34)
-
-Executive-level advice: CEO, CFO, CMO, CTO, legal and board meetings.
-
-| Skill | What it does |
-|---|---|
-| `/agent-protocol` | Use when C-suite advisor agents need to call each other or run a multi-role meeting. Defines invocation syntax, loop prevention, isolation and response formats. |
-| `/arquiteto-de-empresa` | Use when a founder wants to document or design a whole company as version-controlled markdown (company as code, a company wiki agents can read, an OKF bundle). |
-| `/board-deck-builder` | Use when building a board deck, investor update or QBR from all C-suite perspectives. Structures the narrative and how to deliver bad news. |
-| `/board-meeting` | Use for /c-level-agents:boardroom or a strategic question that needs a structured multi-executive deliberation. |
-| `/c-level-skills` | Find which C-level advisor fits a question: 14 C-suite roles, board meetings, culture, M&A. |
-| `/ceo-advisor` | Advice for a CEO or founder on running the company: board and investor trouble, raise or cut, strategy bets, org and culture. |
-| `/cfo-advisor` | Startup finance: runway and burn, unit economics (LTV, CAC, payback), fundraising and dilution. |
-| `/change-management` | Use when rolling out a reorg, pivot, tool switch, leadership change or product kill. Plans it with ADKAR, communication templates and resistance patterns. |
-| `/chief-ai-officer-advisor` | Use for AI strategy decisions: API vs fine-tune vs build, EU AI Act or US state risk classification, when self-hosting pays off, or AI hiring order. |
-| `/chief-customer-officer-advisor` | Use for retention strategy, customer segmentation or CS team sizing decisions (GRR vs NRR, churn causes, pooled vs named CSMs). |
-| `/chief-data-officer-advisor` | Use for data strategy decisions: training models on customer data, warehouse vs lakehouse vs mesh, valuing data for a raise or M&A, or data hiring order. |
-| `/chief-of-staff` | Use when a founder question needs routing to the right C-suite advisor, or a cross-functional decision needs a board meeting convened. |
-| `/chro-advisor` | People strategy: hiring plans, comp bands, org structure, performance, retention. Use whenever the user asks who to hire, what to pay, how to structure teams or why staff leave. |
-| `/ciso-advisor` | Use for security leadership decisions: a security program, budget justification in dollars, SOC 2 vs ISO 27001 vs HIPAA roadmap, or board security reporting. |
-| `/cmo-advisor` | Marketing leadership: positioning, product-led vs sales-led vs community-led growth, budget split across channels, marketing team design. |
-| `/company-os` | Use when choosing or setting up how the company runs: EOS, Scaling Up or OKRs, accountability chart, scorecard, meeting rhythm, quarterly rocks. |
-| `/competitive-intel` | Use for competitor analysis, battlecards, win/loss review or positioning against alternatives. |
-| `/context-engine` | Use when starting a C-suite advisor session, when company context is missing or older than 90 days, or before company data goes to an external service. |
-| `/coo-advisor` | Use for operations leadership: process design, OKR execution, operating cadence, bottlenecks or scaling playbooks. |
-| `/cpo-advisor` | Product leadership: PMF measurement, product vision, portfolio investment, product org design, board product reporting. |
-| `/cro-advisor` | Use for B2B revenue leadership: forecasting, quotas, sales model, NRR and churn, pricing or sales capacity. |
-| `/cs-onboard` | Use when setting up the C-suite advisors for the first time, or when company context is missing or stale after a raise or pivot. |
-| `/cto-advisor` | CTO decisions: tech debt, architecture direction, scaling the engineering team, technology evaluation, DORA metrics. |
-| `/culture-architect` | Use when defining company values, turning them into behaviors, assessing culture health or designing rituals. |
-| `/decision-logger` | Use when logging a decision after a board meeting, reviewing past decisions or checking overdue actions. |
-| `/founder-coach` | Use when a founder is the bottleneck, can't delegate, is burning out or is moving from IC to CEO. |
-| `/general-counsel-advisor` | Legal review of contracts and term sheets (MSA, SaaS, NDA, DPA, employment), IP strategy and regulatory exposure (HIPAA, GDPR, FDA, fintech). |
-| `/internal-narrative` | Use when preparing an all-hands, investor update, recruiting pitch or crisis message, or when stories told to different audiences drift apart. |
-| `/intl-expansion` | Use when expanding to a new country: market selection, entry mode, localization, regulation and regional go-to-market. |
-| `/ma-playbook` | Buy a company or sell yours: diligence, valuation, terms, integration. Use whenever M&A or an exit comes up. |
-| `/org-health-diagnostic` | Use for a whole-company health check before a board review or when functions seem at risk. |
-| `/scenario-war-room` | Use for compound what-if questions ('what if X and Y both happen?') with major downside across functions. |
-| `/strategic-alignment` | Use when teams pull in different directions, OKRs don't connect or departments optimize locally. |
-| `/vpe-advisor` | Use when delivery is slowing, eng hiring is broken, team structure is unclear or you need to decide when to add an eng manager. |
 
 ## Replica pack (11)
 
