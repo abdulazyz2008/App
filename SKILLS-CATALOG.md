@@ -1,6 +1,6 @@
 # Skills catalog
 
-343 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+282 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
 
 
 ## Founder pack (start a business) (11)
@@ -34,22 +34,6 @@
 | `/replica-launch` | Writes the launch for an app clone: the landing page built on the positioning angle, pricing set against the original's public pricing and its users' complaints, and the App Store and Google Play listing linted against… |
 | `/replica-recon` | Reverse-engineers any app into a recon map: screen inventory, user flows, component list, inferred data model and a feature matrix, from public pages, screenshots, app store listings, help docs and the user's own… |
 | `/replica-test` | Clicks through every flow of an app clone and tests it for bugs: a test plan generated from the recon flows with happy paths and edge cases, Playwright end-to-end tests where possible, a browser click-through where not… |
-
-## Trader pack (stocks) (11)
-
-| Skill | What it's for |
-|---|---|
-| `/trader-alerts` | Price Alerts. Rings when a price target, a stop or the opening bell hits: above / below / stop rules, percent moves from the previous close, and the NYSE opening bell, each ringing once so you are not spammed. |
-| `/trader-analyst` | The Earnings Analyst. Reads a company's reported numbers straight from SEC EDGAR (XBRL company facts from its 10-Qs and 10-Ks, plus the latest earnings 8-K and its press release) and sums up what changed: revenue… |
-| `/trader-broker` | Order Executor. Places APPROVED orders through your brokerage connector, one at a time, and never without your explicit yes. |
-| `/trader-budget` | Budget Manager. Sizes every position to your budget before anything is bought: keeps a cash buffer, caps any one stock (the excess is shared out to the others), drops slices under your minimum order, rounds so every… |
-| `/trader-copycat` | The Reverse Engineer. Reads a famous investor's public SEC filings (the quarterly 13F-HR, plus Form 4 if you want the insider trades) and rebuilds their portfolio as weights you can copy: every position, its share of… |
-| `/trader-news` | The News Monitor. Watches breaking market news and SEC filings for the stocks you hold (or are about to copy): Yahoo Finance headlines per ticker and each company's 8-K filings on SEC EDGAR (earnings, CEO changes… |
-| `/trader-pelosi` | The Pelosi Tracker. Watches the stock trades members of Congress must disclose under the STOCK Act: reads the House Clerk's public Periodic Transaction Reports (PTRs) as soon as they are posted, alerts once per new… |
-| `/trader-rebalance` | Rebalancer. Brings the portfolio back to its target weights when it drifts: values every holding at current prices, works out each stock's drift from its target in percentage points, trades only the stocks outside a… |
-| `/trader-risk` | Risk Manager. Checks every proposed order against your limits before it can reach the broker and blocks anything over them: blocked tickers, max order size, minimum order, max position percent after the fill, the cash… |
-| `/trader-screener` | The Stock Screener. Checks a list of companies against the user's own rules (revenue growth, margins, EPS, P/E, earnings yield, sector, anything in the metrics file), says exactly which rule each company passes or fails… |
-| `/trader-tax` | Tax Optimizer. Tracks cost-basis lots for every position (FIFO, highest cost first, or specific lots), shows unrealized gains and losses by lot with short or long term, works out what a sale would realize before you… |
 
 ## Whale pack (pre-sell to customers) (11)
 
@@ -238,57 +222,35 @@
 | `/saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
 | `/stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
 
-## Claude-skills: Marketing (49)
+## Claude-skills: Marketing (27)
 
 | Skill | What it's for |
 |---|---|
-| `/ab-test-setup` | Use before planning or launching any A/B, split or multivariate test, or when asked if a result is significant. |
 | `/ad-creative` | Use for any ad copy request (RSA headlines, Meta, LinkedIn or TikTok ads, bulk variations), before writing. |
-| `/aeo` | Use when content should be cited by ChatGPT, Perplexity, Claude or Gemini (answer engine optimization), before rewriting it. |
 | `/ai-decision-authority` | Use before letting AI or an agent act on a marketing or GTM task without human review, or when writing an AI review policy. |
-| `/analytics-tracking` | Use for any GA4, Google Tag Manager, event-tracking or conversion-tracking setup, audit or broken-event debug, before touching tags. |
-| `/app-store-optimization` | Use for any App Store or Google Play listing, keyword, ranking or review question, before writing metadata. |
 | `/brand-guidelines` | Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. |
 | `/business-name-fit` | Use when naming a company, brand or product, or checking whether a name works abroad, before committing to one. |
 | `/campaign-analytics` | Analyze campaign performance on the user's numbers: ROAS, CPA, ROI, multi-touch attribution and funnel drop-off. |
 | `/churn-prevention` | Use when designing a cancel flow, save offers, exit surveys or dunning emails, or cutting failed-payment churn. |
 | `/cold-email` | Use for any cold outreach or SDR email or follow-up sequence to prospects who did not opt in, before drafting. |
-| `/competitor-alternatives` | Use when creating an 'X vs Y', '[product] alternative' or comparison page, before drafting. |
-| `/content-creator` | Use when someone asks for 'content creator' by name. |
 | `/content-humanizer` | Make a draft sound less like AI: fix generic, robotic text with rhythm, specifics, personality and brand voice. |
 | `/content-production` | Write a blog post, article or guide end to end: research, outline, draft, SEO pass and quality gates. |
 | `/content-strategy` | Use when deciding what content to create (topics, clusters, a blog or content plan), before listing ideas. |
 | `/copy-editing` | Edit, proofread and tighten existing marketing copy in focused passes: clarity, voice, proofreading, specificity, readability and AI tells. |
 | `/copywriting` | Use for any headline, tagline, CTA, landing, pricing or about-page copy request, before drafting. |
-| `/email-sequence` | Use for any drip, nurture, onboarding, welcome or re-engagement email sequence to opted-in users, before writing emails. |
-| `/form-cro` | Use when a lead, contact, demo or checkout form is underperforming or being designed, before changing fields. |
-| `/free-tool-strategy` | Use when considering a free calculator, grader, checker or generator as a marketing asset, before building it. |
-| `/launch-strategy` | Plan a product or feature launch: readiness score and a phased plan by channel. |
 | `/local-seo-manager` | Use for any local business's Google Business Profile, Maps ranking, service-area pages, citations or review replies, before writing. |
-| `/marketing-context` | Use at the start of any marketing project, or when ICP, positioning or brand voice are missing, before other marketing skills. |
 | `/marketing-demand-acquisition` | Use when planning demand generation, paid acquisition across Google, LinkedIn and Meta, or a marketing budget, before allocating spend. |
 | `/marketing-ideas` | Use when asked for marketing or growth ideas for a SaaS or software product. |
 | `/marketing-ops` | Use when a marketing request spans several skills (a campaign across content, SEO, CRO and channels) or it is unclear which skill fits. |
 | `/marketing-psychology` | Apply persuasion and behavioral science ethically to a page, offer or campaign, from 70+ mental models. |
-| `/marketing-skills` | Use when looking for which of the 44 marketing skills fits a task. |
 | `/marketing-strategy-pmm` | Use for product positioning, ICP, competitive battlecards or a go-to-market plan, before drafting. |
-| `/onboarding-cro` | Use when activation, time-to-value or a first-run experience after signup needs work, before redesigning it. |
-| `/page-cro` | Fix a page that is not converting: section by section audit with fixes ranked by impact. |
-| `/paid-ads` | Use for paid campaign strategy on Google, Meta, LinkedIn or X: structure, targeting, bids, retargeting and budgets. |
-| `/paywall-upgrade-cro` | Use when designing or fixing an in-app paywall, upgrade modal, feature gate or trial-expiry screen. |
-| `/popup-cro` | Use when creating or fixing a popup, modal, exit-intent, slide-in or banner meant to convert. |
 | `/pricing-strategy` | Use for SaaS pricing tiers, value metric, packaging, a pricing page or a price increase, before proposing numbers. |
 | `/programmatic-seo` | Use when building many SEO pages from a template and data (location, integration, comparison or directory pages), before generating them. |
 | `/prompt-engineer-toolkit` | Use when a marketing team's AI prompts need testing, versioning or governance, before shipping a prompt. |
-| `/referral-program` | Use when designing or fixing a referral, affiliate or ambassador program, before setting rewards. |
-| `/schema-markup` | Use for any JSON-LD, schema.org, rich-result or structured-data request, before writing markup. |
 | `/seo-audit` | Find why a site is not ranking: technical SEO, on-page issues, meta tags, site health. |
-| `/signup-flow-cro` | Use when signup, registration or trial-start conversion is low or a signup flow is being designed. |
 | `/site-architecture` | Use for URL structure, navigation, internal linking, hub pages or orphan pages, or when SEO problems are structural. |
-| `/social-content` | Write a LinkedIn post, X thread, Instagram, TikTok or Facebook post with each platform's hook, length and format. |
 | `/social-media-analyzer` | Score social performance: engagement rate, reach, ROI per platform, benchmarks. |
 | `/social-media-manager` | Plan social media: strategy, content calendar, community management, follower growth. |
-| `/webinar-marketing` | Use when planning, promoting or fixing a webinar or virtual event (registrations, show-up, follow-up, conversion). |
 | `/x-twitter-growth` | Use for growing on X/Twitter: tweets, threads, profile audit, competitors or posting plan. |
 | `/youtube-full` | Use for any YouTube URL, video ID or @handle, or a request for transcripts, video search, channel, playlist or new-upload monitoring. |
 
@@ -325,44 +287,6 @@
 | `/spec-to-repo` | Use when the user says 'build me an app', 'create a project from this spec', 'scaffold a new repo', 'generate a starter', 'turn this idea into code', 'bootstrap a project', 'I have requirements and need a codebase', or… |
 | `/ui-design-system` | Use when building a design system: tokens, component docs, responsive scales or developer handoff. |
 | `/ux-researcher-designer` | UX research: personas, journey maps, usability test plans, synthesis. |
-
-## Claude-skills: Project management (Jira/Confluence) (9)
-
-| Skill | What it's for |
-|---|---|
-| `/atlassian-admin` | Use for Atlassian org administration: Jira or Confluence users and groups, permissions, SSO, marketplace apps or security policy. |
-| `/atlassian-templates` | Use when creating or changing Jira or Confluence templates, blueprints or page layouts for reuse across the org. |
-| `/confluence-expert` | Use when building or restructuring a Confluence space: page hierarchy, permissions, templates, Jira macros or a content audit. |
-| `/jira-expert` | Jira setup and queries: JQL, workflows, custom fields, automation, dashboards. |
-| `/meeting-analyzer` | Use when the user shares meeting transcripts (.vtt, .srt, .txt, Otter, Granola, Zoom) or asks how they come across in meetings. |
-| `/pm-skills` | Router for project-management skills: sprints, portfolio health, Jira, Confluence, stakeholder comms, plus a delivery loop. |
-| `/scrum-master` | Use for sprint and team analytics: velocity forecasts, sprint health, retrospectives, burndown or blockers. |
-| `/senior-pm` | Project and portfolio management for multi-workstream programs: plans, status reports, risk registers, capacity, executive reporting. |
-| `/team-communications` | Use for any internal communication: 3P updates, weekly or status reports, newsletters, FAQs, incident reports, leadership updates ('write my update'). |
-
-## Claude-skills: Regulatory & quality (medical devices, ISO, GDPR) (19)
-
-| Skill | What it's for |
-|---|---|
-| `/access-lifecycle` | Use when preparing or running a user access review, checking that leavers lost their access, finding orphaned or ownerless service accounts, answering an auditor's access-control request for SOC 2, ISO 27001, PCI DSS… |
-| `/agent-decision-receipts` | Use when an autonomous agent takes a side-effecting action (deploy, delete, pay, grant access) that may need proving later, or for EU AI Act Art. |
-| `/capa-officer` | Use for CAPA work in a medical device QMS: root cause analysis (5-Why, fishbone), corrective action plans, effectiveness checks or CAPA metrics. |
-| `/cmmc-readiness` | Use when a defense contractor or subcontractor is preparing for a CMMC 2.0 Level 2 self-assessment or C3PAO assessment, calculating or checking an SPRS score against NIST SP 800-171 Rev 2, deciding what can go on a… |
-| `/eu-ai-act-specialist` | Use for EU AI Act (Regulation 2024/1689) compliance work: classifying an AI system's risk tier, planning the Art. |
-| `/fda-consultant-specialist` | Use for FDA medical device questions: 510(k) vs De Novo vs PMA, predicates and substantial equivalence, QMSR (21 CFR 820), HIPAA or device cybersecurity. |
-| `/gdpr-dsgvo-expert` | Use for GDPR or DSGVO work: scanning a codebase for privacy risks, writing a DPIA or tracking data subject requests against the Art. |
-| `/information-security-manager-iso27001` | Use when designing or running an ISO 27001 ISMS in HealthTech or MedTech: risk assessment, control implementation, certification or security incidents. |
-| `/isms-audit-expert` | Use for ISO 27001 audit work: internal or surveillance audits, Annex A control evidence, Statement of Applicability, nonconformities, Stage 1 and 2 prep. |
-| `/iso42001-specialist` | Use for ISO/IEC 42001 AI management system work: gap analysis against Clauses 4-10, the AI risk register and Annex A controls, or the internal audit plan. |
-| `/mdr-745-specialist` | Use for EU MDR 2017/745 work: device classification under Annex VIII, technical file gaps (Annex II/III), clinical evaluation, PMS and PSUR cadence, notified body prep. |
-| `/qms-audit-expert` | Use for ISO 13485 internal audits: planning the program, running an audit, classifying findings or preparing for an external audit. |
-| `/quality-documentation-manager` | Use for QMS document control: numbering, versioning, change control or 21 CFR Part 11 e-signatures. |
-| `/quality-manager-qmr` | Use for QMR duties under ISO 13485 5.5.2: management review, quality policy and objectives, quality KPIs and cost of quality. |
-| `/quality-manager-qms-iso13485` | Build or maintain an ISO 13485 medical device QMS: design, documentation, CAPA, audit prep. |
-| `/ra-qm-skills` | Router for regulatory and quality skills: ISO 13485, MDR, FDA, ISO 14971, CAPA, ISO 27001, ISO 42001, EU AI Act, GDPR, SOC 2. |
-| `/regulatory-affairs-head` | Use for medical device market access strategy: FDA 510(k), De Novo or PMA packages, CE marking under MDR, pre-sub meetings, agency deficiency responses or multi-market plans. |
-| `/risk-management-specialist` | Use for ISO 14971 medical device risk management: hazard analysis, FMEA, fault trees, risk controls, benefit-risk or residual risk. |
-| `/soc2-compliance` | Use when the user asks to prepare for SOC 2 audits, map Trust Service Criteria, build control matrices, collect audit evidence, perform gap analysis, or assess SOC 2 Type I vs Type II readiness. |
 
 ## Claude-skills: Self-improving memory (6)
 
