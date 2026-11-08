@@ -1,6 +1,6 @@
 # Skills catalog
 
-283 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+284 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
 
 
 ## Founder pack (start a business) (11)
@@ -365,8 +365,9 @@
 | `/social` | When the user wants help creating, scheduling, or optimizing social media content for LinkedIn, Twitter/X, Instagram, TikTok, or Facebook, or wants to do social listening and engagement triage. |
 | `/video` | When the user wants to create, generate, or produce video content using AI tools or programmatic frameworks. |
 
-## Output style (1)
+## Output style (2)
 
 | Skill | What it's for |
 |---|---|
 | `/i-have-adhd` | ADHD-friendly replies: next action first, numbered steps, no tangents. Stays on until you say "stop adhd mode". |
+| `/humanizer` | Rewrites AI-sounding text so it reads like a person wrote it, without changing the meaning. |
