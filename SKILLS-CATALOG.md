@@ -1,6 +1,6 @@
 # Skills catalog
 
-**290 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
+**224 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
 
 Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fastapi-review`, `/test-coverage`) and 25 helper agents (22 `gsd-*`, `planner`, `python-reviewer`, `fastapi-reviewer`).
 
@@ -21,8 +21,8 @@ Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fast
 | Research | 1 | What people said online in the last 30 days. |
 | Writing & output style | 2 | Make text sound human, or make Claude's replies ADHD-friendly. |
 | Superpowers (coding workflow) | 15 | Careful coding habits: plan, test first, debug, verify. |
-| Engineering | 35 | Senior engineer roles: frontend, backend, security, cloud, QA. |
-| Advanced engineering | 49 | Agents, databases, CI/CD, MCP servers, releases, reliability. |
+| Engineering | 8 | Website, backend, payments, email and code-review skills. |
+| Advanced engineering | 10 | AI agents, automation, MCP servers, databases, multilingual sites. |
 | Playwright testing | 10 | Write, fix and run website tests. |
 | Browser & Python | 6 | Website automation, FastAPI and Python best practices. |
 | Self-improving memory | 6 | Save lessons so Claude remembers them across sessions. |
@@ -301,103 +301,37 @@ Careful coding habits: plan, test first, debug, verify.
 | `/writing-plans` | Use when you have a spec or requirements for a multi-step task, before touching code |
 | `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
 
-## Engineering (35)
+## Engineering (8)
 
-Senior engineer roles: frontend, backend, security, cloud, QA.
+Website, backend, payments, email and code-review skills.
 
 | Skill | What it does |
 |---|---|
-| `/adversarial-reviewer` | Tough, critical review of a diff or PR before merge, through hostile reviewer personas that catch shared blind spots. |
-| `/ai-security` | Use when assessing an AI/ML system or LLM agent for prompt injection, jailbreaks, model inversion, data poisoning or tool abuse. |
-| `/aws-solution-architect` | Use when designing or costing an AWS architecture (serverless, Lambda, API Gateway, DynamoDB, ECS, Aurora, CloudFormation, migration to AWS). |
-| `/azure-cloud-architect` | Use when designing or costing an Azure architecture (AKS, App Service, Functions, Cosmos DB, Bicep or ARM, Azure DevOps, migration to Azure). |
-| `/cloud-security` | Use when checking AWS, Azure or GCP for security misconfigurations: IAM privilege escalation, public buckets, open security groups, IaC gaps. |
 | `/code-reviewer` | Use for any code review: a pull request, a diff, a commit, or a pasted function, handler or file in TypeScript, JavaScript, Python, Go, Swift, Kotlin, C#/.NET, Java, C, C++, Rust, Ruby, PHP or Dart/Flutter. |
 | `/email-template-builder` | Use when adding or reworking transactional email (React Email templates, Resend, Postmark, SendGrid or SES, preview, i18n, dark mode, deliverability). |
-| `/embedded-iot-mentor` | Use for any embedded or IoT hardware project (ESP32, STM32, Arduino, Pico, firmware, PCB, MQTT, Home Assistant, sensor dashboards), before buying parts. |
-| `/engineering-skills` | Find which engineering skill fits a task: architecture, frontend, backend, QA, DevOps, security, AI/ML, data, cloud. |
 | `/epic-design` | Use for any landing page, hero section or scroll-driven web design that should feel cinematic (parallax, scrollytelling, overlapping sections, text reveals, Apple-style animation), before coding. |
-| `/gcp-cloud-architect` | Design, deploy and cut the cost of Google Cloud setups: Cloud Run, GKE, Functions, Cloud SQL, BigQuery, moving to GCP. |
-| `/incident-commander` | Use when declaring or running a production incident or outage, or writing its post-incident review. |
-| `/incident-response` | Handle a suspected security breach: triage, SEV1-SEV4 severity, escalation and forensic evidence, per NIST SP 800-61. |
-| `/ms365-tenant-manager` | Use for Microsoft 365 tenant administration (Entra ID users, Exchange Online, Teams, licenses, Conditional Access, compliance reports). |
-| `/named-persona-adversarial-review` | Use when a PR has architectural or UX impact, or automated review feels generic, and you want it reviewed through named engineers' documented views (Torvalds, Thompson, Carmack, Beck, Jobs, Cagan). |
-| `/red-green-proof` | Turns a suspected bug into a proven one. Verify the cause against reality before claiming it, write a test that FAILS on the current code, apply the fix, watch it pass — then revert the fix and confirm the test goes red again, because a test that passes both ways proves nothing. |
-| `/red-team` | Use when planning or running an authorized red team engagement or attack path analysis. Plans the kill chain with engagement_planner.py: MITRE ATT&CK techniques, choke points, OPSEC risk and crown jewels. |
-| `/security-pen-testing` | Authorized penetration testing of an app or API: vulnerability scans, OWASP Top 10 checks, dependency audits and a pentest report. |
-| `/senior-architect` | System architecture decisions with a written rationale: monolith vs microservices, database choice, scaling limits, ADRs, Mermaid diagrams. |
 | `/senior-backend` | Build and fix backend services: REST or GraphQL APIs, auth, microservices, PostgreSQL queries, migrations and load tests. |
-| `/senior-computer-vision` | Computer vision models: object detection, segmentation, training a custom model, and optimizing or deploying inference (YOLO, DETR, SAM, ONNX, TensorRT). |
-| `/senior-data-engineer` | Data pipelines: Airflow DAGs, Spark, dbt, Kafka, ETL/ELT, data quality checks. Load whenever a DAG or batch job times out or fails, data arrives wrong, or the user designs an ingestion pipeline. |
-| `/senior-data-scientist` | Design experiments and analyze tabular data: A/B tests, causal inference, feature engineering, model evaluation. |
-| `/senior-devops` | Set up CI/CD pipelines, infrastructure as code, containers and deployments on AWS, GCP or Azure. |
 | `/senior-frontend` | Build and review React, Next.js, TypeScript or Tailwind frontends: components, scaffolding, performance and bundle size. |
 | `/senior-fullstack` | Start a fullstack project or audit a codebase: pick a stack (Next.js, FastAPI, MERN, Django), scaffold it and score code quality. |
-| `/senior-ml-engineer` | Use for putting ML models or LLM features into production: deployment, MLOps, drift monitoring, RAG pipelines, LLM API cost and retries. |
 | `/senior-prompt-engineer` | Improve prompts and measure LLM quality: fix inconsistent prompts, build eval sets, score RAG retrieval, check agent tool configs. |
-| `/senior-qa` | Write and improve tests for React or Next.js apps: Jest, React Testing Library, MSW mocks, Playwright E2E, coverage gaps. |
-| `/senior-secops` | Find and fix application security problems: security reviews, CVE remediation, hardening, secrets and auth, SOC 2, PCI-DSS, HIPAA and GDPR checks. |
-| `/senior-security` | Check if a design or code is secure: STRIDE threat model, DREAD risk scores, leaked secret scan. |
 | `/stripe-integration-expert` | Use for any Stripe integration: subscriptions, trials, proration, checkout, usage billing, webhooks, customer portal or invoicing in Next.js, Express or Django. |
-| `/tdd-guide` | Test-first development and test generation for Jest, Pytest, JUnit, Vitest or Mocha: red-green-refactor, fixtures and mocks, coverage gaps. |
-| `/tech-stack-evaluator` | Compare frameworks or tech stacks before committing: side-by-side scoring, total cost of ownership, ecosystem health and migration risk. |
-| `/threat-detection` | Use when hunting threats, sweeping IOCs or looking for anomalies in logs and telemetry. Ranks ATT&CK-mapped signals and z-score anomalies with threat_signal_analyzer.py. |
 
-## Advanced engineering (49)
+## Advanced engineering (10)
 
-Agents, databases, CI/CD, MCP servers, releases, reliability.
+AI agents, automation, MCP servers, databases, multilingual sites.
 
 | Skill | What it does |
 |---|---|
 | `/agent-designer` | Design multi-agent systems (supervisor, swarm, pipeline) and tool schemas; find bottlenecks in run logs. |
-| `/agent-regression-evals` | Use before shipping any agent, prompt, model or tool change, or when a pass-rate drop needs a verdict. |
-| `/agent-run-forensics` | Use when asked why an agent did something, what a past session or run changed, whether tests really passed, or to verify a session summary. |
 | `/agent-workflow-designer` | Use when architecting a multi-step LLM or agent pipeline, choosing single vs multi-agent, or fixing context bloat and broken handoffs. |
-| `/api-design-reviewer` | Use for any PR or spec that adds or changes REST endpoints, before approving it. Lints conventions with api_linter.py, detects breaking changes with breaking_change_detector.py and scores the design with api_scorecard.py. |
-| `/api-test-suite-builder` | Use when asked to write API, integration or contract tests for REST endpoints. Builds the suite from the routes: happy paths, auth, validation errors and edge cases per endpoint. |
-| `/boost-asio-pro` | Use for any C++ networking code with Boost.Asio or standalone Asio (TCP/UDP, SSL, timers, strands, io_context, co_spawn, awaitable, completion handlers), before writing or reviewing it. |
 | `/browser-automation` | Automate a browser: scrape websites, fill forms, pull structured data from web pages. Use whenever the user wants to grab data from a site, fill a web form or extract a table. |
-| `/changelog-generator` | Write release notes and CHANGELOG.md from commits and pick the next semver version. Use whenever the user is cutting a release, asks what changed since the last one or what version comes next, or wants commits linted first. |
-| `/chaos-engineering` | Use before running a chaos experiment, gameday or fault injection, or after one to write it up. |
-| `/ci-cd-pipeline-builder` | Generate a CI/CD workflow for a repo from its detected stack: lint, test, build, deploy. Load whenever the user says the repo has no CI, wants tests run on push, or needs a pipeline YAML. |
-| `/codebase-onboarding` | Explain an unfamiliar repo: architecture brief and onboarding docs. Use whenever someone is new to a codebase, asks how a project is structured or where to start reading. |
-| `/coding-agent-rollout` | Roll out Claude Code to a team: shared or managed settings, MCP and plugin approval, layered CLAUDE.md, adoption. |
-| `/commit-craft` | Turn a mix of changes into clean, reviewable commits with good messages, blocking staged secrets and .env files. |
 | `/database-designer` | Design a database schema: tables, relationships, indexes, normalization, SQL vs NoSQL, migration plans. |
-| `/database-schema-designer` | Use when asked for an ERD, table relationships, normalization or a schema migration plan. Produces the ERD and normalized DDL with migration steps. |
-| `/dependency-auditor` | Audit project dependencies for CVEs and licenses and plan safe upgrades. Use whenever the user asks if their packages are safe, before a release or major version bump, while chasing a CVE, or for a license review. |
-| `/engineering-advanced-skills` | Pick the right advanced engineering skill: agents, RAG, MCP, CI/CD, databases, observability, release. |
-| `/env-secrets-manager` | Use when auditing .env files, planning credential rotation, chasing a missing env var in production or hardening a repo against leaked secrets. |
-| `/feature-flags-architect` | Use before adding, rolling out or retiring a feature flag or kill switch, or when flag debt piles up. |
-| `/focused-fix` | Use when a whole feature or module is broken and needs fixing end to end ('make X work', 'the Y module is broken'). |
 | `/full-page-screenshot` | Use when asked for a full-page or long screenshot of a web page. Captures SPA scroll containers, lazy images and very tall pages through Chrome DevTools Protocol with no extra dependencies. |
-| `/git-worktree-manager` | Use when running several branches or agents in parallel on one repo. Creates worktrees with isolated ports and env via worktree_manager.py and removes stale ones with worktree_cleanup.py. |
 | `/grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
 | `/i18n-localization` | Use when adding UI text, adding or shipping a language, reviewing translation files, or building i18n into an app. |
-| `/interview-system-designer` | Use when designing a hiring loop, competency matrix, scoring rubric or question bank, or checking interviewer calibration. |
 | `/karpathy-coder` | Check a diff for overbuilt code: hidden assumptions, needless abstraction, non-surgical changes, unverified goals (Karpathy's four principles). |
-| `/kubernetes-operator` | Use when building a Kubernetes operator or CRD (controller-runtime, kubebuilder, operator-sdk, KOPF), before writing the controller. |
-| `/mcp-oauth-triage` | Use when an MCP connector that used to authenticate now fails (tool calls 401 after a good token exchange, breaks after refresh, returns another account's data), before changing code. |
 | `/mcp-server-builder` | Use when exposing an API as an MCP server or scaffolding a new MCP server in Python or TypeScript, before hand-writing tool wrappers. |
-| `/migration-architect` | Plan a migration with zero or minimal downtime: phased plan, compatibility check, rollback scripts, for schemas, databases and services. |
-| `/minimalist` | Write the least code: no over-engineering, fewer dependencies. Use whenever the user wants it simpler; applies a ladder first: YAGNI, reuse, stdlib, native platform, existing deps. |
-| `/monorepo-navigator` | Use for Turborepo, Nx, pnpm-workspace or Lerna setup, affected-only builds, remote caching or a multi-repo to monorepo move. |
-| `/observability-designer` | Use when adding metrics, logs and traces to a service, fixing noisy alerts or designing dashboards. |
-| `/performance-profiler` | Use for a slow endpoint, memory leak, CPU spike, large bundle or performance budget in Node.js, Python or Go, before optimizing. |
-| `/pr-review-expert` | File-by-file pull request review for bugs, security and quality, with a merge verdict. Load whenever the user asks to review, look over or check a PR or diff before merging. |
 | `/rag-architect` | Design a RAG pipeline: chunk size, embedding model, vector database and retrieval quality metrics. |
-| `/runbook-generator` | Use when a service needs runbooks for deploy, incident response, maintenance or rollback, before launch. |
-| `/secrets-vault-manager` | Use when setting up HashiCorp Vault, AWS Secrets Manager, Azure Key Vault or GCP Secret Manager, rotating secrets or auditing secret access. |
-| `/self-eval` | Grade finished work honestly on two axes with a devil's-advocate pass against inflation. Use whenever the user asks how well a task went, to rate the work or for an honest self-review. |
-| `/ship-gate` | Use before deploying or going live ('am I ready to ship', 'can I deploy', 'preflight check'). |
-| `/skill-security-auditor` | Use before installing any skill or plugin from an untrusted source, or when asked if a skill is safe. |
-| `/skill-tester` | Use when authoring or auditing a skill in this ecosystem, before release. Validates structure with skill_validator.py, runs its scripts with script_tester.py and grades quality and security with quality_scorer.py and security_scorer.py. |
-| `/slo-architect` | Use when defining or reviewing SLOs, SLIs, error budgets or burn-rate alerts. Designs SLOs with slo_designer.py, computes budgets and multi-window burn-rate thresholds with error_budget_calculator.py and catches common SLO bugs with slo_review.py. |
-| `/spec-driven-workflow` | Use when a feature should be specified before coding (acceptance criteria, spec-first, tests from specs). |
-| `/sql-database-assistant` | Write, fix and speed up SQL: slow queries, EXPLAIN plans, indexes, ORM migrations (Prisma, Drizzle, SQLAlchemy). |
-| `/strict-api` | Use when the user says 'no hallucinations', 'verify APIs' or 'don't invent functions', or code depends on a library version you have not checked. |
-| `/tc-tracker` | Use when tracking technical changes as records, or handing work between AI sessions with a change record. |
-| `/tech-debt-tracker` | Find, rank and track tech debt in a codebase. Use whenever the user asks what to refactor first, plans a cleanup sprint, modernizes legacy code or wants to know how messy the code is. |
 
 ## Playwright testing (10)
 
