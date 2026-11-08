@@ -1,6 +1,6 @@
 # Skills catalog
 
-287 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+302 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
 
 
 ## Founder pack (start a business) (11)
@@ -374,3 +374,23 @@
 | `/promote` | Graduate a proven pattern from auto-memory (MEMORY.md) to CLAUDE.md or .claude/rules/ for permanent enforcement. |
 | `/remember` | Save something important to auto-memory with a timestamp and context. |
 | `/self-improving-agent` | Curate what the agent has learned into durable project knowledge. |
+
+## Superpowers (coding workflow) (15)
+
+| Skill | What it's for |
+|---|---|
+| `/brainstorming` | You MUST use this before any creative work - creating features, building components, adding functionality, modifying behavior, or planning anything new, in software or out of it (a talk, a business, a renovation). |
+| `/diagnosing-superpowers` | Use when a superpowers session went wrong and your human partner wants to know why — repeated work, ignored plans, stumbles, poor results, a skill that didn't fire, "it took too long", "why is it so expensive", "what is it doing" — or wants to build a bug report for the superpowers maintainers, for the current session or a past one identified by id or path, on any harness. |
+| `/dispatching-parallel-agents` | Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies |
+| `/executing-plans` | Use when executing an implementation plan in the current session as the implementer yourself — your human partner chose inline execution, or no subagent tool is available |
+| `/finishing-a-development-branch` | Use when implementation is complete, all tests pass, and you need to decide how to integrate the work |
+| `/receiving-code-review` | Use when receiving code review feedback, before implementing suggestions, especially if feedback seems unclear or technically questionable - requires technical rigor and verification, not performative agreement or blind implementation |
+| `/requesting-code-review` | Use when completing tasks, implementing major features, or before merging to verify work meets requirements |
+| `/subagent-driven-development` | Use when executing implementation plans with independent tasks in the current session |
+| `/systematic-debugging` | Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes |
+| `/test-driven-development` | Use when implementing any feature or bugfix, before writing implementation code |
+| `/using-git-worktrees` | Use when starting feature work that needs isolation from current workspace or before executing implementation plans - ensures an isolated workspace exists via native tools or git worktree fallback |
+| `/using-superpowers` | Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions |
+| `/verification-before-completion` | Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always |
+| `/writing-plans` | Use when you have a spec or requirements for a multi-step task, before touching code |
+| `/writing-skills` | Use when creating new skills, editing existing skills, or verifying skills work before deployment |
