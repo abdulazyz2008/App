@@ -1,6 +1,6 @@
 # Skills catalog
 
-291 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
+290 skills installed in `.claude/skills`. Type `/name` to use one, or just describe the task and Claude picks the skill.
 
 
 ## Founder pack (start a business) (11)
@@ -222,7 +222,7 @@
 | `/saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
 | `/stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
 
-## Claude-skills: Marketing (27)
+## Claude-skills: Marketing (26)
 
 | Skill | What it's for |
 |---|---|
@@ -233,7 +233,6 @@
 | `/campaign-analytics` | Analyze campaign performance on the user's numbers: ROAS, CPA, ROI, multi-touch attribution and funnel drop-off. |
 | `/churn-prevention` | Use when designing a cancel flow, save offers, exit surveys or dunning emails, or cutting failed-payment churn. |
 | `/cold-email` | Use for any cold outreach or SDR email or follow-up sequence to prospects who did not opt in, before drafting. |
-| `/content-humanizer` | Make a draft sound less like AI: fix generic, robotic text with rhythm, specifics, personality and brand voice. |
 | `/content-production` | Write a blog post, article or guide end to end: research, outline, draft, SEO pass and quality gates. |
 | `/content-strategy` | Use when deciding what content to create (topics, clusters, a blog or content plan), before listing ideas. |
 | `/copy-editing` | Edit, proofread and tighten existing marketing copy in focused passes: clarity, voice, proofreading, specificity, readability and AI tells. |

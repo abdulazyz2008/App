@@ -263,7 +263,7 @@ When reviewing drafts: flag issues → explain impact → give specific fix. Don
 ## Related Skills
 
 - **content-strategy**: Use when deciding *what* to write — topics, calendar, pillar structure. NOT for writing the actual piece (that's this skill).
-- **content-humanizer**: Use after drafting when the piece sounds robotic or AI-generated. Run this before the optimization pass.
+- **humanizer**: Use after drafting when the piece sounds robotic or AI-generated. Run this before the optimization pass.
 - **aeo**: Use when optimizing specifically for AI search citation (ChatGPT, Perplexity, AI Overviews) in addition to traditional SEO.
 - **copywriting**: Use for landing pages, CTAs, and conversion copy. NOT for long-form content (that's this skill).
 - **seo-audit**: Use when auditing an existing content library for SEO gaps. NOT for single-piece production.

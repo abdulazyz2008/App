@@ -44,7 +44,7 @@ def analyze_campaign(campaign: dict) -> dict:
     skills_used = list(set(t["skill"] for t in tasks))
     pods_covered = set()
     pod_map = {
-        "content": ["content-strategy", "copywriting", "copy-editing", "social-content", "marketing-ideas", "content-production", "content-humanizer", "content-creator"],
+        "content": ["content-strategy", "copywriting", "copy-editing", "social-content", "marketing-ideas", "content-production", "humanizer", "content-creator"],
         "seo": ["seo-audit", "programmatic-seo", "aeo", "schema-markup", "site-architecture"],
         "cro": ["page-cro", "form-cro", "signup-flow-cro", "onboarding-cro", "popup-cro", "paywall-upgrade-cro"],
         "channels": ["email-sequence", "cold-email", "paid-ads", "ad-creative", "social-media-manager"],

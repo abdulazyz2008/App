@@ -42,7 +42,7 @@ User wants to assess their marketing → you run a cross-functional audit touchi
 | "Social media post," "LinkedIn post," "tweet" | **social-content** | Not social-media-manager (that's for strategy) |
 | "Marketing ideas," "brainstorm," "what else can I try" | **marketing-ideas** | |
 | "Write an article," "research and write," "SEO article" | **content-production** | Not content-creator (production has the full pipeline) |
-| "Sounds too robotic," "make it human," "AI watermarks" | **content-humanizer** | |
+| "Sounds too robotic," "make it human," "AI watermarks" | **humanizer** | |
 
 ### SEO Pod
 | Trigger | Route to | NOT this |
@@ -148,7 +148,7 @@ For multi-skill campaigns, follow this sequence:
 1. content-strategy (plan topics + calendar)
 2. seo-audit (identify SEO opportunities)
 3. content-production (research → write → optimize)
-4. content-humanizer (polish for natural voice)
+4. humanizer (polish for natural voice)
 5. schema-markup (add structured data)
 6. social-content (promote on social)
 7. email-sequence (distribute via email)
