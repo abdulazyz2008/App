@@ -1,6 +1,6 @@
 # Skills catalog
 
-**191 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
+**200 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
 
 Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fastapi-review`, `/test-coverage`) and 25 helper agents (22 `gsd-*`, `planner`, `python-reviewer`, `fastapi-reviewer`).
 
@@ -23,6 +23,7 @@ Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fast
 | Engineering | 8 | Website, backend, payments, email and code-review skills. |
 | Advanced engineering | 11 | AI agents, automation, MCP servers, databases, multilingual sites, finding new skills. |
 | Playwright testing | 10 | Write, fix and run website tests. |
+| Vercel (React, Next.js & deploy) | 9 | React and Next.js best practices, Vercel deploys and cost tuning, UI and writing reviews. |
 | Browser & Python | 6 | Website automation, FastAPI and Python best practices. |
 | Self-improving memory | 6 | Save lessons so Claude remembers them across sessions. |
 
@@ -308,6 +309,22 @@ Write, fix and run website tests.
 | `/pw-review` | Use when reviewing Playwright tests for quality ('review tests', 'audit tests', 'playwright best practices check'). |
 | `/report` | Summarize Playwright results. Use whenever the user asks how tests went, for a test report or status. |
 | `/testrail` | Use when syncing Playwright tests with TestRail ('testrail', 'sync test cases', 'push results to testrail', 'import from testrail'). |
+
+## Vercel (React, Next.js & deploy) (9)
+
+React and Next.js best practices, Vercel deploys and cost tuning, UI and writing reviews.
+
+| Skill | What it does |
+|---|---|
+| `/deploy-to-vercel` | Deploy an app or website to Vercel and return the link, including a temporary preview deploy without logging in. |
+| `/vercel-cli-with-tokens` | Deploy and manage Vercel projects with an access token instead of an interactive login, including environment variables. |
+| `/vercel-optimize` | Cut Vercel cost and speed up a deployed Next.js, SvelteKit, Nuxt or Astro app, using its real metrics and usage. Needs the Vercel CLI. |
+| `/vercel-composition-patterns` | React component patterns that scale: compound components, context providers, fewer boolean props. Includes React 19 changes. |
+| `/vercel-react-best-practices` | React and Next.js performance rules from Vercel Engineering, for writing, reviewing or refactoring components and pages. |
+| `/vercel-react-native-skills` | React Native and Expo best practices: fast lists, animations, native modules. |
+| `/vercel-react-view-transitions` | Smooth page and element animations with React's View Transition API, including Next.js route changes. |
+| `/web-design-guidelines` | Review UI code against Vercel's Web Interface Guidelines (accessibility, UX, design). Fetches the latest rules from GitHub each time. |
+| `/writing-guidelines` | Review docs and other prose against Vercel's writing guidelines. Fetches the latest rules from GitHub each time. |
 
 ## Browser & Python (6)
 
