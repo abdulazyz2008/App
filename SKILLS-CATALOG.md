@@ -1,6 +1,6 @@
 # Skills catalog
 
-**190 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
+**191 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
 
 Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fastapi-review`, `/test-coverage`) and 25 helper agents (22 `gsd-*`, `planner`, `python-reviewer`, `fastapi-reviewer`).
 
@@ -21,7 +21,7 @@ Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fast
 | Writing & output style | 2 | Make text sound human, or make Claude's replies ADHD-friendly. |
 | Superpowers (coding workflow) | 15 | Careful coding habits: plan, test first, debug, verify. |
 | Engineering | 8 | Website, backend, payments, email and code-review skills. |
-| Advanced engineering | 10 | AI agents, automation, MCP servers, databases, multilingual sites. |
+| Advanced engineering | 11 | AI agents, automation, MCP servers, databases, multilingual sites, finding new skills. |
 | Playwright testing | 10 | Write, fix and run website tests. |
 | Browser & Python | 6 | Website automation, FastAPI and Python best practices. |
 | Self-improving memory | 6 | Save lessons so Claude remembers them across sessions. |
@@ -274,7 +274,7 @@ Website, backend, payments, email and code-review skills.
 | `/senior-prompt-engineer` | Improve prompts and measure LLM quality: fix inconsistent prompts, build eval sets, score RAG retrieval, check agent tool configs. |
 | `/stripe-integration-expert` | Use for any Stripe integration: subscriptions, trials, proration, checkout, usage billing, webhooks, customer portal or invoicing in Next.js, Express or Django. |
 
-## Advanced engineering (10)
+## Advanced engineering (11)
 
 AI agents, automation, MCP servers, databases, multilingual sites.
 
@@ -282,6 +282,7 @@ AI agents, automation, MCP servers, databases, multilingual sites.
 |---|---|
 | `/agent-designer` | Design multi-agent systems (supervisor, swarm, pipeline) and tool schemas; find bottlenecks in run logs. |
 | `/agent-workflow-designer` | Use when architecting a multi-step LLM or agent pipeline, choosing single vs multi-agent, or fixing context bloat and broken handoffs. |
+| `/find-skills` | Find and install more agent skills. Use when you ask "is there a skill for X" or "how do I do X" and an installable skill might already exist. |
 | `/browser-automation` | Automate a browser: scrape websites, fill forms, pull structured data from web pages. Use whenever the user wants to grab data from a site, fill a web form or extract a table. |
 | `/database-designer` | Design a database schema: tables, relationships, indexes, normalization, SQL vs NoSQL, migration plans. |
 | `/full-page-screenshot` | Use when asked for a full-page or long screenshot of a web page. Captures SPA scroll containers, lazy images and very tall pages through Chrome DevTools Protocol with no extra dependencies. |
