@@ -1,0 +1,13 @@
+{
+  "id": "P047",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "In our house the clothes have always been washed by hand and it gets done; I have never felt we needed a machine. If I ever did buy one, I would start with an ordinary semi-automatic for half this money, not pay extra for a battery.",
+  "objection": "A normal semi-automatic costs about half of ₹21,999, and we do not even own a washer yet, so paying double for battery backup feels like paying for a problem we do not have.",
+  "would_change_my_mind": "If a neighbour's family I trust used it for a few months and I saw it really save the women of the house their daily hours, even through the power cuts, at a price closer to a normal semi-automatic.",
+  "price_too_cheap": 6000,
+  "price_cheap": 10000,
+  "price_expensive": 14000,
+  "price_too_expensive": 18000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P032",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I can afford it, but I have never seen this battery machine in anyone's house. I won't spend twenty-two thousand on something new until my brother-in-law or a neighbour has used it through a monsoon season and the dealer I know stands behind it.",
+  "objection": "Will a cold wash really get the mud out of farm clothes, and will that battery still hold a charge after two summers in our heat, or will I be running back to the dealer?",
+  "would_change_my_mind": "Seeing it working in a relative's or neighbour's house, with my own trusted dealer showing it washing muddy field clothes during a power cut.",
+  "price_too_cheap": 9000,
+  "price_cheap": 14000,
+  "price_expensive": 20000,
+  "price_too_expensive": 27000
+}

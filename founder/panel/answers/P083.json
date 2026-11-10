@@ -1,0 +1,13 @@
+{
+  "id": "P083",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "We wash everything by hand at home and it works fine, so I don't see why we would spend ₹22,000 on a machine now, when every rupee is going toward the wedding. A battery for power cuts doesn't matter to me when we don't own a washer at all.",
+  "objection": "A normal semi-automatic washer costs about half this, and we have never needed even that one. Taking on ₹2,000 a month in EMI for a year while we are saving would put pressure on the family.",
+  "would_change_my_mind": "If the wedding were over and someone in the house could no longer hand-wash, and the price came down near a basic semi-automatic, around ₹12,000, I might think about it.",
+  "price_too_cheap": 5000,
+  "price_cheap": 9000,
+  "price_expensive": 13000,
+  "price_too_expensive": 18000
+}

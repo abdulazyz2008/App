@@ -1,0 +1,13 @@
+{
+  "id": "P045",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "Twenty-two thousand is more than a month and a half of what we earn, and every rupee is going to the wedding fund right now. I already have an inverter and battery, so I would rather hand-wash or put a cheap washer on the inverter than pay for a second battery inside a machine.",
+  "objection": "I am paying again for a battery when I already own one. Two loads per charge is not much, and if the lithium battery dies after three years in our heat I am stuck with a dealer bill I cannot afford.",
+  "would_change_my_mind": "A version without the built-in battery, made to run well off my existing inverter or solar, for under ₹12,000, or an EMI around ₹800 a month.",
+  "price_too_cheap": 7000,
+  "price_cheap": 10000,
+  "price_expensive": 14000,
+  "price_too_expensive": 18000
+}

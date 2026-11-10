@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "We have always washed by hand at home and it costs nothing, so I don't feel any need for a machine at all, let alone one with a battery. I can afford ₹22,000, but I would rather put that money into the farm or the shop.",
+  "objection": "When the power goes, my borewell pump stops too, so there is no water to fill the machine anyway. A battery that finishes the wash does not solve my real problem, and the women at home already manage fine by hand.",
+  "would_change_my_mind": "If my wife or mother asked for one, or I saw a neighbour's machine save real time and labour for a full year without trouble at the dealer.",
+  "price_too_cheap": 8000,
+  "price_cheap": 13000,
+  "price_expensive": 20000,
+  "price_too_expensive": 28000
+}

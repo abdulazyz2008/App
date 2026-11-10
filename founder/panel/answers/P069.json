@@ -1,0 +1,13 @@
+{
+  "id": "P069",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is almost a whole month of what our house earns, and hand-washing costs nothing. Even if I wanted a machine, I would not buy it in an ordinary week; I would wait for Diwali and see what offer the dealer gives.",
+  "objection": "The pump only runs when there is power, so when the light goes I have no water anyway. What good is a battery that finishes the wash if the tank is empty? And ₹1,999 every month for a year is a big weight for something we already do by hand.",
+  "would_change_my_mind": "A proper Diwali offer from the local dealer: a good discount or a free gift with low-cost EMI, so the monthly amount comes down to around ₹1,200 and I can see a neighbour's machine working through power cuts.",
+  "price_too_cheap": 7000,
+  "price_cheap": 12000,
+  "price_expensive": 17000,
+  "price_too_expensive": 22000
+}

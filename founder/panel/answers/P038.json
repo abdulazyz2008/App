@@ -1,0 +1,13 @@
+{
+  "id": "P038",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "Twenty-two thousand is two months of what the whole house earns, and even ₹2,000 a month for a year is too much when we still wash most clothes by hand. Nobody in the village has this machine yet, so I would not be the first to spend on it.",
+  "objection": "My inverter can already run a small washer, and if not I would rather buy a bigger inverter that runs the fan and lights too, not a machine that only washes two loads on its battery.",
+  "would_change_my_mind": "If a relative or the dealer I trust had one working for a year in the evening power cuts and the price came down to around ₹12,000, I would think about it.",
+  "price_too_cheap": 5000,
+  "price_cheap": 8000,
+  "price_expensive": 12000,
+  "price_too_expensive": 16000
+}

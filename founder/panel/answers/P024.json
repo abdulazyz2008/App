@@ -1,0 +1,13 @@
+{
+  "id": "P024",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "Twenty-two thousand is two months of what my family earns, and even ₹1,999 a month is a big piece of our money while we save for the wedding and school fees. My wife washes by hand and it costs us nothing, so I cannot spend this on a machine now.",
+  "objection": "I don't know this brand from TV. If the battery dies after three years, who in my village will fix it and how much will a new battery cost? Nobody has told me that price.",
+  "would_change_my_mind": "If a big brand I know sold it for under ₹12,000, with a mechanic near my village and a fixed, low price for a new battery written down.",
+  "price_too_cheap": 6000,
+  "price_cheap": 9000,
+  "price_expensive": 13000,
+  "price_too_expensive": 16000
+}

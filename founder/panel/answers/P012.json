@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is a quarter of what we earn in a whole year, and the EMI of ₹2,000 every month is more than I can promise. A plain semi-automatic costs about half, and hand-washing costs nothing, so I will keep washing by hand.",
+  "objection": "It is a premium machine for people with money. With my small solar system and weak grid I am not sure the battery even charges properly, and adding ₹6,500 for a panel makes it nearly ₹28,500.",
+  "would_change_my_mind": "If the full price with the solar panel came close to a normal semi-automatic, around ₹10,000-12,000, or the EMI dropped to a few hundred rupees a month.",
+  "price_too_cheap": 5000,
+  "price_cheap": 9000,
+  "price_expensive": 12000,
+  "price_too_expensive": 15000
+}

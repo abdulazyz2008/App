@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "Every rupee we can spare is going into the wedding fund right now, and the women at home already wash by hand for free. Adding a ₹2,000 EMI every month for a year just so the washing finishes during a power cut is not something I can justify this year.",
+  "objection": "₹1,999 a month is a new fixed payment while we are saving, and the battery only does two cold loads, so I am paying a lot extra over a basic machine for something hand-washing already covers.",
+  "would_change_my_mind": "An EMI under ₹1,000 a month, or the offer coming after the wedding when the savings pressure is off.",
+  "price_too_cheap": 7000,
+  "price_cheap": 11000,
+  "price_expensive": 16000,
+  "price_too_expensive": 20000
+}

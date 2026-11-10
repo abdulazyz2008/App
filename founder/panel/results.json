@@ -1,0 +1,311 @@
+{
+ "business": "Battery-backed washing machine (working name): a semi-automatic washer with a built-in battery that finishes a load during a power cut, charged from the grid when power is on or from an optional solar panel",
+ "seed": 960537,
+ "dealt": 100,
+ "answered": 81,
+ "skipped": [
+  [
+   "P081",
+   "missing"
+  ],
+  [
+   "P082",
+   "missing"
+  ],
+  [
+   "P084",
+   "missing"
+  ],
+  [
+   "P085",
+   "missing"
+  ],
+  [
+   "P086",
+   "missing"
+  ],
+  [
+   "P087",
+   "missing"
+  ],
+  [
+   "P088",
+   "missing"
+  ],
+  [
+   "P089",
+   "missing"
+  ],
+  [
+   "P090",
+   "missing"
+  ],
+  [
+   "P091",
+   "missing"
+  ],
+  [
+   "P092",
+   "missing"
+  ],
+  [
+   "P093",
+   "missing"
+  ],
+  [
+   "P094",
+   "missing"
+  ],
+  [
+   "P095",
+   "missing"
+  ],
+  [
+   "P096",
+   "missing"
+  ],
+  [
+   "P097",
+   "missing"
+  ],
+  [
+   "P098",
+   "missing"
+  ],
+  [
+   "P099",
+   "missing"
+  ],
+  [
+   "P100",
+   "missing"
+  ]
+ ],
+ "buys": 0,
+ "passes": 81,
+ "buy_rate": 0.0,
+ "by_segment": [
+  [
+   "Small farmer or daily-wage household",
+   28,
+   0.0
+  ],
+  [
+   "Salaried, government-job or remittance household",
+   23,
+   0.0
+  ],
+  [
+   "Prosperous farmer or shop owner",
+   22,
+   0.0
+  ],
+  [
+   "Hamlet with weak or no grid, uses a solar home system",
+   8,
+   0.0
+  ]
+ ],
+ "by_behaviour": [
+  [
+   "Hand-wash family",
+   19,
+   0.0
+  ],
+  [
+   "Price-first",
+   5,
+   0.0
+  ],
+  [
+   "EMI buyer",
+   12,
+   0.0
+  ],
+  [
+   "Festival-offer waiter",
+   10,
+   0.0
+  ],
+  [
+   "Asks relatives and the dealer",
+   15,
+   0.0
+  ],
+  [
+   "Big-brand loyal",
+   7,
+   0.0
+  ],
+  [
+   "Already owns an inverter",
+   13,
+   0.0
+  ]
+ ],
+ "by_income": [
+  [
+   "under ₹217,000",
+   27,
+   0.0
+  ],
+  [
+   "₹217,000 to ₹557,000",
+   27,
+   0.0
+  ],
+  [
+   "₹557,000 and up",
+   27,
+   0.0
+  ]
+ ],
+ "why_not": [
+  [
+   "price",
+   38,
+   [
+    "Twenty-two thousand is two months of what the whole family earns, and ₹2,000 every month for a year is more than we can promise when the harvest money is uncertain. The women already wash by hand and it costs us nothing, so this is not where our money goes first.",
+    "₹22,000 is most of a month's family income and every rupee right now is going to the wedding fund. Even ₹2,000 a month for a year is a new bill I can't take on just so a washer finishes when the light goes; we can wait for the power or wash by hand."
+   ],
+   [
+    "P001",
+    "P002"
+   ]
+  ],
+  [
+   "need",
+   19,
+   [
+    "Our water only comes for a short time each day, so the power cut is not the real problem. A battery does nothing when the tank is empty. And with the wedding money being saved, ₹22,000, or ₹2,000 every month for a year, on a washing machine is not happening.",
+    "We already have an inverter in the house, and if it struggles with a washer I can buy a bigger battery for it, which also keeps the fans and lights running. Paying twenty-two thousand for a washer with its own battery that only does two cold loads feels like paying twice for the same thing, and nobody I know has one yet."
+   ],
+   [
+    "P008",
+    "P013"
+   ]
+  ],
+  [
+   "trust",
+   11,
+   [
+    "Twenty-two thousand is about a month and more of what our whole house earns, and nobody I know has used a washing machine that runs on a battery. I won't put that money down until someone in the family or the neighbour has had one working for a season.",
+    "The power cuts are a real trouble for me, but I only buy brands I see on TV like LG or Samsung, and here nobody tells me whose machine this is. ₹21,999 is nearly double a normal semi-automatic, and I will not put that much into a name I don't know just because the local dealer says so."
+   ],
+   [
+    "P010",
+    "P018"
+   ]
+  ],
+  [
+   "habit",
+   10,
+   [
+    "We have always washed by hand at home and it costs nothing, so I don't feel any need for a machine at all, let alone one with a battery. I can afford ₹22,000, but I would rather put that money into the farm or the shop.",
+    "We have always washed by hand at the tap and it works fine for us. Without steady power the borewell often isn't running anyway, so a machine that finishes its load on battery doesn't fix my real water problem."
+   ],
+   [
+    "P004",
+    "P028"
+   ]
+  ],
+  [
+   "timing",
+   3,
+   [
+    "Every rupee we can spare is going into the wedding fund right now, and the women at home already wash by hand for free. Adding a ₹2,000 EMI every month for a year just so the washing finishes during a power cut is not something I can justify this year.",
+    "I am not buying a big machine in an ordinary week at full price. Hand-washing costs us nothing, and if I buy a washer at all it will be at the harvest or for a wedding in the family, when the dealer gives a discount or a free gift."
+   ],
+   [
+    "P016",
+    "P049"
+   ]
+  ]
+ ],
+ "why_yes": [],
+ "flip": [
+  "If the dealer let me pay small amounts after harvest instead of a fixed EMI every month, and showed me it cleaning our muddy work clothes in front of me.",
+  "If the price came down close to an ordinary semi-automatic, around ₹12,000-13,000, with a lower EMI like ₹800-1,000 a month, and a neighbour showed me it cleans muddy clothes properly.",
+  "If it cost close to an ordinary semi-automatic, around thirteen or fourteen thousand, with the battery included.",
+  "If my wife or mother asked for one, or I saw a neighbour's machine save real time and labour for a full year without trouble at the dealer.",
+  "If the dealer brought the EMI down to around ₹1,300-1,400 a month, or threw in the solar panel free, so the gap with a normal machine felt small.",
+  "A Diwali or harvest-season offer that brings it near ₹15,000 with a free gift, EMI I can pay after harvest instead of every month, and a neighbour I know already using it without trouble.",
+  "If it cost under ₹10,000, or the monthly payment was around ₹500, and I saw a neighbour's muddy field clothes come out clean from it.",
+  "If my cousin or the dealer I trust showed me one running in a house like ours with the same water problem, and the EMI came down to around ₹1,000 a month after the wedding expenses are done.",
+  "A big Diwali or harvest-season offer that brings the price near ₹12,000 with a free gift, on a small EMI I can pay after the crop is sold.",
+  "A relative or neighbour using one for a few months without trouble, and the dealer telling me in writing what a replacement battery costs.",
+  "If a big brand I know from TV sold it, with the solar panel included, for under ₹12,000 or about ₹800 a month.",
+  "If the full price with the solar panel came close to a normal semi-automatic, around ₹10,000-12,000, or the EMI dropped to a few hundred rupees a month.",
+  "If my dealer or a relative in the village had been using one for a season and told me it saves them trouble that the inverter does not, and the price came down closer to an ordinary semi-automatic plus a little.",
+  "If the price came down near a normal semi-automatic, around ₹13,000 to ₹14,000, and the dealer washed my muddy work clothes on battery in front of me and they came out clean.",
+  "If it came down to around ₹12,000-13,000 with the solar panel included, or an EMI under ₹800 a month, I would think about it seriously.",
+  "An EMI under ₹1,000 a month, or the offer coming after the wedding when the savings pressure is off.",
+  "If it cost close to a basic semi-automatic, around ₹10,000 or EMI under ₹800 a month, and someone in the village I trust already used one without problems.",
+  "If a big TV brand I trust made it, or stood behind the battery with its own service centre in our district, and a neighbour showed me it cleaning muddy clothes on battery.",
+  "An EMI under ₹800 a month, or seeing a neighbour's machine clean real muddy farm clothes on battery.",
+  "If the EMI came down to around ₹800-900 a month, or the dealer took my old washer or inverter battery in exchange, I would think about it.",
+  "A written battery replacement price under ₹4,000 and the dealer promising home service in my village, plus seeing a neighbour use one for a few months without trouble.",
+  "If my brother-in-law or a neighbour bought one, used it for a full monsoon with the power cuts, and told me it works, and the dealer let me pay smaller instalments after harvest, around ₹12,000 to ₹14,000 total.",
+  "If it could run off the inverter I already own and cost under ₹12,000, or the EMI was about ₹800 a month, and the dealer showed me it works with a bucket or tank fill when the tap water is not there.",
+  "If a big brand I know sold it for under ₹12,000, with a mechanic near my village and a fixed, low price for a new battery written down.",
+  "A festival or wedding-season offer from my own dealer, with the solar panel thrown in free and a few thousand off, plus a neighbour I trust who has used it through one monsoon and one summer without trouble.",
+  "An EMI under ₹900 a month, with the dealer showing me it really cleans muddy farm clothes before I sign.",
+  "A relative or neighbour using one for a few months and telling me it cleans muddy clothes and keeps going through the power cuts, with the dealer I already trust standing behind it.",
+  "If my daughter-in-law or a neighbour I trust used one for months through the power cuts, and it could run off a filled tank or drum without needing the pump, I might think about it for the household.",
+  "If a relative or neighbour had used it for a season and the dealer offered it for much less, with the solar panel included and a smaller monthly amount.",
+  "If a relative or neighbour had used one for a season and said it really works with little water, and the EMI came down to around ₹1,000 a month after the wedding is done.",
+  "If the dealer showed me it could feed power back to my lights and fans, or the solar kit could run my borewell pump too, so it is backup for the house and not only for washing.",
+  "Seeing it working in a relative's or neighbour's house, with my own trusted dealer showing it washing muddy field clothes during a power cut.",
+  "If a neighbour I trust had one working for a year with the dealer actually coming to the village for repairs, and the replacement battery price was written down and low.",
+  "If it cost close to a normal semi-automatic, around ₹11,000, or the EMI was ₹700-800 a month, I would think about it.",
+  "If a relative or neighbour in the block had one running for a few months and said it really works with our water and power, and the dealer showed me it can run on stored bucket water.",
+  "If the dealer showed me that my inverter really cannot handle a washer motor, and the price came down to around ₹15,000 with the battery replacement cost written down.",
+  "If the dealer showed me in my own house that my inverter can't handle a washer, and that this one doesn't drain my inverter battery in the evening when we need the fans, I might think about it for the women in the house.",
+  "If a relative or the dealer I trust had one working for a year in the evening power cuts and the price came down to around ₹12,000, I would think about it.",
+  "If it came down close to ₹13,000-14,000, or the EMI was under ₹1,000 a month, so it costs about what a normal semi-automatic does.",
+  "If it could run off the water we store in drums by hand-filling it, and cost under ₹12,000 so the EMI is a few hundred rupees a month, not ₹2,000.",
+  "Seeing it wash a neighbour's muddy farm clothes properly, in front of me, through a power cut, at a price closer to fifteen thousand.",
+  "A price near ₹10,000, or an EMI under ₹800 a month, with the dealer showing me it runs on my existing inverter battery.",
+  "A relative or neighbour using it for a few months and telling me it finishes the wash during power cuts, with my trusted dealer standing behind the battery warranty.",
+  "A Diwali or harvest offer that brings it near ₹15,000 with the solar panel free, plus a written promise that the dealer's mechanic comes to my village for repairs and a fixed price for the replacement battery.",
+  "A version without the built-in battery, made to run well off my existing inverter or solar, for under ₹12,000, or an EMI around ₹800 a month.",
+  "A big Diwali or harvest offer from the dealer I already know, with the solar panel free and a low EMI, plus seeing it work in a neighbour's house first.",
+  "If a neighbour's family I trust used it for a few months and I saw it really save the women of the house their daily hours, even through the power cuts, at a price closer to a normal semi-automatic.",
+  "A big brand I know, like LG, Samsung or Godrej, selling this for around ₹14,000, or the EMI dropping to about ₹1,000 a month after the wedding is over.",
+  "A festival offer from my local dealer: a clear discount, or the solar panel thrown in free, plus a YouTube video of someone in a village like mine showing it finishing a load during a power cut.",
+  "A big Diwali or harvest-season offer that brings the price down to around ₹12,000 with a free gift, from a dealer in the block town I already know.",
+  "If a neighbour in my village bought it and it worked for a year without trouble, and the price came down to around ten thousand after the wedding is done.",
+  "If my wife asked for it properly, or I saw it working in a neighbour's house through our power cuts for a few months without trouble, I would take it on EMI from the dealer.",
+  "If a big brand I know, like LG, Samsung or Godrej, made it and advertised it on TV, with service in our town.",
+  "If a brand I know, like LG, Samsung or Whirlpool, sold it with the battery, or my neighbour had one working well for a year with the dealer actually servicing it.",
+  "An EMI under ₹1,000 a month with the solar panel included, and seeing it clean a neighbour's muddy work clothes in front of me.",
+  "If the price came down to around ₹10,000 with a small EMI I could stop after a bad harvest, and a neighbour showed me it cleaning real muddy field clothes.",
+  "If it cost about the same as a normal semi-automatic, around ₹13,000, so the battery came almost free, or if a neighbour showed me it works through our long evening cuts without touching the inverter.",
+  "An EMI under ₹800 a month with no down payment, so it fits next to my other instalments.",
+  "If the women of the house were no longer able to hand-wash, or my daughter-in-law insisted, and the price came close to an ordinary semi-automatic, around twelve or thirteen thousand.",
+  "If the dealer showed me my inverter cannot run a washer and the price came down near a normal semi-automatic, around 13,000-14,000, from a brand people in my village already use.",
+  "If it cost close to a normal semi-automatic, around ₹14-15k, or if my dealer showed me my inverter really cannot handle a washer motor without tripping",
+  "If a neighbour or the dealer showed me it cleaning our muddy clothes on battery during a power cut, and the EMI came down to around ₹1,200 a month after the wedding is done.",
+  "If a basic washer came in under ₹10,000 after the wedding is paid for, and the women in the house were tired of hand-washing, I might think about one, but probably still without the battery.",
+  "If a neighbour I trust had one running for a year without trouble, and the dealer wrote down the replacement battery price and promised to come to the village for repairs.",
+  "If the EMI came down to about ₹800-900 a month, after the wedding is done and money is less tight",
+  "A festival offer that brings it to about ₹16,000 with the solar panel thrown in free, and a neighbour I know who has used one for a year without trouble.",
+  "If a relative or neighbour had one running for a few months and told me it works even with our water problems, and the dealer I trust stood behind it, I would think about it on EMI.",
+  "The dealer showing it working in a house like mine, filled by bucket from stored water with little water per load, and telling me the battery replacement price up front.",
+  "A proper Diwali offer from the local dealer: a good discount or a free gift with low-cost EMI, so the monthly amount comes down to around ₹1,200 and I can see a neighbour's machine working through power cuts.",
+  "A price near ₹10,000 with a small EMI, and a dealer demo in our village showing it run on our own solar power with the water we have.",
+  "If it cost under ₹12,000 and a neighbour in my village had used one for a year without trouble.",
+  "If the woman who does our washing left or could no longer do it, or my daughter-in-law asked for it, then I would buy one, and the battery would matter because of the evening power cuts.",
+  "If a big brand I know from TV sold it, or a neighbour had used one through a whole monsoon season with no trouble, and the EMI came down to around ₹1,200 a month.",
+  "If my cousin or a neighbour used it for a few months through the summer power cuts and said it works, and the dealer I already trust told me the replacement battery price up front.",
+  "If the dealer showed me my inverter really can't take the washer's motor load, and the price came down close to a normal semi-automatic plus a little extra, maybe ₹15,000 to ₹16,000.",
+  "My cousin or a neighbour using one for a season and telling me it really finishes the wash in a power cut, with my own dealer standing behind the battery service.",
+  "If a neighbour I trust had one running for a year with no trouble, and the dealer brought the price down near a plain semi-automatic, about ₹14,000, I would think about it for my wife.",
+  "A big Diwali or harvest-season offer, something like ₹14,000 with a free gift and a low EMI, plus proof from a neighbour that it works with the little water we store in a drum or bucket.",
+  "A relative or neighbour using it for a year without trouble, plus the dealer writing down the replacement battery price and promising village repair visits, and an EMI closer to ₹1,000 a month.",
+  "If the dealer showed me that my inverter can't actually handle a washer motor, or if the battery could also run my lights and fans during a cut so it does the inverter's job too, at around ₹15,000.",
+  "If the wedding were over and someone in the house could no longer hand-wash, and the price came down near a basic semi-automatic, around ₹12,000, I might think about it."
+ ],
+ "purchases_first_month_per_buyer": null,
+ "price_answers": 81
+}

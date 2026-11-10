@@ -1,0 +1,13 @@
+{
+  "id": "P080",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already have an inverter and battery in the house, so I would rather buy an ordinary semi-automatic for about ₹11,000 and run it on the inverter, or put in a bigger battery that runs the fans and the washer. Paying double for a second battery that only runs the washing machine doesn't make sense to me.",
+  "objection": "A normal semi-automatic costs about half this, and my inverter can probably already run one. Two cold loads on a charge isn't much for a family, and in 3 or 4 years I'll be paying again for a new lithium battery.",
+  "would_change_my_mind": "If the dealer showed me that my inverter can't actually handle a washer motor, or if the battery could also run my lights and fans during a cut so it does the inverter's job too, at around ₹15,000.",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 17000,
+  "price_too_expensive": 21000
+}

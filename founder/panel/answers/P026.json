@@ -1,0 +1,13 @@
+{
+  "id": "P026",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹1,999 every month for a year is too much for a washing machine when my wife already hand-washes and the money is needed for diesel, seed and the pump. Even a normal washer would be a stretch for us, never mind one with a battery.",
+  "objection": "A cold wash on battery won't get the red mud out of my field clothes, so we will still be scrubbing by hand, and I'd be paying a big EMI for something that only half does the job. Also the water comes from the borewell, and that needs power too.",
+  "would_change_my_mind": "An EMI under ₹900 a month, with the dealer showing me it really cleans muddy farm clothes before I sign.",
+  "price_too_cheap": 6000,
+  "price_cheap": 10000,
+  "price_expensive": 15000,
+  "price_too_expensive": 20000
+}

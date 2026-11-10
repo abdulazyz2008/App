@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is more than a whole month of what our house earns, and a plain semi-automatic is half that. The power cuts are a real headache, but my hands and a bucket still work for free, and I won't spend this kind of money outside Diwali or harvest time anyway.",
+  "objection": "I'd be paying double just for a battery that does two loads. Even ₹1,999 a month for a year is a big fixed bill when our income comes in lumps after harvest, and if that battery dies in the village who comes to fix it?",
+  "would_change_my_mind": "A Diwali or harvest-season offer that brings it near ₹15,000 with a free gift, EMI I can pay after harvest instead of every month, and a neighbour I know already using it without trouble.",
+  "price_too_cheap": 7000,
+  "price_cheap": 11000,
+  "price_expensive": 15000,
+  "price_too_expensive": 19000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P063",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "We wash by hand at the tap and it works fine, power cut or not. Every rupee is going to the wedding, and ₹22,000 is more than a month of what we earn, all for a machine we have never needed.",
+  "objection": "Power cuts don't stop my hands, so the battery fixes a problem I don't have. If I ever bought a washer, I'd get a cheap plain one and run it on the inverter we already have, not pay extra for a battery.",
+  "would_change_my_mind": "If a basic washer came in under ₹10,000 after the wedding is paid for, and the women in the house were tired of hand-washing, I might think about one, but probably still without the battery.",
+  "price_too_cheap": 4000,
+  "price_cheap": 7000,
+  "price_expensive": 11000,
+  "price_too_expensive": 15000
+}

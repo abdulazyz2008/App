@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is almost two months of what I earn, and ₹1,999 a month for a year is too much when hand-washing costs us nothing. My inverter and battery already have to cover lights and fans in the evening cuts, so a washer is not where my money goes first.",
+  "objection": "I would be paying a big amount, or locking into a year of EMI, to replace something we already do for free. And two loads on the battery sounds fine, but if the battery goes weak after the warranty I am stuck with an expensive machine and a long trip to the dealer.",
+  "would_change_my_mind": "If it came down to around ₹12,000-13,000 with the solar panel included, or an EMI under ₹800 a month, I would think about it seriously.",
+  "price_too_cheap": 6000,
+  "price_cheap": 10000,
+  "price_expensive": 14000,
+  "price_too_expensive": 18000
+}

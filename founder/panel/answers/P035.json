@@ -1,0 +1,13 @@
+{
+  "id": "P035",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "The battery fixes the power cut, but in our house the bigger problem is water. Half the time the tank is not full when the light comes back, so a ₹22,000 machine still ends up waiting while we wash by hand.",
+  "objection": "Water supply is not reliable, so a machine that finishes the load without power does not help much if there is no water to fill it. And nobody I know has used this battery type, so I don't know if it will last three years in our heat.",
+  "would_change_my_mind": "If a relative or neighbour in the block had one running for a few months and said it really works with our water and power, and the dealer showed me it can run on stored bucket water.",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 18000,
+  "price_too_expensive": 24000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P050",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is more than a month of what my whole house earns, and my wife already washes clothes by hand at no cost. Paying ₹2,000 every month for a year just for washing, I cannot do that, maybe after a good harvest.",
+  "objection": "Hand-washing is free and we have always done it, so why should I pay so much money and then keep paying EMI on top of the seed and fertiliser loans.",
+  "would_change_my_mind": "A big Diwali or harvest-season offer that brings the price down to around ₹12,000 with a free gift, from a dealer in the block town I already know.",
+  "price_too_cheap": 5000,
+  "price_cheap": 9000,
+  "price_expensive": 13000,
+  "price_too_expensive": 17000
+}

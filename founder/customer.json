@@ -1,0 +1,98 @@
+{
+  "business": "Battery-backed washing machine (working name): a semi-automatic washer with a built-in battery that finishes a load during a power cut, charged from the grid when power is on or from an optional solar panel",
+  "target": "Rural Indian households (village and small-town) that face frequent or long power cuts and either hand-wash today or own a basic washer that stops when the power goes",
+  "where": "Rural India: villages and taluka/block towns, bought through local electronics dealers",
+  "age": [
+    24,
+    55
+  ],
+  "segments": [
+    {
+      "name": "Small farmer or daily-wage household",
+      "share": 0.35,
+      "income": [
+        100000,
+        250000
+      ]
+    },
+    {
+      "name": "Salaried, government-job or remittance household",
+      "share": 0.3,
+      "income": [
+        250000,
+        600000
+      ]
+    },
+    {
+      "name": "Prosperous farmer or shop owner",
+      "share": 0.25,
+      "income": [
+        600000,
+        1500000
+      ]
+    },
+    {
+      "name": "Hamlet with weak or no grid, uses a solar home system",
+      "share": 0.1,
+      "income": [
+        80000,
+        200000
+      ]
+    }
+  ],
+  "behaviours": [
+    {
+      "name": "Hand-wash family",
+      "share": 0.22,
+      "how": "Clothes are washed by hand at home, a tap or a pond; a machine has never seemed necessary."
+    },
+    {
+      "name": "Already owns an inverter",
+      "share": 0.16,
+      "how": "Has an inverter and battery for lights and fans during cuts, and thinks about everything in terms of what it can run."
+    },
+    {
+      "name": "EMI buyer",
+      "share": 0.15,
+      "how": "Buys big items on monthly instalments through the dealer or a finance company; the monthly amount matters more than the total."
+    },
+    {
+      "name": "Asks relatives and the dealer",
+      "share": 0.15,
+      "how": "Will not buy until a relative, neighbour or the trusted local dealer vouches for it."
+    },
+    {
+      "name": "Festival-offer waiter",
+      "share": 0.12,
+      "how": "Waits for Diwali, harvest season or a wedding in the family to make a big purchase, and expects a discount or free gift."
+    },
+    {
+      "name": "Big-brand loyal",
+      "share": 0.12,
+      "how": "Only trusts well-known brands they see on TV, because service and spare parts are available."
+    },
+    {
+      "name": "Price-first",
+      "share": 0.08,
+      "how": "Compares the cheapest option in the shop and walks away from anything that feels like a premium."
+    }
+  ],
+  "objections": [
+    "A normal semi-automatic washer costs about half this",
+    "My inverter can already run a washer, or I could buy a bigger one",
+    "Water supply is not reliable, so a machine does not help much",
+    "Who will repair it in my village, and what does a new battery cost?",
+    "Hand-washing is free and we have always done it",
+    "Will a cold wash really clean muddy farm clothes?",
+    "I have never heard of this brand"
+  ],
+  "habits": [
+    "power goes off for several hours most days, often in the evening",
+    "the women of the house spend one to two hours a day washing clothes",
+    "you go to the block town market once or twice a week",
+    "you watch product videos on YouTube on your phone",
+    "water comes from a borewell pump that only runs when there is power",
+    "the family is saving for a wedding or for school fees"
+  ],
+  "currency": "₹"
+}

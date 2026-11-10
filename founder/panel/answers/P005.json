@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹1,999 a month I can manage, but I'm paying almost double what a normal semi-automatic costs just for a battery that does two loads. When the power goes, my borewell pump stops too, so finishing the wash isn't my biggest problem. For that money I'd rather put an inverter in the house that runs everything.",
+  "objection": "A normal semi-automatic is about half this price. The extra ₹10,000 or so is for a battery, and I'm not sure it will still hold a charge after the 3-year warranty, or what a new one would cost.",
+  "would_change_my_mind": "If the dealer brought the EMI down to around ₹1,300-1,400 a month, or threw in the solar panel free, so the gap with a normal machine felt small.",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 17500,
+  "price_too_expensive": 24000
+}

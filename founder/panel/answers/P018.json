@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "The power cuts are a real trouble for me, but I only buy brands I see on TV like LG or Samsung, and here nobody tells me whose machine this is. ₹21,999 is nearly double a normal semi-automatic, and I will not put that much into a name I don't know just because the local dealer says so.",
+  "objection": "If the battery dies after the third year or the dealer shuts shop, who will give me spare parts for an unknown machine? And will a cold wash even get the mud out of farm clothes? Otherwise I am scrubbing them by hand again anyway.",
+  "would_change_my_mind": "If a big TV brand I trust made it, or stood behind the battery with its own service centre in our district, and a neighbour showed me it cleaning muddy clothes on battery.",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 17000,
+  "price_too_expensive": 21000
+}

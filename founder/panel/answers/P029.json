@@ -1,0 +1,13 @@
+{
+  "id": "P029",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "Twenty-two thousand is more than a month and a half of everything we earn, and then six and a half more for the panel because our grid hardly gives power to charge it. Hand-washing costs us nothing, so I cannot put that much money into a machine.",
+  "objection": "Even ₹1,999 a month for a whole year is too heavy for us, and I don't know if this battery will really last in our village or if the dealer will come when it breaks. Nobody I know has one yet.",
+  "would_change_my_mind": "If a relative or neighbour had used it for a season and the dealer offered it for much less, with the solar panel included and a smaller monthly amount.",
+  "price_too_cheap": 4000,
+  "price_cheap": 7000,
+  "price_expensive": 11000,
+  "price_too_expensive": 15000
+}

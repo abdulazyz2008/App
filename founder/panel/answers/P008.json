@@ -1,0 +1,13 @@
+{
+  "id": "P008",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our water only comes for a short time each day, so the power cut is not the real problem. A battery does nothing when the tank is empty. And with the wedding money being saved, ₹22,000, or ₹2,000 every month for a year, on a washing machine is not happening.",
+  "objection": "The machine needs water, and water is what we don't have reliably. I'd be paying extra for a battery that fixes the smaller problem. I also don't know anyone who has used a battery washing machine, and I don't know how long that battery really lasts.",
+  "would_change_my_mind": "If my cousin or the dealer I trust showed me one running in a house like ours with the same water problem, and the EMI came down to around ₹1,000 a month after the wedding expenses are done.",
+  "price_too_cheap": 7000,
+  "price_cheap": 10000,
+  "price_expensive": 14000,
+  "price_too_expensive": 18000
+}

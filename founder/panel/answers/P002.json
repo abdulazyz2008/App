@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is most of a month's family income and every rupee right now is going to the wedding fund. Even ₹2,000 a month for a year is a new bill I can't take on just so a washer finishes when the light goes; we can wait for the power or wash by hand.",
+  "objection": "It costs nearly double a plain semi-automatic in the shop, and I'm not sure a cold wash on battery will actually get muddy farm clothes clean, so I'd be paying extra for something we'd still have to redo by hand.",
+  "would_change_my_mind": "If the price came down close to an ordinary semi-automatic, around ₹12,000-13,000, with a lower EMI like ₹800-1,000 a month, and a neighbour showed me it cleans muddy clothes properly.",
+  "price_too_cheap": 6000,
+  "price_cheap": 9000,
+  "price_expensive": 13000,
+  "price_too_expensive": 16000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "A plain 7 kg semi-automatic costs about half of this in the shop, and paying ₹22,000, or ₹28,500 with the solar kit, just for a battery feels like paying for something fancy. When the power goes the women can finish the wash by hand like they always have.",
+  "objection": "Two cold-water loads on the battery won't get mud and dung out of farm clothes, so I'd be paying double for a battery that doesn't do the real job, and then I'd have to replace that battery after the warranty ends.",
+  "would_change_my_mind": "If the price came down near a normal semi-automatic, around ₹13,000 to ₹14,000, and the dealer washed my muddy work clothes on battery in front of me and they came out clean.",
+  "price_too_cheap": 7000,
+  "price_cheap": 11000,
+  "price_expensive": 15000,
+  "price_too_expensive": 19000
+}

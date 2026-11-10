@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "I earn about ₹12,000 a month, so ₹1,999 every month for a year is too much to take out of the house for washing clothes. My wife washes by hand, and when the light goes we just wait or use the inverter, so I cannot justify it.",
+  "objection": "The instalment is about a sixth of my monthly income, and the inverter I already have can run a small washer for an evening. Why pay extra for a battery inside the machine?",
+  "would_change_my_mind": "If the EMI came down to around ₹800-900 a month, or the dealer took my old washer or inverter battery in exchange, I would think about it.",
+  "price_too_cheap": 6000,
+  "price_cheap": 9000,
+  "price_expensive": 13000,
+  "price_too_expensive": 17000
+}

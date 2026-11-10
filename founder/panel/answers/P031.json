@@ -1,0 +1,13 @@
+{
+  "id": "P031",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already have an inverter and battery in the house, and a semi-automatic washer doesn't pull much, so I can plug an ordinary ₹11-12,000 machine into it and it keeps going through the cut. Paying almost double just to get a second battery inside the washer makes no sense to me.",
+  "objection": "Two cold loads per charge from a battery sealed in the machine, when my inverter already does that job and also runs the lights and fans. If I want more backup I'd rather put the money into a bigger inverter battery that helps the whole house, maybe even the pump.",
+  "would_change_my_mind": "If the dealer showed me it could feed power back to my lights and fans, or the solar kit could run my borewell pump too, so it is backup for the house and not only for washing.",
+  "price_too_cheap": 8000,
+  "price_cheap": 12000,
+  "price_expensive": 15500,
+  "price_too_expensive": 19000
+}

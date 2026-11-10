@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is more than I earn in a month, and we wash by hand at home without any trouble. Even ₹2,000 a month on EMI is a big cut from what we have for food and the farm, all for something we have never needed.",
+  "objection": "A normal semi-automatic costs about half this, and I don't even own that. Why would I pay double for a battery when I don't have a machine at all?",
+  "would_change_my_mind": "If it cost close to a basic semi-automatic, around ₹10,000 or EMI under ₹800 a month, and someone in the village I trust already used one without problems.",
+  "price_too_cheap": 4000,
+  "price_cheap": 7000,
+  "price_expensive": 10000,
+  "price_too_expensive": 14000
+}

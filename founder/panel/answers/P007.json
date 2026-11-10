@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹21,999 is about two months of everything we earn, and ₹1,999 every month for a year is a fifth of our household money. We wash by hand and it works; I cannot put that much into a machine when seed, school fees and the doctor come first.",
+  "objection": "It costs too much for a family like mine, and I am not sure a cold wash will get the mud and sweat out of farm clothes. I would still be scrubbing them by hand after paying all that.",
+  "would_change_my_mind": "If it cost under ₹10,000, or the monthly payment was around ₹500, and I saw a neighbour's muddy field clothes come out clean from it.",
+  "price_too_cheap": 4000,
+  "price_cheap": 7000,
+  "price_expensive": 11000,
+  "price_too_expensive": 15000
+}

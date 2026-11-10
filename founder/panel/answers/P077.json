@@ -1,0 +1,13 @@
+{
+  "id": "P077",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "In our house the clothes have always been washed by hand at the tap, and it works fine, so I don't see why I would spend ₹22,000 on a machine now. And if I ever did want one, my inverter can already run a normal semi-automatic, or I would just buy a bigger inverter that runs the whole house.",
+  "objection": "I don't need a battery inside a washing machine when I already have an inverter at home. A plain semi-automatic costs about half this, so I'd be paying ₹10,000 extra for a battery I already have.",
+  "would_change_my_mind": "If a neighbour I trust had one running for a year with no trouble, and the dealer brought the price down near a plain semi-automatic, about ₹14,000, I would think about it for my wife.",
+  "price_too_cheap": 7000,
+  "price_cheap": 11000,
+  "price_expensive": 15000,
+  "price_too_expensive": 19000
+}

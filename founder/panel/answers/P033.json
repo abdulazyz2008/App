@@ -1,0 +1,13 @@
+{
+  "id": "P033",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "We have always washed by hand at home and it gets done; paying twenty-two thousand for a machine, battery or no battery, is not something my household feels it needs. If I ever bought a washer, a plain one would come first, and the battery part is solving a problem I don't have yet.",
+  "objection": "Who will repair it in my village, and what will a new battery cost after three years? The dealer is in the block town, not at my door, and a big battery can cost almost as much as the machine.",
+  "would_change_my_mind": "If a neighbour I trust had one working for a year with the dealer actually coming to the village for repairs, and the replacement battery price was written down and low.",
+  "price_too_cheap": 7000,
+  "price_cheap": 11000,
+  "price_expensive": 16000,
+  "price_too_expensive": 20000
+}

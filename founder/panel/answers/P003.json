@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "A normal 7 kg semi-automatic in the market costs around ten to twelve thousand, and this is double that just for a battery. My inverter already keeps things running when the power goes, so I would rather buy a plain machine or a bigger inverter battery that helps the whole house.",
+  "objection": "Twenty-two thousand for a washing machine is a premium price, and I am paying extra for a battery that only does two loads when my inverter can already do the job.",
+  "would_change_my_mind": "If it cost close to an ordinary semi-automatic, around thirteen or fourteen thousand, with the battery included.",
+  "price_too_cheap": 7500,
+  "price_cheap": 11000,
+  "price_expensive": 14000,
+  "price_too_expensive": 17000
+}

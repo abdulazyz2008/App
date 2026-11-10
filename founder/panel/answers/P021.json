@@ -1,0 +1,13 @@
+{
+  "id": "P021",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "₹1,999 a month I could manage on my salary, but I am not paying almost double what a normal semi-automatic costs for a battery when nobody tells me what a new battery costs or who in my area actually knows how to fix it. When the power goes the pump stops too, so the clothes just wait in the tub until the light comes back, same as now.",
+  "objection": "After 3 years the battery will die and I don't know if it costs ₹3,000 or ₹10,000, and the dealer in town has never repaired a lithium battery machine. If it breaks, I will be stuck sending it to the city and waiting weeks.",
+  "would_change_my_mind": "A written battery replacement price under ₹4,000 and the dealer promising home service in my village, plus seeing a neighbour use one for a few months without trouble.",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 17000,
+  "price_too_expensive": 22000
+}

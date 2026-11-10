@@ -1,0 +1,13 @@
+{
+  "id": "P037",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Clothes in our house get washed by hand, the way it has always been done, and it costs nothing. I can afford ₹22,000, but I don't see why I should spend it on a machine to fix a problem we don't have.",
+  "objection": "I already have an inverter and battery that keeps the lights and fans going. If I ever bought a washer, I'd first ask whether my inverter can run a plain semi-automatic one, so why pay extra for a second battery inside the machine that only does about 2 loads?",
+  "would_change_my_mind": "If the dealer showed me in my own house that my inverter can't handle a washer, and that this one doesn't drain my inverter battery in the evening when we need the fans, I might think about it for the women in the house.",
+  "price_too_cheap": 8000,
+  "price_cheap": 12000,
+  "price_expensive": 18000,
+  "price_too_expensive": 24000
+}

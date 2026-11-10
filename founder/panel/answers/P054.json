@@ -1,0 +1,13 @@
+{
+  "id": "P054",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I can afford it, but I don't know whose machine this is. I have never seen it on TV, and a normal semi-automatic from LG or Samsung costs about half this. Power cuts are a nuisance, but I can wait and finish the wash when the light comes back.",
+  "objection": "If it's not a big company, who will fix the battery in three years when the dealer has closed or stopped stocking parts? A lithium battery that fails is ₹22,000 sitting in the corner.",
+  "would_change_my_mind": "If a brand I know, like LG, Samsung or Whirlpool, sold it with the battery, or my neighbour had one working well for a year with the dealer actually servicing it.",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 18000,
+  "price_too_expensive": 24000
+}

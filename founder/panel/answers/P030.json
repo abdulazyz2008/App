@@ -1,0 +1,13 @@
+{
+  "id": "P030",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "We are putting every rupee aside for the wedding, and ₹22,000 is more than a month of what we earn, or ₹2,000 every month for a year. We wash by hand already and it costs us nothing but time.",
+  "objection": "The power is not the only problem. Many days there is not enough water in the tank, so even a machine that runs on battery will sit there. And nobody I know has one of these yet.",
+  "would_change_my_mind": "If a relative or neighbour had used one for a season and said it really works with little water, and the EMI came down to around ₹1,000 a month after the wedding is done.",
+  "price_too_cheap": 6000,
+  "price_cheap": 10000,
+  "price_expensive": 14000,
+  "price_too_expensive": 18000
+}

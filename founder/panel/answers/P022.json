@@ -1,0 +1,13 @@
+{
+  "id": "P022",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is more than a month of what my whole house earns, and ₹2,000 every month for a year is too much when the crop money comes only twice a year. My wife washes by hand and it gets done, power or no power.",
+  "objection": "A normal semi-automatic costs about half this, and I am paying the extra for a battery. If that battery dies after the warranty, who pays for a new one, and how much?",
+  "would_change_my_mind": "If my brother-in-law or a neighbour bought one, used it for a full monsoon with the power cuts, and told me it works, and the dealer let me pay smaller instalments after harvest, around ₹12,000 to ₹14,000 total.",
+  "price_too_cheap": 7000,
+  "price_cheap": 11000,
+  "price_expensive": 15000,
+  "price_too_expensive": 19000
+}

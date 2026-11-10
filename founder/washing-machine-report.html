@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Battery Washer Report</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm 18mm 16mm; }
+  :root{
+    --ink:#1b1f24; --muted:#5b6470; --line:#d9dde3; --soft:#f3f5f8;
+    --accent:#1f5f8b; --accent-soft:#e3eef6; --bad:#b4442f; --bad-soft:#f7e6e2;
+    --good:#2f7a4c; --good-soft:#e2f1e7; --warn:#9a6a10; --warn-soft:#f8efd9;
+  }
+  *{box-sizing:border-box}
+  body{ font-family:"Inter","DejaVu Sans",sans-serif; color:var(--ink); background:#fff;
+        font-size:10.2pt; line-height:1.5; margin:0; }
+  h1{font-size:26pt; line-height:1.15; margin:0 0 8px; letter-spacing:-0.02em}
+  h2{font-size:15pt; margin:0 0 10px; letter-spacing:-0.01em; color:var(--accent)}
+  h3{font-size:11.5pt; margin:16px 0 6px}
+  p{margin:0 0 8px}
+  ul,ol{margin:0 0 8px; padding-left:18px}
+  li{margin:0 0 3px}
+  .section{padding-top:2px}
+  .cover{page-break-after:always}
+  h2,h3{break-after:avoid}
+  tr{break-inside:avoid}
+  .eyebrow{break-after:avoid}
+  .eyebrow{font-size:8.5pt; text-transform:uppercase; letter-spacing:.12em; color:var(--muted); margin-bottom:4px; font-weight:600}
+  .muted{color:var(--muted)}
+  .small{font-size:8.8pt}
+  table{border-collapse:collapse; width:100%; margin:6px 0 12px; font-size:9.3pt}
+  th,td{border-bottom:1px solid var(--line); padding:5px 7px; text-align:left; vertical-align:top}
+  th{background:var(--soft); font-weight:600}
+  td.num,th.num{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:12px}
+  .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px}
+  .card{border:1px solid var(--line); border-radius:8px; padding:10px 12px; background:#fff; break-inside:avoid}
+  .card h3{margin-top:0}
+  .stat{font-size:22pt; font-weight:700; line-height:1.1; letter-spacing:-0.02em}
+  .stat-label{font-size:8.8pt; color:var(--muted)}
+  .callout{border-left:4px solid var(--accent); background:var(--accent-soft); padding:9px 12px; border-radius:0 6px 6px 0; margin:8px 0 12px; break-inside:avoid}
+  .callout.bad{border-color:var(--bad); background:var(--bad-soft)}
+  .callout.good{border-color:var(--good); background:var(--good-soft)}
+  .callout.warn{border-color:var(--warn); background:var(--warn-soft)}
+  .pill{display:inline-block; padding:1px 8px; border-radius:999px; font-size:8.5pt; font-weight:600}
+  .pill.bad{background:var(--bad-soft); color:var(--bad)}
+  .pill.good{background:var(--good-soft); color:var(--good)}
+  .pill.warn{background:var(--warn-soft); color:var(--warn)}
+  blockquote{margin:6px 0 10px; padding:6px 12px; border-left:3px solid var(--line); color:#333; font-style:italic; break-inside:avoid}
+  blockquote .who{display:block; font-style:normal; font-size:8.5pt; color:var(--muted); margin-top:2px}
+  figure{margin:8px 0 12px; break-inside:avoid}
+  figcaption{font-size:8.6pt; color:var(--muted); margin-top:4px}
+  .cover{height:255mm; display:flex; flex-direction:column; justify-content:space-between}
+  .cover-top{padding-top:30mm}
+  .verdict{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:22px}
+  .toc{columns:2; font-size:9.6pt}
+  .toc li{margin-bottom:4px}
+  .check li{list-style:none; margin-left:-16px}
+  .check li::before{content:"☐ "; color:var(--accent)}
+  .bar{height:12px; border-radius:3px; background:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- ============ COVER ============ -->
+<div class="cover">
+  <div class="cover-top">
+    <div class="eyebrow">Idea review · November 2026</div>
+    <h1>The self-charging washing machine</h1>
+    <p style="font-size:13pt; color:var(--muted); max-width:150mm">
+      From the original two-battery idea to a product for rural India: why the first version cannot work,
+      what a buildable version looks like, and what 81 simulated Indian buyers said about it.</p>
+
+    <div class="verdict">
+      <div class="card" style="border-color:var(--bad)">
+        <div class="eyebrow" style="color:var(--bad)">The original idea</div>
+        <div class="stat" style="color:var(--bad)">Does not work</div>
+        <p class="small" style="margin-top:6px">The two-battery loop loses about a quarter of its energy on every swap. It is a perpetual-motion machine, and physics rules those out. Making it bigger makes the losses bigger too.</p>
+      </div>
+      <div class="card" style="border-color:var(--warn)">
+        <div class="eyebrow" style="color:var(--warn)">The reframed idea, for India</div>
+        <div class="stat" style="color:var(--warn)">0 of 81 buy</div>
+        <p class="small" style="margin-top:6px">A battery-backed washer at ₹21,999 found no buyers in a simulated rural-India panel. The no's came with clear reasons, though, and they point to a cheaper, different product.</p>
+      </div>
+    </div>
+
+    <h3 style="margin-top:26px">Contents</h3>
+    <ol class="toc">
+      <li>The original idea</li>
+      <li>Why it cannot work: the physics</li>
+      <li>Why "bigger" does not help</li>
+      <li>The founder board review</li>
+      <li>The reframed idea</li>
+      <li>Testing it on the Indian market</li>
+      <li>What the buyers said</li>
+      <li>Why it would and would not work in India</li>
+      <li>How it could work in India: a detailed plan</li>
+      <li>How to test it for real</li>
+      <li>Method and limits</li>
+      <li>Appendix: the arithmetic</li>
+    </ol>
+  </div>
+  <p class="small muted">The board review and buyer panel were simulated with AI sub-agents, following published business frameworks. Panel answers are not real customer data: they show objections well and predict sales poorly. Where this report uses a market figure, it is labelled as an estimate.</p>
+</div>
+
+<!-- ============ 1. THE IDEA ============ -->
+<div class="section">
+  <div class="eyebrow">Part 1</div>
+  <h2>1. The original idea</h2>
+  <p>The idea started from a washing machine. Its drum (the "turbine") spins the clothes, and the plan was to use that spin to make the machine charge itself:</p>
+  <ol>
+    <li>Fit two <b>15,000 mAh batteries</b> inside the machine. Battery A starts full; Battery B starts empty.</li>
+    <li>Battery A powers the motor, which spins the drum: <b>electrical → mechanical</b> energy.</li>
+    <li>The spinning drum also turns a generator, which charges Battery B: <b>mechanical → electrical</b> energy.</li>
+    <li>When A is empty and B is full, the roles swap, and the cycle repeats.</li>
+  </ol>
+  <p>The hope was that energy would keep moving between the two batteries through the drum, so the machine would wash without being plugged in. A follow-up question was whether the idea could be scaled up as a source of electricity.</p>
+
+  <figure>
+    <svg viewBox="0 0 700 210" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Inter, DejaVu Sans, sans-serif">
+      <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#1f5f8b"/></marker>
+      <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#b4442f"/></marker></defs>
+      <rect x="20" y="70" width="120" height="70" rx="10" fill="#e3eef6" stroke="#1f5f8b"/>
+      <text x="80" y="100" text-anchor="middle" font-size="14" font-weight="700" fill="#1b1f24">Battery A</text>
+      <text x="80" y="120" text-anchor="middle" font-size="11" fill="#5b6470">full</text>
+      <rect x="200" y="70" width="110" height="70" rx="10" fill="#fff" stroke="#1f5f8b"/>
+      <text x="255" y="102" text-anchor="middle" font-size="13" font-weight="600">Motor</text>
+      <text x="255" y="120" text-anchor="middle" font-size="10" fill="#5b6470">elec → mech</text>
+      <circle cx="390" cy="105" r="42" fill="#fff" stroke="#1f5f8b"/>
+      <text x="390" y="102" text-anchor="middle" font-size="13" font-weight="600">Drum</text>
+      <text x="390" y="118" text-anchor="middle" font-size="10" fill="#5b6470">washes clothes</text>
+      <rect x="470" y="70" width="110" height="70" rx="10" fill="#fff" stroke="#1f5f8b"/>
+      <text x="525" y="102" text-anchor="middle" font-size="13" font-weight="600">Generator</text>
+      <text x="525" y="120" text-anchor="middle" font-size="10" fill="#5b6470">mech → elec</text>
+      <rect x="600" y="70" width="90" height="70" rx="10" fill="#fff" stroke="#1f5f8b" stroke-dasharray="4 3"/>
+      <text x="645" y="100" text-anchor="middle" font-size="14" font-weight="700">Battery B</text>
+      <text x="645" y="120" text-anchor="middle" font-size="11" fill="#5b6470">empty</text>
+      <line x1="140" y1="105" x2="198" y2="105" stroke="#1f5f8b" stroke-width="2.5" marker-end="url(#ar)"/>
+      <line x1="310" y1="105" x2="346" y2="105" stroke="#1f5f8b" stroke-width="2.5" marker-end="url(#ar)"/>
+      <line x1="432" y1="105" x2="468" y2="105" stroke="#1f5f8b" stroke-width="2.5" marker-end="url(#ar)"/>
+      <line x1="580" y1="105" x2="598" y2="105" stroke="#1f5f8b" stroke-width="2.5" marker-end="url(#ar)"/>
+      <path d="M645,140 C645,195 80,195 80,142" fill="none" stroke="#1f5f8b" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+      <text x="362" y="200" text-anchor="middle" font-size="11" fill="#1f5f8b">swap roles when A is empty, and repeat</text>
+      <line x1="255" y1="70" x2="255" y2="30" stroke="#b4442f" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="390" y1="63" x2="390" y2="30" stroke="#b4442f" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="525" y1="70" x2="525" y2="30" stroke="#b4442f" stroke-width="1.5" marker-end="url(#arr)"/>
+      <text x="390" y="20" text-anchor="middle" font-size="11" fill="#b4442f">heat and friction, lost at every step (the part the idea leaves out)</text>
+    </svg>
+    <figcaption>Figure 1. The proposed loop. The red arrows show where energy leaves and never comes back.</figcaption>
+  </figure>
+
+  <h2 style="margin-top:14px">2. Why it cannot work: the physics</h2>
+  <p>Two basic laws of physics decide this.</p>
+  <div class="grid2">
+    <div class="card"><h3>Energy is conserved</h3><p class="small">Energy cannot be created. Everything Battery A gives out has to go somewhere: into washing the clothes, into heat, or into Battery B. So Battery B can never receive more than Battery A gave out, and in practice it receives much less.</p></div>
+    <div class="card"><h3>Every conversion wastes some</h3><p class="small">Each time energy changes form, part of it becomes heat in wires, bearings and the battery itself. That heat spreads out into the room and cannot be collected again.</p></div>
+  </div>
+  <p>With realistic efficiencies for each step, one trip around the loop gives back only about three quarters of the starting energy, and that is <b>before any washing is done</b>:</p>
+  <table>
+    <tr><th>Step</th><th class="num">Typical efficiency</th><th class="num">Energy left of 100</th></tr>
+    <tr><td>Battery A → motor (electrical → mechanical)</td><td class="num">~90%</td><td class="num">90</td></tr>
+    <tr><td>Drum → generator (mechanical → electrical)</td><td class="num">~90%</td><td class="num">81</td></tr>
+    <tr><td>Charging Battery B</td><td class="num">~95%</td><td class="num">77</td></tr>
+    <tr><td><b>One full trip</b></td><td class="num"><b>~69–77%</b></td><td class="num"><b>~77</b></td></tr>
+  </table>
+  <p>Washing makes this worse. Moving wet clothes and water through the drum is work, and that energy leaves the loop as warm water, warm clothes and friction. The generator also acts as a <b>brake</b> on the drum, because generating power means pushing back on whatever turns it. So the motor has to work harder, and the machine washes <b>less</b> than the same battery would with no generator at all.</p>
+</div>
+
+<div class="section">
+  <figure>
+    <svg viewBox="0 0 700 220" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Inter, DejaVu Sans, sans-serif">
+      <line x1="60" y1="180" x2="680" y2="180" stroke="#d9dde3"/>
+      <g font-size="11" fill="#5b6470" text-anchor="end">
+        <text x="52" y="184">0</text><text x="52" y="124">50</text><text x="52" y="64">100</text>
+      </g>
+      <line x1="60" y1="120" x2="680" y2="120" stroke="#eef0f3"/><line x1="60" y1="60" x2="680" y2="60" stroke="#eef0f3"/>
+      <!-- 100,77,59,46,35,27 ; scale 1.2px per unit, base 180 -->
+      <g fill="#1f5f8b">
+        <rect x="90" y="60" width="70" height="120" rx="3"/>
+        <rect x="190" y="87.6" width="70" height="92.4" rx="3"/>
+        <rect x="290" y="109.2" width="70" height="70.8" rx="3"/>
+        <rect x="390" y="124.8" width="70" height="55.2" rx="3"/>
+        <rect x="490" y="138" width="70" height="42" rx="3"/>
+        <rect x="590" y="147.6" width="70" height="32.4" rx="3"/>
+      </g>
+      <g font-size="12" font-weight="700" text-anchor="middle" fill="#1b1f24">
+        <text x="125" y="52">100</text><text x="225" y="80">77</text><text x="325" y="101">59</text>
+        <text x="425" y="117">46</text><text x="525" y="130">35</text><text x="625" y="140">27</text>
+      </g>
+      <g font-size="11" text-anchor="middle" fill="#5b6470">
+        <text x="125" y="198">Start</text><text x="225" y="198">Swap 1</text><text x="325" y="198">Swap 2</text>
+        <text x="425" y="198">Swap 3</text><text x="525" y="198">Swap 4</text><text x="625" y="198">Swap 5</text>
+      </g>
+      <text x="60" y="20" font-size="12" font-weight="600" fill="#1b1f24">Energy left in the system (start = 100), with no washing at all</text>
+    </svg>
+    <figcaption>Figure 2. At about 77% per trip, the loop runs down: after five swaps roughly three quarters of the energy has become heat. Real washing would drain it faster.</figcaption>
+  </figure>
+
+  <h3>The batteries are also small for the job</h3>
+  <p>A battery's mAh rating measures charge, not energy. To get energy you multiply by the voltage, and the voltage was not specified:</p>
+  <table>
+    <tr><th>If the 15,000 mAh battery is…</th><th class="num">Energy stored</th><th class="num">Share of one warm load (~640 Wh)</th></tr>
+    <tr><td>3.7 V (a single lithium cell, like a power bank)</td><td class="num">≈ 55 Wh</td><td class="num">≈ 9%</td></tr>
+    <tr><td>12 V (a small lead-acid or lithium pack)</td><td class="num">≈ 180 Wh</td><td class="num">≈ 28%</td></tr>
+  </table>
+  <p>A warm load needs about 440 Wh just to heat 15 litres of water from 15 °C to 40 °C, plus roughly 100–300 Wh for the drum. The generator recovers nothing from water heating, which is the biggest energy cost.</p>
+
+  <h2 style="margin-top:14px">3. Why "bigger" does not help</h2>
+  <p>Scaling up does not change the percentages. A bigger motor, drum and generator each lose roughly the same <i>fraction</i> of the energy, so a bigger machine just loses more energy in total. No power station, car or wind turbine feeds its own output back in to run itself, for this same reason. Machines that claim to power themselves are called <b>perpetual-motion machines</b>, and every one ever tested has failed for this reason.</p>
+  <div class="callout bad"><b>Conclusion on the original idea:</b> the loop cannot make energy, cannot keep a washer running, and cannot be scaled up as a power source. What survives is the underlying wish for a washer that keeps working without reliable mains power. That need is real, and the rest of this report tests it.</div>
+</div>
+
+<!-- ============ 4. BOARD ============ -->
+<div class="section">
+  <div class="eyebrow">Part 2</div>
+  <h2>4. The founder board review</h2>
+  <p>Three simulated board members reviewed the original idea. Each used one published business framework and nothing else: the <b>Offers</b> lens (is the market good, and would buyers believe the promise?), the <b>Monopoly</b> lens (is there a real breakthrough that can be defended?) and the <b>Product</b> lens (what is the customer's actual experience?). These lenses are summaries of published books. They are not the views of the authors.</p>
+  <table>
+    <tr><th>Lens</th><th class="num">Score</th><th>Vote</th><th>Main reason</th></tr>
+    <tr><td>Offers</td><td class="num">1 / 10</td><td><span class="pill bad">PASS</span></td><td>The core promise has zero likelihood of coming true, so no guarantee or proof is possible. The washer market itself is fine.</td></tr>
+    <tr><td>Monopoly</td><td class="num">1 / 10</td><td><span class="pill bad">PASS</span></td><td>The mechanism is not a breakthrough, because it breaks energy conservation. Without the loop, nothing proprietary is left to defend.</td></tr>
+    <tr><td>Product</td><td class="num">2 / 10</td><td><span class="pill bad">PASS</span></td><td>The customer moment is clear ("start a load, never think about the socket"), but the machine cannot deliver it, and the batteries are far too small.</td></tr>
+  </table>
+  <p><b>Vote: 3 PASS · average 1.3 / 10.</b> All three members raised the same three risks: the loop makes no energy, the batteries are small next to a wash cycle, and once the loop is removed only an ordinary battery washer is left.</p>
+  <p>Where they differed: the Product lens scored a little higher because the customer's wish is easy to state in one sentence. The Offers lens noted that washer buyers have money and are easy to reach, so the market is not what sinks the idea.</p>
+
+  <h2 style="margin-top:14px">5. The reframed idea</h2>
+  <p>The board suggested one version of the idea that is buildable and honest:</p>
+  <div class="callout good"><b>A battery-backed washing machine for homes with unreliable power.</b> It charges from the mains when power is on, or from a small solar panel, washes in cold water to keep the energy needed small, and finishes the load when the power goes out. The honest claim is <i>"it keeps working when the power goes out"</i>, never <i>"it powers itself"</i>.</div>
+  <p>Before money is spent on that version, two questions have to be answered: would people buy it, and at what price? Rural India was chosen as the market to test, because long and frequent power cuts are common there.</p>
+
+  <!-- ============ 6. INDIA TEST ============ -->
+  <div class="eyebrow" style="margin-top:16px">Part 3</div>
+  <h2>6. Testing it on the Indian market</h2>
+  <h3>The pitch every buyer saw</h3>
+  <div class="card small">
+    A 7 kg semi-automatic washing machine with a built-in lithium battery.<br>
+    When the power goes out mid-wash, it switches to the battery and finishes the load (about 2 cold-water loads per full charge).<br>
+    It charges from your normal plug when power is on, or from an optional 300 W solar panel.<br>
+    <b>Price: ₹21,999</b> for the machine, or <b>₹1,999 a month for 12 months</b> on EMI. Solar panel kit: ₹6,500 extra.<br>
+    Sold and installed by your local electronics dealer; 2-year warranty on the machine, 3 years on the battery, with service at the dealer.
+  </div>
+  <p class="small muted">The price was chosen as an estimate: roughly a plain semi-automatic washer plus a lithium battery pack. It is a starting point to test, not a costed figure.</p>
+</div>
+
+<div class="section">
+  <h3>Who the buyers were</h3>
+  <p>The panel was dealt from a profile of rural Indian households in villages and block towns that face frequent power cuts. Every segment share and income range below is an estimate made for this test, not survey data.</p>
+  <div class="grid2">
+    <table>
+      <tr><th>Segment</th><th class="num">Share</th><th class="num">Income / yr</th></tr>
+      <tr><td>Small farmer or daily-wage</td><td class="num">35%</td><td class="num">₹1–2.5 L</td></tr>
+      <tr><td>Salaried, government job or remittance</td><td class="num">30%</td><td class="num">₹2.5–6 L</td></tr>
+      <tr><td>Prosperous farmer or shop owner</td><td class="num">25%</td><td class="num">₹6–15 L</td></tr>
+      <tr><td>Hamlet with weak or no grid (solar home system)</td><td class="num">10%</td><td class="num">₹0.8–2 L</td></tr>
+    </table>
+    <table>
+      <tr><th>Buying behaviour</th><th class="num">Share</th></tr>
+      <tr><td>Hand-wash family</td><td class="num">22%</td></tr>
+      <tr><td>Already owns an inverter</td><td class="num">16%</td></tr>
+      <tr><td>Buys on EMI</td><td class="num">15%</td></tr>
+      <tr><td>Asks relatives and the dealer first</td><td class="num">15%</td></tr>
+      <tr><td>Waits for festival offers</td><td class="num">12%</td></tr>
+      <tr><td>Loyal to big brands</td><td class="num">12%</td></tr>
+      <tr><td>Price-first</td><td class="num">8%</td></tr>
+    </table>
+  </div>
+  <p>Each buyer was a separate AI sub-agent with its own name, age, income, buying habit, everyday context and first doubt. Each was told not to be agreeable and not to invent facts about the product. 100 buyers were dealt, and <b>81 answered</b> before the run was stopped. The remaining 19 were not run.</p>
+
+  <!-- ============ 7. RESULTS ============ -->
+  <h2 style="margin-top:14px">7. What the buyers said</h2>
+  <div class="grid3">
+    <div class="card"><div class="stat">0 / 81</div><div class="stat-label">would buy at ₹21,999</div></div>
+    <div class="card"><div class="stat">₹19,000</div><div class="stat-label">median price at which buyers would not buy at all</div></div>
+    <div class="card"><div class="stat">₹11,000</div><div class="stat-label">median price that would feel like a bargain</div></div>
+  </div>
+
+  <h3>Why they said no</h3>
+  <figure>
+    <svg viewBox="0 0 700 170" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Inter, DejaVu Sans, sans-serif">
+      <!-- scale: 38 -> 420px ; 11.05 px per buyer -->
+      <g font-size="12" fill="#1b1f24">
+        <text x="0" y="22">Price</text><text x="0" y="52">No real need</text><text x="0" y="82">Trust</text><text x="0" y="112">Habit</text><text x="0" y="142">Timing</text>
+      </g>
+      <g fill="#1f5f8b">
+        <rect x="130" y="9" width="420" height="18" rx="3"/>
+        <rect x="130" y="39" width="210" height="18" rx="3"/>
+        <rect x="130" y="69" width="121.5" height="18" rx="3"/>
+        <rect x="130" y="99" width="110.5" height="18" rx="3"/>
+        <rect x="130" y="129" width="33" height="18" rx="3"/>
+      </g>
+      <g font-size="12" font-weight="700" fill="#1b1f24">
+        <text x="558" y="23">38 (47%)</text><text x="348" y="53">19 (23%)</text><text x="259" y="83">11 (14%)</text><text x="248" y="113">10 (12%)</text><text x="171" y="143">3 (4%)</text>
+      </g>
+    </svg>
+    <figcaption>Figure 3. The main reason each of the 81 buyers gave for passing.</figcaption>
+  </figure>
+
+  <h3>The themes behind the no's</h3>
+  <table>
+    <tr><th>Theme (mentioned in the reason, objection or what would change their mind)</th><th class="num">Buyers</th></tr>
+    <tr><td>Want to see a neighbour or relative using it first</td><td class="num">42</td></tr>
+    <tr><td>Water supply is the real problem (borewell pump stops in a cut, tank runs dry)</td><td class="num">28</td></tr>
+    <tr><td>Already have an inverter that could run a plain washer</td><td class="num">25</td></tr>
+    <tr><td>Money is going to a wedding or school fees</td><td class="num">19</td></tr>
+    <tr><td>Unknown cost of a replacement battery after the warranty</td><td class="num">18</td></tr>
+    <tr><td>Doubt that a cold wash cleans muddy farm clothes</td><td class="num">15</td></tr>
+    <tr><td>Would only buy at Diwali, harvest or with a festival offer</td><td class="num">13</td></tr>
+    <tr><td>Unknown brand; want LG, Samsung, Godrej or similar</td><td class="num">12</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>Different groups said no for different reasons</h3>
+  <table>
+    <tr><th>Segment</th><th class="num">Buyers</th><th>Top reason</th><th class="num">Median walk-away price</th></tr>
+    <tr><td>Small farmer or daily-wage</td><td class="num">28</td><td>Price (23 of 28)</td><td class="num">₹17,000</td></tr>
+    <tr><td>Salaried, government job or remittance</td><td class="num">23</td><td>No real need (10), then price and trust</td><td class="num">₹21,000</td></tr>
+    <tr><td>Prosperous farmer or shop owner</td><td class="num">22</td><td>Habit (9): "we have always washed by hand"</td><td class="num">₹24,500</td></tr>
+    <tr><td>Hamlet with weak or no grid</td><td class="num">8</td><td>Price (8 of 8), and they also need the solar kit</td><td class="num">₹17,500</td></tr>
+  </table>
+  <p>The poorer households liked the idea but could not afford it. The richer households could afford it but did not see why they needed it, because they hand-wash today or already own an inverter. Inverter owners mostly said they had "no real need" (7 of 13). People who rely on relatives and dealers mostly said "trust" (6 of 15).</p>
+
+  <h3>In their own words</h3>
+  <p class="small muted">These are simulated buyers, not real customers. Their quotes must not be used as testimonials.</p>
+  <blockquote>"Twenty-two thousand is two months of what the whole family earns, and ₹2,000 every month for a year is more than we can promise when the harvest money is uncertain."<span class="who">Small farmer, hand-wash family · price</span></blockquote>
+  <blockquote>"I already have an inverter and battery in the house… if I plug [a plain washer] into the inverter it keeps going through the cut, so why pay ₹22,000 for a second battery inside the machine?"<span class="who">Salaried household, owns an inverter · no real need</span></blockquote>
+  <blockquote>"The power cuts are only half my problem; on many days there is no water in the tank either, and a battery does nothing for that."<span class="who">Prosperous household, waits for festival offers · no real need</span></blockquote>
+  <blockquote>"I am not paying almost double what a normal semi-automatic costs for a battery when nobody tells me what a new battery costs or who in my area actually knows how to fix it. When the power goes the pump stops too."<span class="who">Salaried household, buys on EMI · trust</span></blockquote>
+  <blockquote>"I can afford it, but I have never seen this battery machine in anyone's house. I won't spend twenty-two thousand on something new until my brother-in-law or a neighbour has used it through a monsoon season."<span class="who">Prosperous household · trust</span></blockquote>
+
+  <h3>What price would work</h3>
+  <p>Each buyer gave four prices. The medians across all 81:</p>
+  <figure>
+    <svg viewBox="0 0 700 120" width="100%" xmlns="http://www.w3.org/2000/svg" font-family="Inter, DejaVu Sans, sans-serif">
+      <!-- axis 4k..24k -> x 40..660 ; 31px per 1k -->
+      <line x1="40" y1="60" x2="660" y2="60" stroke="#5b6470" stroke-width="1.5"/>
+      <rect x="257" y="52" width="124" height="16" fill="#e2f1e7"/>
+      <g font-size="10" fill="#5b6470" text-anchor="middle">
+        <text x="40" y="112">₹4k</text><text x="195" y="112">₹9k</text><text x="350" y="112">₹14k</text><text x="505" y="112">₹19k</text><text x="660" y="112">₹24k</text>
+      </g>
+      <g stroke="#1b1f24" stroke-width="2">
+        <line x1="133" y1="44" x2="133" y2="76"/><line x1="257" y1="44" x2="257" y2="76"/>
+        <line x1="381" y1="44" x2="381" y2="76"/><line x1="505" y1="44" x2="505" y2="76"/>
+      </g>
+      <line x1="597" y1="36" x2="597" y2="84" stroke="#b4442f" stroke-width="3"/>
+      <g font-size="10.5" text-anchor="middle" fill="#1b1f24">
+        <text x="133" y="36">Too cheap ₹7k</text><text x="257" y="94">Bargain ₹11k</text>
+        <text x="381" y="36">Getting expensive ₹15k</text><text x="505" y="94">Won't buy ₹19k</text>
+      </g>
+      <text x="597" y="26" font-size="10.5" text-anchor="middle" fill="#b4442f" font-weight="700">Asked ₹21,999</text>
+    </svg>
+    <figcaption>Figure 4. Median price answers. The green band (about ₹11,000–15,000) is where most buyers would consider it. The asking price is above the median walk-away point.</figcaption>
+  </figure>
+  <ul>
+    <li><b>53 of 81</b> buyers (65%) set their walk-away price at or below the ₹21,999 asking price.</li>
+    <li><b>80 of 81</b> would still consider it at ₹14,000. <b>67 of 81</b> would still consider it at ₹16,000.</li>
+    <li>For EMI, 22 of the 23 buyers who named a monthly amount put it at <b>₹700–1,200 a month</b>, against the ₹1,999 offered.</li>
+  </ul>
+  <div class="callout warn">The price that works (₹11,000–15,000) is about what buyers believe a plain semi-automatic costs today, which panelists put at ₹10,000–12,000. That belief has not been checked against real shop prices. If it is right, buyers will pay a <b>small</b> premium for power-cut backup, but not a doubled price.</div>
+</div>
+
+<!-- ============ 8. WOULD / WOULDN'T ============ -->
+<div class="section">
+  <div class="eyebrow">Part 4</div>
+  <h2>8. Why it would and would not work in India</h2>
+  <div class="grid2">
+    <div class="card" style="border-color:var(--good)">
+      <h3 style="color:var(--good)">Why it could work</h3>
+      <ul class="small">
+        <li><b>The pain is real.</b> Panelists described evening power cuts lasting hours, and women spending one to two hours a day washing by hand.</li>
+        <li><b>EMI is normal.</b> Buyers already buy large appliances on instalments through local dealers, so a monthly price is easy to understand.</li>
+        <li><b>The dealer network exists.</b> Rural buyers trust a known dealer, and that dealer is also the sales, installation and service channel.</li>
+        <li><b>Solar is familiar.</b> Off-grid hamlets already use solar home systems, so solar charging is not a foreign idea.</li>
+        <li><b>Festival buying gives a launch window.</b> Big purchases cluster around Diwali, harvest and weddings, so a launch has natural moments.</li>
+        <li><b>The price gap is not huge.</b> Almost every buyer would consider it at ₹14,000.</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:var(--bad)">
+      <h3 style="color:var(--bad)">Why it would not work as pitched</h3>
+      <ul class="small">
+        <li><b>Too expensive.</b> At ₹21,999 it costs about double a plain machine. For small farmers that is one to two months of household income.</li>
+        <li><b>The inverter already does the job.</b> Many homes have an inverter that buyers believe can run a plain washer. A battery used only for washing looks like paying twice.</li>
+        <li><b>Water, not power, is often the limit.</b> The borewell pump stops in a power cut too, so a battery alone does not let the wash finish.</li>
+        <li><b>Hand-washing is "free".</b> The labour cost falls on women and is invisible in the household budget, so the machine reads as a want, not a need.</li>
+        <li><b>New brand, new battery.</b> Buyers fear the battery failing, an unknown replacement price, and repairs that only happen in town.</li>
+        <li><b>Cold wash and mud.</b> Farm households doubt a cold semi-automatic gets field clothes clean.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="callout"><b>The pattern:</b> buyers are not rejecting backup power. They are rejecting <i>paying again</i> for backup they think they already have, on a machine that does not fix their water problem, from a brand nobody in the village has tried. Each of those can be changed.</div>
+
+  <!-- ============ 9. PLAN ============ -->
+  <div class="eyebrow" style="margin-top:14px">Part 5</div>
+  <h2>9. How it could work in India: a detailed plan</h2>
+  <p>This is a redesign that answers the panel's objections one by one. It is still untested. Every cost figure is an open question until a supplier quotes one.</p>
+
+  <h3>9.1 Change the product: sell "power-cut proof", not "a second battery"</h3>
+  <table>
+    <tr><th>Objection</th><th>Design answer</th></tr>
+    <tr><td>"My inverter can already run a washer"</td><td><b>Make the base model battery-free and inverter-friendly.</b> Use an efficient, low-surge motor (for example a BLDC motor) and a soft-start controller so it runs safely on a typical home inverter without tripping it. Market it as "certified to run on your inverter". This removes the most expensive part and the second-battery objection together.</td></tr>
+    <tr><td>"No water when the power goes"</td><td><b>Add a bucket-fill / tank mode.</b> Include a top-fill inlet and a low-water cold wash so the machine can run from stored water in a drum or overhead tank, with no tap pressure needed.</td></tr>
+    <tr><td>"Cold wash won't clean muddy clothes"</td><td><b>A heavy-soil cold programme</b> with a longer soak and agitation cycle, shown in dealer demos on real muddy work clothes.</td></tr>
+    <tr><td>"Battery fails; unknown replacement cost"</td><td><b>Make the battery an optional, swappable add-on</b> with its replacement price printed on the box and in the warranty card. Offer it for homes with no inverter.</td></tr>
+    <tr><td>Hamlets with weak or no grid</td><td><b>A solar bundle:</b> machine + battery + panel, sold through solar-home-system installers. Before building this bundle, check whether rural solar subsidy schemes can lower its price.</td></tr>
+  </table>
+</div>
+
+<div class="section">
+  <h3>9.2 A product line built on the panel's prices</h3>
+  <table>
+    <tr><th>Model</th><th>Who it is for</th><th class="num">Target price</th><th class="num">Target EMI</th></tr>
+    <tr><td><b>Base</b>: 7 kg semi-auto, inverter-friendly, bucket-fill</td><td>Inverter owners, salaried and prosperous households</td><td class="num">₹12,000–14,000</td><td class="num">≈ ₹1,000 × 12</td></tr>
+    <tr><td><b>Backup</b>: base + swappable battery (≈ 2 cold loads)</td><td>Grid homes without an inverter</td><td class="num">₹15,000–17,000</td><td class="num">≈ ₹1,300 × 12</td></tr>
+    <tr><td><b>Solar</b>: backup + 300 W panel</td><td>Hamlets with weak or no grid</td><td class="num">Depends on subsidy</td><td class="num">Harvest-linked</td></tr>
+  </table>
+  <p class="small muted">These are the panel's acceptable price ranges, not costed prices. Whether each model can be built and sold at a profit at these prices is the next open question (see section 10).</p>
+
+  <h3>9.3 Change how it is paid for</h3>
+  <ul>
+    <li><b>Harvest-linked EMI.</b> Small payments, with larger ones after the kharif and rabi harvests, in place of a fixed ₹1,999 every month. Several buyers named this as what would change their mind.</li>
+    <li><b>Festival launch.</b> Launch before Diwali and the harvest season with a real offer, such as a free bucket-fill kit or the solar panel at cost. No fake discounts.</li>
+    <li><b>Exchange offer.</b> Take an old washer or an old inverter battery as part payment.</li>
+  </ul>
+
+  <h3>9.4 Build trust village by village</h3>
+  <ul>
+    <li><b>Demo households.</b> Place machines in a few homes per village, chosen through the local dealer, a self-help group or a respected family, so neighbours see one working through a full season of power cuts. 42 of 81 buyers asked for exactly this.</li>
+    <li><b>Live muddy-clothes demo</b> at the dealer and at the weekly market: wash real field clothes during a staged power cut.</li>
+    <li><b>Short local-language videos</b> on YouTube and WhatsApp showing a village home finishing a load in a power cut. Many panelists watch product videos on their phones.</li>
+    <li><b>Service in the village.</b> A written promise of repair visits to the village, not only at the dealer in town, plus a fixed battery replacement price.</li>
+    <li><b>Partner for brand trust.</b> Buyers loyal to big brands only trust names they see on TV. Licensing the design to an established brand, or selling under a known dealer chain, may move faster than building a new brand.</li>
+  </ul>
+
+  <h3>9.5 Who to sell to first</h3>
+  <p>Start with <b>salaried and remittance households in villages with long, regular evening power cuts and an overhead water tank</b>. They can afford ₹12,000–14,000, they make up the largest group that said "no real need" (10 of 23), and both the inverter-friendly design and the tank mode answer their objections directly. Small farmers come second, once harvest-linked EMI exists. Solar hamlets come third, because that model costs the most and depends on subsidies.</p>
+</div>
+
+<!-- ============ 10. REAL TEST ============ -->
+<div class="section">
+  <h2>10. How to test it for real</h2>
+  <p>The simulated panel is a cheap first look. Do these steps before building anything at scale:</p>
+  <ol>
+    <li><b>Check real prices.</b> Visit three or four rural electronics dealers and note the actual prices of 7 kg semi-automatics, inverters and inverter batteries. The panel's ₹10,000–12,000 figure is an assumption.</li>
+    <li><b>Check the inverter claim.</b> Test whether common home inverters actually run a semi-automatic washer, and on which motor types they trip. If most can, the base model is the product. If most cannot, the battery has a real job.</li>
+    <li><b>Measure energy per load.</b> Meter a cold-water semi-automatic wash and size the battery from the measured Wh, not from guesses.</li>
+    <li><b>Get a bill of materials.</b> Ask suppliers to quote the motor, controller, battery pack, charger and body, so the price ranges in 9.2 can be checked against real costs.</li>
+    <li><b>Take refundable pre-orders.</b> Show the base model and its price in two or three villages with a dealer and ask for a small refundable deposit. Deposits, not "yes, I'd buy", are the real signal.</li>
+    <li><b>Run demo households</b> for one power-cut season, then record how many neighbours ask the dealer about the machine.</li>
+  </ol>
+
+  <h3>Checklist</h3>
+  <ul class="check">
+    <li>Real rural shop prices recorded for a semi-automatic washer, an inverter and an inverter battery</li>
+    <li>Inverter compatibility tested with at least three common inverter models</li>
+    <li>Wh per cold load measured on a real machine</li>
+    <li>Supplier quotes for each part; unit cost per model calculated</li>
+    <li>Harvest-linked EMI partner found (dealer finance or a local lender)</li>
+    <li>Refundable deposits collected in at least two villages</li>
+    <li>Demo households placed and followed for a season</li>
+  </ul>
+
+  <h2 style="margin-top:14px">11. Method and limits</h2>
+  <ul class="small">
+    <li><b>Board review:</b> three AI sub-agents, each applying one published business framework. They scored the business, not the founder.</li>
+    <li><b>Buyer panel:</b> 100 persona cards dealt from the rural-India profile with a fixed random seed (960537). 81 answered before the run was stopped, and the other 19 were not run. Each buyer answered alone, without seeing the others.</li>
+    <li><b>Simulated buyers lean agreeable</b>, so a real buy rate would probably be <i>no higher</i> than the panel's. Here the panel already said 0%, which is a strong warning about the ₹21,999 offer. A real panel might still find a few early buyers.</li>
+    <li><b>Segment shares, incomes and the ₹21,999 price are estimates</b> made to run the test. They are not market data.</li>
+    <li><b>Prices panelists quoted for other products</b> (plain washers, inverters) are their beliefs and have not been checked.</li>
+    <li><b>Quotes are simulated</b> and must never be presented as real customer testimonials.</li>
+  </ul>
+
+  <h2 style="margin-top:14px">12. Appendix: the arithmetic</h2>
+  <table class="small">
+    <tr><th>Quantity</th><th>Working</th><th class="num">Result</th></tr>
+    <tr><td>Battery energy at 3.7 V</td><td>15 Ah × 3.7 V</td><td class="num">55.5 Wh</td></tr>
+    <tr><td>Battery energy at 12 V</td><td>15 Ah × 12 V</td><td class="num">180 Wh</td></tr>
+    <tr><td>One round trip, best case</td><td>0.90 motor × 0.90 generator × 0.95 charging</td><td class="num">≈ 0.77</td></tr>
+    <tr><td>One round trip, typical case</td><td>0.85 × 0.85 × 0.95</td><td class="num">≈ 0.69</td></tr>
+    <tr><td>After five swaps (best case)</td><td>0.77<sup>5</sup></td><td class="num">≈ 0.27</td></tr>
+    <tr><td>Heating one load of water</td><td>15 kg × 4.186 kJ/kg·K × 25 K = 1.57 MJ</td><td class="num">≈ 440 Wh</td></tr>
+    <tr><td>Drum motor per cycle (estimate)</td><td>range to be measured</td><td class="num">100–300 Wh</td></tr>
+    <tr><td>Share of a warm load from one battery</td><td>55–180 Wh ÷ ~640 Wh</td><td class="num">≈ 9–28%</td></tr>
+  </table>
+</div>
+
+</body>
+</html>

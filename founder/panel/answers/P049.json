@@ -1,0 +1,13 @@
+{
+  "id": "P049",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "I am not buying a big machine in an ordinary week at full price. Hand-washing costs us nothing, and if I buy a washer at all it will be at the harvest or for a wedding in the family, when the dealer gives a discount or a free gift.",
+  "objection": "₹22,000, or ₹28,500 with the solar panel, is a lot for something we already do by hand for free. And will the battery really last, and will the dealer actually come out and fix it in the village?",
+  "would_change_my_mind": "A festival offer from my local dealer: a clear discount, or the solar panel thrown in free, plus a YouTube video of someone in a village like mine showing it finishing a load during a power cut.",
+  "price_too_cheap": 9000,
+  "price_cheap": 15000,
+  "price_expensive": 22000,
+  "price_too_expensive": 28000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P061",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "I already paid for an inverter and battery, so I'm not paying again for a second battery inside a washing machine. A normal semi-automatic costs maybe ₹10-12k, and I can run it off my inverter or put the extra money into a bigger battery that runs the fans too.",
+  "objection": "Why buy a battery that only runs the washer when my inverter already covers the house? And two loads per charge is not much. If that lithium battery dies after the 3-year warranty, I'm stuck with a costly replacement and only the dealer to fix it.",
+  "would_change_my_mind": "If it cost close to a normal semi-automatic, around ₹14-15k, or if my dealer showed me my inverter really cannot handle a washer motor without tripping",
+  "price_too_cheap": 9000,
+  "price_cheap": 13000,
+  "price_expensive": 17000,
+  "price_too_expensive": 22000
+}

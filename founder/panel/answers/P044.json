@@ -1,0 +1,13 @@
+{
+  "id": "P044",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹22,000 is more than a month and a half of what my family earns, and even ₹2,000 a month for a year is too much when my wife still washes by hand for free. If I buy something this big it will be at Diwali or after harvest, with a discount or a gift, not in an ordinary week.",
+  "objection": "Who will repair it in my village, and what will a new battery cost when this one dies after three years? The dealer is in town, and if he does not come, I am stuck with a dead machine I am still paying EMI on.",
+  "would_change_my_mind": "A Diwali or harvest offer that brings it near ₹15,000 with the solar panel free, plus a written promise that the dealer's mechanic comes to my village for repairs and a fixed price for the replacement battery.",
+  "price_too_cheap": 7000,
+  "price_cheap": 12000,
+  "price_expensive": 16000,
+  "price_too_expensive": 20000
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "price",
+  "reason": "₹21,999 is close to two months of everything our family earns, and with our weak grid I would also need the ₹6,500 solar kit, so it is really ₹28,500. Even ₹1,999 a month for a year is more than I can promise when hand-washing costs me nothing but my time.",
+  "objection": "I don't know this brand from TV. If the battery dies in year four, will anyone still make the part? And will a cold wash really get the mud out of farm clothes, or will I end up scrubbing them by hand anyway?",
+  "would_change_my_mind": "If a big brand I know from TV sold it, with the solar panel included, for under ₹12,000 or about ₹800 a month.",
+  "price_too_cheap": 6000,
+  "price_cheap": 9000,
+  "price_expensive": 13000,
+  "price_too_expensive": 17000
+}

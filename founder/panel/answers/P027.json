@@ -1,0 +1,13 @@
+{
+  "id": "P027",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I have never seen a washing machine with a battery inside, and nobody in my family or village has one yet. With money set aside for the wedding, I will not spend twenty-two thousand on something new until someone I know has used it through a season.",
+  "objection": "Will a cold wash really get the mud out of farm clothes? And will the battery still hold a charge after two summers, or does it just become dead weight?",
+  "would_change_my_mind": "A relative or neighbour using one for a few months and telling me it cleans muddy clothes and keeps going through the power cuts, with the dealer I already trust standing behind it.",
+  "price_too_cheap": 9000,
+  "price_cheap": 14000,
+  "price_expensive": 19000,
+  "price_too_expensive": 25000
+}

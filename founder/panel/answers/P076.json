@@ -1,0 +1,13 @@
+{
+  "id": "P076",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I can afford it, and power cuts mid-wash are a real nuisance at home, but nobody I know owns one of these yet. I won't put twenty-two thousand into a new kind of machine until a relative or my dealer has seen it run for a few months.",
+  "objection": "A normal semi-automatic costs about half this, so I'd be paying double mostly for the battery. If that battery dies after three years I'm stuck with an expensive replacement nobody here knows how to fix.",
+  "would_change_my_mind": "My cousin or a neighbour using one for a season and telling me it really finishes the wash in a power cut, with my own dealer standing behind the battery service.",
+  "price_too_cheap": 9000,
+  "price_cheap": 14000,
+  "price_expensive": 19000,
+  "price_too_expensive": 25000
+}

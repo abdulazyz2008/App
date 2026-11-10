@@ -1,0 +1,13 @@
+{
+  "id": "P043",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I can afford it, but nobody I know has one of these battery machines yet, and I don't buy anything new until my brother-in-law or the dealer I've used for years tells me it actually works. Also our water comes at fixed times, so the power is not the only problem.",
+  "objection": "A new kind of battery machine with nobody in the family having tried it. If the battery goes bad after a couple of years, will the dealer really fix it, or will I be left with a heavy box in the corner?",
+  "would_change_my_mind": "A relative or neighbour using it for a few months and telling me it finishes the wash during power cuts, with my trusted dealer standing behind the battery warranty.",
+  "price_too_cheap": 9000,
+  "price_cheap": 15000,
+  "price_expensive": 22000,
+  "price_too_expensive": 30000
+}
