@@ -1,12 +1,4 @@
 {
-  "extraKnownMarketplaces": {
-    "claude-code-skills": {
-      "source": {
-        "source": "github",
-        "repo": "alirezarezvani/claude-skills"
-      }
-    }
-  },
   "enabledPlugins": {
     "product-skills@claude-code-skills": true,
     "marketing-skills@claude-code-skills": true,
@@ -15,6 +7,15 @@
     "pw@claude-code-skills": true,
     "self-improving-agent@claude-code-skills": true,
     "karpathy-coder@claude-code-skills": true,
-    "grill-me@claude-code-skills": true
+    "grill-me@claude-code-skills": true,
+    "ecc@ecc": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-code-skills": {
+      "source": {
+        "source": "github",
+        "repo": "alirezarezvani/claude-skills"
+      }
+    }
   }
 }
