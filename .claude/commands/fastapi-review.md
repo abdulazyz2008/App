@@ -34,6 +34,6 @@ Fix: Concrete change to make.
 ## Related
 
 - Agent: `fastapi-reviewer`
-- Skill: `fastapi-patterns`
+- Skill: `ecc:fastapi-patterns` (from the ECC plugin)
 - Command: `/python-review`
 - Skill: `security-scan`

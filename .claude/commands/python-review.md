@@ -203,7 +203,7 @@ The reviewer checks for:
 ## Related
 
 - Agent: `agents/python-reviewer.md`
-- Skills: `skills/python-patterns/`, `skills/python-testing/`
+- Skills: `ecc:python-patterns`, `ecc:python-testing` (from the ECC plugin)
 
 ## Common Fixes
 

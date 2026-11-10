@@ -1,6 +1,6 @@
 # Skills catalog
 
-**200 skills** in `.claude/skills`, checked on disk: every skill has a valid `SKILL.md`, a matching name and a description, with no duplicates. Type `/name` to use one, or describe the task and Claude picks the skill.
+**200 skills** listed here. 132 live in `.claude/skills`. The other 68 come from the plugins enabled in `.claude/settings.json` and are shown with their plugin prefix (for example `/pw:pw` or `/marketing-skills:cold-email`); the repo no longer keeps its own copies of them. Type `/name` to use one, or describe the task and Claude picks the skill. The ECC plugin adds 314 more skills (`/ecc:*`) that are not listed here.
 
 Also installed: 26 commands (23 `/gsd-*` from GSD, plus `/python-review`, `/fastapi-review`, `/test-coverage`) and 25 helper agents (22 `gsd-*`, `planner`, `python-reviewer`, `fastapi-reviewer`).
 
@@ -117,32 +117,32 @@ Copywriting, SEO audits, content and social skills.
 
 | Skill | What it does |
 |---|---|
-| `/ad-creative` | Use for any ad copy request (RSA headlines, Meta, LinkedIn or TikTok ads, bulk variations), before writing. |
-| `/ai-decision-authority` | Use before letting AI or an agent act on a marketing or GTM task without human review, or when writing an AI review policy. |
+| `/marketing-skills:ad-creative` | Use for any ad copy request (RSA headlines, Meta, LinkedIn or TikTok ads, bulk variations), before writing. |
+| `/marketing-skills:ai-decision-authority` | Use before letting AI or an agent act on a marketing or GTM task without human review, or when writing an AI review policy. |
 | `/brand-guidelines` | Use when writing or enforcing brand guidelines (colors, typography, logo rules, imagery, tone of voice), or checking an asset against them. |
-| `/business-name-fit` | Use when naming a company, brand or product, or checking whether a name works abroad, before committing to one. |
-| `/campaign-analytics` | Analyze campaign performance on the user's numbers: ROAS, CPA, ROI, multi-touch attribution and funnel drop-off. |
-| `/churn-prevention` | Use when designing a cancel flow, save offers, exit surveys or dunning emails, or cutting failed-payment churn. |
-| `/cold-email` | Use for any cold outreach or SDR email or follow-up sequence to prospects who did not opt in, before drafting. |
+| `/marketing-skills:business-name-fit` | Use when naming a company, brand or product, or checking whether a name works abroad, before committing to one. |
+| `/marketing-skills:campaign-analytics` | Analyze campaign performance on the user's numbers: ROAS, CPA, ROI, multi-touch attribution and funnel drop-off. |
+| `/marketing-skills:churn-prevention` | Use when designing a cancel flow, save offers, exit surveys or dunning emails, or cutting failed-payment churn. |
+| `/marketing-skills:cold-email` | Use for any cold outreach or SDR email or follow-up sequence to prospects who did not opt in, before drafting. |
 | `/content-production` | Write a blog post, article or guide end to end: research, outline, draft, SEO pass and quality gates. |
 | `/content-strategy` | Use when deciding what content to create (topics, clusters, a blog or content plan), before listing ideas. |
 | `/copy-editing` | Edit, proofread and tighten existing marketing copy in focused passes: clarity, voice, proofreading, specificity, readability and AI tells. |
 | `/copywriting` | Use for any headline, tagline, CTA, landing, pricing or about-page copy request, before drafting. |
-| `/local-seo-manager` | Use for any local business's Google Business Profile, Maps ranking, service-area pages, citations or review replies, before writing. |
-| `/marketing-demand-acquisition` | Use when planning demand generation, paid acquisition across Google, LinkedIn and Meta, or a marketing budget, before allocating spend. |
-| `/marketing-ideas` | Use when asked for marketing or growth ideas for a SaaS or software product. Picks from 139 tactics by stage, budget and channel instead of a generic list. |
+| `/marketing-skills:local-seo-manager` | Use for any local business's Google Business Profile, Maps ranking, service-area pages, citations or review replies, before writing. |
+| `/marketing-skills:marketing-demand-acquisition` | Use when planning demand generation, paid acquisition across Google, LinkedIn and Meta, or a marketing budget, before allocating spend. |
+| `/marketing-skills:marketing-ideas` | Use when asked for marketing or growth ideas for a SaaS or software product. Picks from 139 tactics by stage, budget and channel instead of a generic list. |
 | `/marketing-ops` | Use when a marketing request spans several skills (a campaign across content, SEO, CRO and channels) or it is unclear which skill fits. |
-| `/marketing-psychology` | Apply persuasion and behavioral science ethically to a page, offer or campaign, from 70+ mental models. |
-| `/marketing-strategy-pmm` | Use for product positioning, ICP, competitive battlecards or a go-to-market plan, before drafting. |
-| `/pricing-strategy` | Use for SaaS pricing tiers, value metric, packaging, a pricing page or a price increase, before proposing numbers. |
-| `/programmatic-seo` | Use when building many SEO pages from a template and data (location, integration, comparison or directory pages), before generating them. |
-| `/prompt-engineer-toolkit` | Use when a marketing team's AI prompts need testing, versioning or governance, before shipping a prompt. |
-| `/seo-audit` | Find why a site is not ranking: technical SEO, on-page issues, meta tags, site health. Use whenever the user asks why a page is not on Google, why traffic dropped or for an SEO audit. |
-| `/site-architecture` | Use for URL structure, navigation, internal linking, hub pages or orphan pages, or when SEO problems are structural. |
-| `/social-media-analyzer` | Score social performance: engagement rate, reach, ROI per platform, benchmarks. Load whenever the user asks which platform performs best, if posts are working, or shares social metrics to compare. |
-| `/social-media-manager` | Plan social media: strategy, content calendar, community management, follower growth. Use whenever the user asks what to post and when, or how to grow followers. |
-| `/x-twitter-growth` | Use for growing on X/Twitter: tweets, threads, profile audit, competitors or posting plan. |
-| `/youtube-full` | Use for any YouTube URL, video ID or @handle, or a request for transcripts, video search, channel, playlist or new-upload monitoring. |
+| `/marketing-skills:marketing-psychology` | Apply persuasion and behavioral science ethically to a page, offer or campaign, from 70+ mental models. |
+| `/marketing-skills:marketing-strategy-pmm` | Use for product positioning, ICP, competitive battlecards or a go-to-market plan, before drafting. |
+| `/marketing-skills:pricing-strategy` | Use for SaaS pricing tiers, value metric, packaging, a pricing page or a price increase, before proposing numbers. |
+| `/marketing-skills:programmatic-seo` | Use when building many SEO pages from a template and data (location, integration, comparison or directory pages), before generating them. |
+| `/marketing-skills:prompt-engineer-toolkit` | Use when a marketing team's AI prompts need testing, versioning or governance, before shipping a prompt. |
+| `/marketing-skills:seo-audit` | Find why a site is not ranking: technical SEO, on-page issues, meta tags, site health. Use whenever the user asks why a page is not on Google, why traffic dropped or for an SEO audit. |
+| `/marketing-skills:site-architecture` | Use for URL structure, navigation, internal linking, hub pages or orphan pages, or when SEO problems are structural. |
+| `/marketing-skills:social-media-analyzer` | Score social performance: engagement rate, reach, ROI per platform, benchmarks. Load whenever the user asks which platform performs best, if posts are working, or shares social metrics to compare. |
+| `/marketing-skills:social-media-manager` | Plan social media: strategy, content calendar, community management, follower growth. Use whenever the user asks what to post and when, or how to grow followers. |
+| `/marketing-skills:x-twitter-growth` | Use for growing on X/Twitter: tweets, threads, profile audit, competitors or posting plan. |
+| `/marketing-skills:youtube-full` | Use for any YouTube URL, video ID or @handle, or a request for transcripts, video search, channel, playlist or new-upload monitoring. |
 ## UI/UX Pro Max (design) (7)
 
 Design intelligence for websites and apps: styles, palettes, fonts, components, branding.
@@ -163,20 +163,20 @@ PRDs, UX research, roadmaps, landing pages.
 
 | Skill | What it does |
 |---|---|
-| `/competitive-teardown` | Deep competitor teardown: pricing, reviews, hiring, SEO, UX, scored across 12 dimensions with SWOT and positioning maps. |
-| `/design-qa` | Use when a UI screen, page or component is about to be called done, handed off or shipped, or when generated UI looks generic or half-finished. |
-| `/experiment-designer` | Plan A/B tests and product experiments: hypotheses, sample size, priority, reading results. |
-| `/landing-page-generator` | Use when asked for a landing, marketing or campaign page as a Next.js TSX component with Tailwind. |
-| `/product-analytics` | Use when defining product KPIs, building metric dashboards, running cohort or retention analysis, or interpreting feature adoption trends across product stages. |
-| `/product-discovery` | Validate product ideas: map assumptions, plan discovery sprints, test problem-solution fit. |
-| `/product-manager-toolkit` | PM toolkit: RICE prioritization, customer interview synthesis, PRDs and go-to-market. Use whenever the user asks what to build next, to rank features, write a PRD or sum up interview notes. |
-| `/product-skills` | Use when a product request needs routing across the product-team skills (prioritization, OKRs, UX research, experiments, discovery, roadmaps), or to run the continuous discovery loop. |
-| `/product-strategist` | Head of Product: quarterly OKRs cascaded from company to team, product vision, roadmap, team structure. |
-| `/roadmap-communicator` | Write roadmap narratives, release notes, changelogs, stakeholder updates. Use whenever the user explains plans to execs, engineers or customers. |
-| `/saas-scaffolder` | Use when starting a new SaaS app with auth, database, Stripe billing and a dashboard (Next.js App Router, TypeScript, Tailwind, shadcn/ui, Drizzle). |
-| `/spec-to-repo` | Use when the user says 'build me an app', 'create a project from this spec', 'scaffold a new repo', 'generate a starter', 'turn this idea into code', 'bootstrap a project', 'I have requirements and need a codebase', or provides a natural-language project specification and expects a complete… |
-| `/ui-design-system` | Use when building a design system: tokens, component docs, responsive scales or developer handoff. |
-| `/ux-researcher-designer` | UX research: personas, journey maps, usability test plans, synthesis. Use whenever the user asks who their users are or why they struggle. |
+| `/product-skills:competitive-teardown` | Deep competitor teardown: pricing, reviews, hiring, SEO, UX, scored across 12 dimensions with SWOT and positioning maps. |
+| `/product-skills:design-qa` | Use when a UI screen, page or component is about to be called done, handed off or shipped, or when generated UI looks generic or half-finished. |
+| `/product-skills:experiment-designer` | Plan A/B tests and product experiments: hypotheses, sample size, priority, reading results. |
+| `/product-skills:landing-page-generator` | Use when asked for a landing, marketing or campaign page as a Next.js TSX component with Tailwind. |
+| `/product-skills:product-analytics` | Use when defining product KPIs, building metric dashboards, running cohort or retention analysis, or interpreting feature adoption trends across product stages. |
+| `/product-skills:product-discovery` | Validate product ideas: map assumptions, plan discovery sprints, test problem-solution fit. |
+| `/product-skills:product-manager-toolkit` | PM toolkit: RICE prioritization, customer interview synthesis, PRDs and go-to-market. Use whenever the user asks what to build next, to rank features, write a PRD or sum up interview notes. |
+| `/product-skills:product-skills` | Use when a product request needs routing across the product-team skills (prioritization, OKRs, UX research, experiments, discovery, roadmaps), or to run the continuous discovery loop. |
+| `/product-skills:product-strategist` | Head of Product: quarterly OKRs cascaded from company to team, product vision, roadmap, team structure. |
+| `/product-skills:roadmap-communicator` | Write roadmap narratives, release notes, changelogs, stakeholder updates. Use whenever the user explains plans to execs, engineers or customers. |
+| `/product-skills:saas-scaffolder` | Use when starting a new SaaS app with auth, database, Stripe billing and a dashboard (Next.js App Router, TypeScript, Tailwind, shadcn/ui, Drizzle). |
+| `/product-skills:spec-to-repo` | Use when the user says 'build me an app', 'create a project from this spec', 'scaffold a new repo', 'generate a starter', 'turn this idea into code', 'bootstrap a project', 'I have requirements and need a codebase', or provides a natural-language project specification and expects a complete… |
+| `/product-skills:ui-design-system` | Use when building a design system: tokens, component docs, responsive scales or developer handoff. |
+| `/product-skills:ux-researcher-designer` | UX research: personas, journey maps, usability test plans, synthesis. Use whenever the user asks who their users are or why they struggle. |
 
 ## Business growth (5)
 
@@ -184,11 +184,11 @@ Customer success, sales engineering, proposals and contracts.
 
 | Skill | What it does |
 |---|---|
-| `/business-growth-skills` | Use when a growth request needs routing between customer-success-manager, sales-engineer, revenue-operations and contract-and-proposal-writer. |
-| `/contract-and-proposal-writer` | Use when drafting a freelance contract, proposal, SOW, NDA or MSA for US, EU, UK or DACH jurisdictions. |
-| `/customer-success-manager` | Use when reviewing customer accounts for health, churn risk or expansion. Scores health with health_score_calculator.py, churn with churn_risk_analyzer.py and upsell with expansion_opportunity_scorer.py. |
-| `/revenue-operations` | Check sales pipeline and forecasts: pipeline coverage, forecast accuracy, magic number, CAC payback. |
-| `/sales-engineer` | Use for pre-sales work: RFP coverage gaps, competitive feature matrices or planning and scoring a proof of concept. |
+| `/business-growth-skills:business-growth-skills` | Use when a growth request needs routing between customer-success-manager, sales-engineer, revenue-operations and contract-and-proposal-writer. |
+| `/business-growth-skills:contract-and-proposal-writer` | Use when drafting a freelance contract, proposal, SOW, NDA or MSA for US, EU, UK or DACH jurisdictions. |
+| `/business-growth-skills:customer-success-manager` | Use when reviewing customer accounts for health, churn risk or expansion. Scores health with health_score_calculator.py, churn with churn_risk_analyzer.py and upsell with expansion_opportunity_scorer.py. |
+| `/business-growth-skills:revenue-operations` | Check sales pipeline and forecasts: pipeline coverage, forecast accuracy, magic number, CAC payback. |
+| `/business-growth-skills:sales-engineer` | Use for pre-sales work: RFP coverage gaps, competitive feature matrices or planning and scoring a proof of concept. |
 
 ## Finance (6)
 
@@ -196,12 +196,12 @@ Valuation, SaaS metrics, month-end close.
 
 | Skill | What it does |
 |---|---|
-| `/finance-skills` | Pick the right finance skill: ratios, DCF, forecasts (financial-analyst), ARR, churn, CAC, LTV (saas-metrics-coach), month-end-close. |
-| `/financial-analyst` | Analyze financial statements, value a company with a DCF, explain budget variance, build rolling forecasts. |
-| `/month-end-close` | Use when running, planning or speeding up a month-end (or quarter-end) close — building or reviewing the close checklist and calendar, reconciling a bank statement or sub-ledger to the general ledger, writing or reviewing flux (variance) explanations, or finding why the close takes too many days. |
-| `/passive-deal-screener` | Use when a passive investor shares a private deal (syndication, preferred equity, bridge fund, private credit) to screen as an LP. |
-| `/saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
-| `/stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
+| `/finance-skills:finance-skills` | Pick the right finance skill: ratios, DCF, forecasts (financial-analyst), ARR, churn, CAC, LTV (saas-metrics-coach), month-end-close. |
+| `/finance-skills:financial-analyst` | Analyze financial statements, value a company with a DCF, explain budget variance, build rolling forecasts. |
+| `/finance-skills:month-end-close` | Use when running, planning or speeding up a month-end (or quarter-end) close — building or reviewing the close checklist and calendar, reconciling a bank statement or sub-ledger to the general ledger, writing or reviewing flux (variance) explanations, or finding why the close takes too many days. |
+| `/finance-skills:passive-deal-screener` | Use when a passive investor shares a private deal (syndication, preferred equity, bridge fund, private credit) to screen as an LP. |
+| `/finance-skills:saas-metrics-coach` | Use when someone shares SaaS revenue or customer numbers, or asks about ARR, MRR, churn, LTV, CAC, NRR or how their SaaS is doing. |
+| `/finance-skills:stock-analysis` | Analyze, research or value a listed stock or company (US, global, NSE or BSE) with verified data, ratios, scores and valuation. |
 
 ## Replica pack (11)
 
@@ -287,9 +287,9 @@ AI agents, automation, MCP servers, databases, multilingual sites.
 | `/browser-automation` | Automate a browser: scrape websites, fill forms, pull structured data from web pages. Use whenever the user wants to grab data from a site, fill a web form or extract a table. |
 | `/database-designer` | Design a database schema: tables, relationships, indexes, normalization, SQL vs NoSQL, migration plans. |
 | `/full-page-screenshot` | Use when asked for a full-page or long screenshot of a web page. Captures SPA scroll containers, lazy images and very tall pages through Chrome DevTools Protocol with no extra dependencies. |
-| `/grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
+| `/grill-me:grill-me` | Interview the user relentlessly about a plan or design until reaching shared understanding, resolving each branch of the decision tree. |
 | `/i18n-localization` | Use when adding UI text, adding or shipping a language, reviewing translation files, or building i18n into an app. |
-| `/karpathy-coder` | Check a diff for overbuilt code: hidden assumptions, needless abstraction, non-surgical changes, unverified goals (Karpathy's four principles). |
+| `/karpathy-coder:karpathy-coder` | Check a diff for overbuilt code: hidden assumptions, needless abstraction, non-surgical changes, unverified goals (Karpathy's four principles). |
 | `/mcp-server-builder` | Use when exposing an API as an MCP server or scaffolding a new MCP server in Python or TypeScript, before hand-writing tool wrappers. |
 | `/rag-architect` | Design a RAG pipeline: chunk size, embedding model, vector database and retrieval quality metrics. |
 
@@ -299,16 +299,16 @@ Write, fix and run website tests.
 
 | Skill | What it does |
 |---|---|
-| `/browserstack` | Use when running Playwright tests on BrowserStack or across a browser matrix ('browserstack', 'cross-browser', 'test on safari or firefox', 'browser compatibility'). |
-| `/coverage` | Find what is not tested: map untested pages and flows and coverage gaps. Use whenever the user asks what needs tests, about missing tests or test coverage. |
-| `/fix` | Diagnose and fix a failing or flaky Playwright test. Use whenever a test fails, passes only sometimes, breaks intermittently or needs fixing. |
-| `/generate` | Use when asked to write Playwright or e2e tests for a page, component or feature ('write tests', 'add tests for', 'e2e test'). |
-| `/migrate` | Use when moving tests from Cypress or Selenium to Playwright ('migrate tests', 'convert tests', 'replace selenium'). |
-| `/pw` | Use for any Playwright or end-to-end browser testing work: writing tests, fixing flaky ones, migrating from Cypress or Selenium, CI setup, TestRail or BrowserStack. |
-| `/pw-init` | Use when setting up Playwright in a project ('set up playwright', 'add e2e tests', 'configure playwright', 'init playwright'). |
-| `/pw-review` | Use when reviewing Playwright tests for quality ('review tests', 'audit tests', 'playwright best practices check'). |
-| `/report` | Summarize Playwright results. Use whenever the user asks how tests went, for a test report or status. |
-| `/testrail` | Use when syncing Playwright tests with TestRail ('testrail', 'sync test cases', 'push results to testrail', 'import from testrail'). |
+| `/pw:browserstack` | Use when running Playwright tests on BrowserStack or across a browser matrix ('browserstack', 'cross-browser', 'test on safari or firefox', 'browser compatibility'). |
+| `/pw:coverage` | Find what is not tested: map untested pages and flows and coverage gaps. Use whenever the user asks what needs tests, about missing tests or test coverage. |
+| `/pw:fix` | Diagnose and fix a failing or flaky Playwright test. Use whenever a test fails, passes only sometimes, breaks intermittently or needs fixing. |
+| `/pw:generate` | Use when asked to write Playwright or e2e tests for a page, component or feature ('write tests', 'add tests for', 'e2e test'). |
+| `/pw:migrate` | Use when moving tests from Cypress or Selenium to Playwright ('migrate tests', 'convert tests', 'replace selenium'). |
+| `/pw:pw` | Use for any Playwright or end-to-end browser testing work: writing tests, fixing flaky ones, migrating from Cypress or Selenium, CI setup, TestRail or BrowserStack. |
+| `/pw:pw-init` | Use when setting up Playwright in a project ('set up playwright', 'add e2e tests', 'configure playwright', 'init playwright'). |
+| `/pw:pw-review` | Use when reviewing Playwright tests for quality ('review tests', 'audit tests', 'playwright best practices check'). |
+| `/pw:report` | Summarize Playwright results. Use whenever the user asks how tests went, for a test report or status. |
+| `/pw:testrail` | Use when syncing Playwright tests with TestRail ('testrail', 'sync test cases', 'push results to testrail', 'import from testrail'). |
 
 ## Vercel (React, Next.js & deploy) (9)
 
@@ -333,11 +333,11 @@ Website automation, FastAPI and Python best practices.
 | Skill | What it does |
 |---|---|
 | `/agent-browser` | Browser automation CLI for AI agents. Use when the user needs to interact with websites, including navigating pages, filling forms, clicking buttons, taking screenshots, extracting data, testing web apps, or automating any browser task. |
-| `/api-design` | REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs. |
-| `/fastapi-patterns` | FastAPI best practices covering project structure, Pydantic v2 schemas, dependency injection, async handlers, authentication, authorization, transactional service layers, and testing with httpx and pytest. |
-| `/python-patterns` | Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications. |
-| `/python-testing` | Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements. |
-| `/verification-loop` | Run a six-phase verification of a Claude Code session's work — build, type check, lint, tests with coverage, security grep, and diff review — then produce a PASS/FAIL verification report. |
+| `/ecc:api-design` | REST API design patterns including resource naming, status codes, pagination, filtering, error responses, versioning, and rate limiting for production APIs. |
+| `/ecc:fastapi-patterns` | FastAPI best practices covering project structure, Pydantic v2 schemas, dependency injection, async handlers, authentication, authorization, transactional service layers, and testing with httpx and pytest. |
+| `/ecc:python-patterns` | Pythonic idioms, PEP 8 standards, type hints, and best practices for building robust, efficient, and maintainable Python applications. |
+| `/ecc:python-testing` | Python testing strategies using pytest, TDD methodology, fixtures, mocking, parametrization, and coverage requirements. |
+| `/ecc:verification-loop` | Run a six-phase verification of a Claude Code session's work — build, type check, lint, tests with coverage, security grep, and diff review — then produce a PASS/FAIL verification report. |
 
 ## Self-improving memory (6)
 
@@ -345,9 +345,9 @@ Save lessons so Claude remembers them across sessions.
 
 | Skill | What it does |
 |---|---|
-| `/extract` | Turn a fix or pattern that keeps coming up into a reusable skill with SKILL.md, reference docs and examples. |
-| `/memory-review` | Review what the agent has learned in auto-memory: what to promote to permanent rules, stale entries to prune, duplicates to merge. |
-| `/memory-status` | Health check of agent auto-memory: line counts, topic files, capacity, stale entries and what to prune. |
-| `/promote` | Graduate a proven pattern from auto-memory (MEMORY.md) to CLAUDE.md or .claude/rules/ for permanent enforcement. |
-| `/remember` | Save something important to auto-memory with a timestamp and context. Use whenever the user says remember this, note it for next time or don't forget, wants you to stop repeating a mistake across sessions, or a discovery is too important for auto-capture. |
-| `/self-improving-agent` | Curate what the agent has learned into durable project knowledge. Reviews Claude Code auto-memory (MEMORY.md and its topic files) for learnings worth keeping, promotes proven ones into CLAUDE.md or .claude/rules/, records a correction as a lesson that persists across sessions, prunes stale or… |
+| `/self-improving-agent:extract` | Turn a fix or pattern that keeps coming up into a reusable skill with SKILL.md, reference docs and examples. |
+| `/self-improving-agent:memory-review` | Review what the agent has learned in auto-memory: what to promote to permanent rules, stale entries to prune, duplicates to merge. |
+| `/self-improving-agent:memory-status` | Health check of agent auto-memory: line counts, topic files, capacity, stale entries and what to prune. |
+| `/self-improving-agent:promote` | Graduate a proven pattern from auto-memory (MEMORY.md) to CLAUDE.md or .claude/rules/ for permanent enforcement. |
+| `/self-improving-agent:remember` | Save something important to auto-memory with a timestamp and context. Use whenever the user says remember this, note it for next time or don't forget, wants you to stop repeating a mistake across sessions, or a discovery is too important for auto-capture. |
+| `/self-improving-agent:self-improving-agent` | Curate what the agent has learned into durable project knowledge. Reviews Claude Code auto-memory (MEMORY.md and its topic files) for learnings worth keeping, promotes proven ones into CLAUDE.md or .claude/rules/, records a correction as a lesson that persists across sessions, prunes stale or… |
