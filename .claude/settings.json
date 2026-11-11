@@ -11,10 +11,17 @@
         "source": "github",
         "repo": "mvanhorn/last30days-skill"
       }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
+      }
     }
   },
   "enabledPlugins": {
     "ecc@ecc": true,
-    "last30days@last30days-skill": true
+    "last30days@last30days-skill": true,
+    "ponytail@ponytail": true
   }
 }
