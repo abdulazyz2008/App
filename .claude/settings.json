@@ -11,7 +11,8 @@
     "self-improving-agent@claude-code-skills": true,
     "karpathy-coder@claude-code-skills": true,
     "grill-me@claude-code-skills": true,
-    "ecc@ecc": true
+    "ecc@ecc": true,
+    "ponytail@ponytail": true
   },
   "extraKnownMarketplaces": {
     "claude-code-skills": {
@@ -24,6 +25,12 @@
       "source": {
         "source": "git",
         "url": "https://github.com/affaan-m/ECC.git"
+      }
+    },
+    "ponytail": {
+      "source": {
+        "source": "github",
+        "repo": "DietrichGebert/ponytail"
       }
     }
   }
