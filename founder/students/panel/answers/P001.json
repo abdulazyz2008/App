@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "I'd download it the day I heard about it because it's free and I download everything, but I delete most apps within a week, and my class WhatsApp groups already ping me about everything. Unless it beats those groups, it'll be gone before the month is up.",
+  "objection": "My WhatsApp groups already have the announcements, and people in them tell me what actually matters. One more app with more notifications just gets muted and then deleted.",
+  "would_change_my_mind": "If it caught a deadline my WhatsApp groups missed, like a submission date a professor only posted on the portal. I did miss one last semester, so that would make me keep it.",
+  "price_too_cheap": 19,
+  "price_cheap": 49,
+  "price_expensive": 149,
+  "price_too_expensive": 299
+}

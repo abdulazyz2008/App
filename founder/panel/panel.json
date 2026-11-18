@@ -1,0 +1,97 @@
+{
+ "n": 20,
+ "seed": 451880,
+ "customer": {
+  "business": "UniDash (working name): a never-miss-a-deadline feed for students, paid for by the university",
+  "target": "People who approve student-facing software at Indian private universities and autonomous colleges",
+  "where": "India, private universities and autonomous colleges, starting in Hyderabad",
+  "currency": "₹",
+  "age": [
+   32,
+   62
+  ],
+  "segments": [
+   {
+    "name": "IT head / CIO of a private university or college",
+    "share": 0.3,
+    "income": [
+     1200000,
+     3500000
+    ]
+   },
+   {
+    "name": "Dean of students or academic dean",
+    "share": 0.3,
+    "income": [
+     1500000,
+     4000000
+    ]
+   },
+   {
+    "name": "Registrar or head of administration",
+    "share": 0.2,
+    "income": [
+     1200000,
+     3000000
+    ]
+   },
+   {
+    "name": "Director, principal or trustee of a private college",
+    "share": 0.2,
+    "income": [
+     2500000,
+     8000000
+    ]
+   }
+  ],
+  "behaviours": [
+   {
+    "name": "Happy with the current ERP vendor",
+    "share": 0.2,
+    "how": "Bought the college ERP years ago and expects new features to come from that vendor."
+   },
+   {
+    "name": "Budget guardian",
+    "share": 0.2,
+    "how": "Every new spend needs a committee or trustee approval and a clear reason."
+   },
+   {
+    "name": "Rankings and accreditation chaser",
+    "share": 0.15,
+    "how": "Buys things that help NAAC/NIRF scores and look good to applicants."
+   },
+   {
+    "name": "Data and security cautious",
+    "share": 0.15,
+    "how": "Worries about student data leaks and outside apps touching Microsoft 365."
+   },
+   {
+    "name": "Wants proof first",
+    "share": 0.15,
+    "how": "Asks which other colleges use it and wants to speak to them."
+   },
+   {
+    "name": "Overloaded, ignores vendors",
+    "share": 0.15,
+    "how": "Gets many vendor pitches a week and answers almost none."
+   }
+  ],
+  "objections": [
+   "Our ERP already has a student app",
+   "Students already get every notice on WhatsApp groups",
+   "Will my staff have to enter everything a second time?",
+   "Student data privacy and the DPDP Act",
+   "A tiny new startup: will it still exist next year?",
+   "There is no budget left this academic year",
+   "IT will not give an outside app access to our Microsoft 365"
+  ],
+  "habits": [
+   "vendor purchases are approved after a committee meeting",
+   "your college uses Microsoft 365 for staff and student email",
+   "class notices mostly go out through WhatsApp groups run by faculty",
+   "a NAAC accreditation visit is due next year",
+   "students complain every semester that they missed an exam notice"
+  ]
+ },
+ "pitch": "UniDash: a phone app that puts every official deadline, exam notice and announcement your students need into one feed, with alerts, so fewer of them miss submissions and exams.\nFree for students. The university pays ₹300 per student per year (a 3,000-student college pays ₹9 lakh a year).\nIt connects to your existing Microsoft 365 and ERP/LMS once your IT team approves access, and reads what staff already publish, so nobody posts twice. Includes read receipts on announcements and a monthly report on missed deadlines.\nOpening offer: a free one-term pilot with one batch, ending in a before-and-after report on missed submissions.\nBuilt by a small Hyderabad startup; comes with a data-processing agreement under India's DPDP Act.\nAll prices are in Indian rupees. Give your price answers in ₹ per student per year."
+}

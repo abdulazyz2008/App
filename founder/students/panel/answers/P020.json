@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "My friends' WhatsApp group already tells me every deadline, usually the night before, and that works well enough for me. I'd probably install it if someone made me, then mute the alerts and forget it exists within two weeks.",
+  "objection": "Not another app on my phone. Plus it uses my college Microsoft login, which I've used maybe twice this semester. I don't even remember the password.",
+  "would_change_my_mind": "If my whole friend group and class reps started using it instead of WhatsApp, so it became the place where deadlines actually show up first.",
+  "price_too_cheap": 5,
+  "price_cheap": 15,
+  "price_expensive": 40,
+  "price_too_expensive": 80
+}

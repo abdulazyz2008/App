@@ -1,0 +1,13 @@
+{
+  "id": "P001",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "We already have an ERP with a notice board and SMS alerts, and if students need a better feed I will ask our vendor to add it rather than bring in another small company. There is no budget left this academic year anyway, and nine lakh a year for notifications will not get through committee.",
+  "objection": "This is one more vendor touching student data and our Microsoft 365, for something our ERP vendor should be giving us. If the Hyderabad startup shuts down in two years, I am the one answering for it.",
+  "would_change_my_mind": "If our existing ERP vendor partnered with them or offered it as an add-on, and the pilot report showed a clear drop in missed exams that I could put in front of the committee before next year's budget is set.",
+  "price_too_cheap": 30,
+  "price_cheap": 75,
+  "price_expensive": 150,
+  "price_too_expensive": 250
+}

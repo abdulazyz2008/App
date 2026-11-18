@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I might let one batch try the free pilot, but I won't commit ₹9 lakh a year and hand over Microsoft 365 and ERP access to a small startup I've never heard of. It also does nothing obvious for my NAAC or NIRF scores, and our faculty WhatsApp groups already get the notices out for free.",
+  "objection": "A tiny new startup: will it still exist next year? If they shut down after I've connected it to our ERP and got students used to it, I'm the one explaining that to management and cleaning up the data.",
+  "would_change_my_mind": "Two or three named peer universities already paying for it, plus pilot numbers showing it measurably cut missed submissions in a way I can put in our NAAC self-study report.",
+  "price_too_cheap": 30,
+  "price_cheap": 80,
+  "price_expensive": 200,
+  "price_too_expensive": 350
+}

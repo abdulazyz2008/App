@@ -1,0 +1,13 @@
+{
+  "id": "P020",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Not this month. I don't sign up for something students will rely on because the idea is nice. Nobody has told me which colleges already use it, and a small startup asking for access to our Microsoft 365 and ERP will take IT and the management weeks to clear. I might agree to the free pilot after I've spoken to a college that runs it, but I wouldn't commit ₹9 lakh before that.",
+  "objection": "Who else uses this? I want to call a dean at a college like ours and hear whether it really pulls from our existing systems or whether my staff end up entering every notice a second time when the integration breaks.",
+  "would_change_my_mind": "Two or three comparable Indian colleges I can phone, with their before-and-after numbers on missed submissions, and IT confirming the M365 connection works without any extra posting by staff.",
+  "price_too_cheap": 50,
+  "price_cheap": 120,
+  "price_expensive": 250,
+  "price_too_expensive": 400
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P016",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "There is no budget left this academic year, and nine lakh is not something I can find mid-year for an app when the WhatsApp groups already do the job, imperfectly. I might listen to the pilot pitch, but I am not signing anything that touches our Microsoft 365 this month.",
+  "objection": "A small startup I have never heard of asking my IT team for access to Microsoft 365 and our ERP, where all the student data sits. One leak and it is my name in the newspaper and in front of the trustees, and a DPDP agreement on paper does not tell me how they actually protect it.",
+  "would_change_my_mind": "A pilot where they get read-only access scoped to one batch, a proper security review our IT head signs off on, and references from two or three colleges like ours already using it, timed so the paid contract starts with next year's budget.",
+  "price_too_cheap": 50,
+  "price_cheap": 120,
+  "price_expensive": 250,
+  "price_too_expensive": 400
+}

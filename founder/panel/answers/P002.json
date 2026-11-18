@@ -1,0 +1,13 @@
+{
+  "id": "P002",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our ERP already has a student app that pushes notices, so paying nine lakh a year for a second feed is hard to justify to the committee. I might let one batch try the free pilot, but nothing about this moves our NAAC or NIRF numbers as it is pitched.",
+  "objection": "It duplicates what our ERP vendor already gives us, and a small Hyderabad startup getting into our Microsoft 365 and ERP data is a risk the committee and IT will question, DPDP agreement or not.",
+  "would_change_my_mind": "A pilot report from a college like ours showing a clear drop in missed submissions, packaged as evidence we can cite under NAAC student support and progression criteria.",
+  "price_too_cheap": 30,
+  "price_cheap": 80,
+  "price_expensive": 180,
+  "price_too_expensive": 300
+}

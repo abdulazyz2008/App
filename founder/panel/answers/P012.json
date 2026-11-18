@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "A small startup asking for read access to our Microsoft 365 and ERP, with student data flowing into a phone app, is not something I can push through committee in a month. I might discuss the free pilot, but I am not committing ₹9 lakh a year on a pitch.",
+  "objection": "What exactly they read from our tenant and ERP, where student data is stored, and who is liable if a small Hyderabad team gets breached. A DPDP agreement on paper does not tell me their security is real.",
+  "would_change_my_mind": "A security review I can verify: least-privilege read-only M365 permissions documented, data hosted in India, a third-party audit or pen-test report, and a reference from another university already running it.",
+  "price_too_cheap": 50,
+  "price_cheap": 120,
+  "price_expensive": 250,
+  "price_too_expensive": 400
+}

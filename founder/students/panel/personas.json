@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Talia",
+  "age": 20,
+  "segment": "Well-off student (yearly pocket money)",
+  "income": 261000,
+  "behaviour": "Tries every new app",
+  "behaviour_how": "Installs new apps quickly and deletes most within a week.",
+  "objection": "I already get everything on WhatsApp groups",
+  "habit": "you missed at least one assignment deadline last semester"
+ },
+ {
+  "id": "P002",
+  "name": "Emma",
+  "age": 21,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 13000,
+  "behaviour": "Organised planner",
+  "behaviour_how": "Already keeps deadlines in Google Calendar or Notion.",
+  "objection": "I already get everything on WhatsApp groups",
+  "habit": "you missed at least one assignment deadline last semester"
+ },
+ {
+  "id": "P003",
+  "name": "Mira",
+  "age": 17,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 22000,
+  "behaviour": "Tries every new app",
+  "behaviour_how": "Installs new apps quickly and deletes most within a week.",
+  "objection": "Not another app on my phone",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P004",
+  "name": "Mason",
+  "age": 18,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 108000,
+  "behaviour": "Organised planner",
+  "behaviour_how": "Already keeps deadlines in Google Calendar or Notion.",
+  "objection": "My college portal works fine",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P005",
+  "name": "Min",
+  "age": 21,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 42000,
+  "behaviour": "Lives in WhatsApp groups",
+  "behaviour_how": "Gets every notice from class groups and never opens email.",
+  "objection": "Not another app on my phone",
+  "habit": "you stay in a hostel near campus"
+ },
+ {
+  "id": "P006",
+  "name": "Pablo",
+  "age": 18,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 57000,
+  "behaviour": "Lives in WhatsApp groups",
+  "behaviour_how": "Gets every notice from class groups and never opens email.",
+  "objection": "Will it actually be accurate, or will it miss things?",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P007",
+  "name": "Owen",
+  "age": 17,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 21000,
+  "behaviour": "Last-minute crammer",
+  "behaviour_how": "Finds out about deadlines from friends the night before.",
+  "objection": "Will it actually be accurate, or will it miss things?",
+  "habit": "you missed at least one assignment deadline last semester"
+ },
+ {
+  "id": "P008",
+  "name": "Dana",
+  "age": 18,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 45000,
+  "behaviour": "Organised planner",
+  "behaviour_how": "Already keeps deadlines in Google Calendar or Notion.",
+  "objection": "Not another app on my phone",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P009",
+  "name": "Ezra",
+  "age": 18,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 76000,
+  "behaviour": "Last-minute crammer",
+  "behaviour_how": "Finds out about deadlines from friends the night before.",
+  "objection": "My college portal works fine",
+  "habit": "you check Instagram and WhatsApp first thing every morning"
+ },
+ {
+  "id": "P010",
+  "name": "Leila",
+  "age": 18,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 27000,
+  "behaviour": "Privacy-minded",
+  "behaviour_how": "Wary of apps asking to sign in with their college account.",
+  "objection": "Not another app on my phone",
+  "habit": "you stay in a hostel near campus"
+ },
+ {
+  "id": "P011",
+  "name": "Lena",
+  "age": 20,
+  "segment": "Well-off student (yearly pocket money)",
+  "income": 233000,
+  "behaviour": "Busy with extracurriculars",
+  "behaviour_how": "Clubs, fests and sport take most evenings.",
+  "objection": "I already get everything on WhatsApp groups",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P012",
+  "name": "Ada",
+  "age": 20,
+  "segment": "Well-off student (yearly pocket money)",
+  "income": 205000,
+  "behaviour": "Last-minute crammer",
+  "behaviour_how": "Finds out about deadlines from friends the night before.",
+  "objection": "Not another app on my phone",
+  "habit": "you stay in a hostel near campus"
+ },
+ {
+  "id": "P013",
+  "name": "Noah",
+  "age": 23,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 17000,
+  "behaviour": "Lives in WhatsApp groups",
+  "behaviour_how": "Gets every notice from class groups and never opens email.",
+  "objection": "Not another app on my phone",
+  "habit": "you commute an hour to college by metro"
+ },
+ {
+  "id": "P014",
+  "name": "Sienna",
+  "age": 19,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 31000,
+  "behaviour": "Busy with extracurriculars",
+  "behaviour_how": "Clubs, fests and sport take most evenings.",
+  "objection": "It will spam me with notifications",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P015",
+  "name": "Declan",
+  "age": 22,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 66000,
+  "behaviour": "Lives in WhatsApp groups",
+  "behaviour_how": "Gets every notice from class groups and never opens email.",
+  "objection": "I already get everything on WhatsApp groups",
+  "habit": "you check Instagram and WhatsApp first thing every morning"
+ },
+ {
+  "id": "P016",
+  "name": "Levi",
+  "age": 22,
+  "segment": "Well-off student (yearly pocket money)",
+  "income": 188000,
+  "behaviour": "Tries every new app",
+  "behaviour_how": "Installs new apps quickly and deletes most within a week.",
+  "objection": "My college portal works fine",
+  "habit": "you missed at least one assignment deadline last semester"
+ },
+ {
+  "id": "P017",
+  "name": "Kai",
+  "age": 20,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 92000,
+  "behaviour": "Busy with extracurriculars",
+  "behaviour_how": "Clubs, fests and sport take most evenings.",
+  "objection": "I already get everything on WhatsApp groups",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P018",
+  "name": "Marcus",
+  "age": 18,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 33000,
+  "behaviour": "Privacy-minded",
+  "behaviour_how": "Wary of apps asking to sign in with their college account.",
+  "objection": "My college portal works fine",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ },
+ {
+  "id": "P019",
+  "name": "Ethan",
+  "age": 18,
+  "segment": "Student with a comfortable allowance (yearly pocket money)",
+  "income": 38000,
+  "behaviour": "Privacy-minded",
+  "behaviour_how": "Wary of apps asking to sign in with their college account.",
+  "objection": "It will spam me with notifications",
+  "habit": "you missed at least one assignment deadline last semester"
+ },
+ {
+  "id": "P020",
+  "name": "Zara",
+  "age": 20,
+  "segment": "Student on a tight allowance (yearly pocket money)",
+  "income": 15000,
+  "behaviour": "Last-minute crammer",
+  "behaviour_how": "Finds out about deadlines from friends the night before.",
+  "objection": "Not another app on my phone",
+  "habit": "you have opened your college Outlook maybe twice this semester"
+ }
+]

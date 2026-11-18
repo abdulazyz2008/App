@@ -1,0 +1,13 @@
+{
+  "id": "P011",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I get a dozen pitches like this a week and this one wants access to our Microsoft 365 and ERP, meaning student data, from a small startup I have never heard of. Even the free pilot needs IT sign-off and a committee meeting, and nothing gets through that in a month.",
+  "objection": "Handing student records to a small Hyderabad startup. A DPDP agreement on paper means little if they get breached or shut down, and the institution answers for it, not them. Also, our ERP portal and email already carry these notices, so I am not convinced missed deadlines are a problem worth ₹9 lakh.",
+  "would_change_my_mind": "A reference from a registrar at a comparable university who has run it for a year with no data incidents, plus a security audit our IT team accepts.",
+  "price_too_cheap": 40,
+  "price_cheap": 100,
+  "price_expensive": 220,
+  "price_too_expensive": 350
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P004",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our ERP already has a student app and we send notices on it and on WhatsApp groups, so I don't see why I should add another app and ₹9 lakh a year to the budget. With NAAC due next year, my team has no time to onboard a new vendor or chase IT for Microsoft 365 and ERP access.",
+  "objection": "This duplicates what our ERP vendor already gives us, and a small startup asking for access to student data means more paperwork for IT and legal at a time I can least afford it.",
+  "would_change_my_mind": "If another college like ours showed me their missed-submission numbers going down and how that helped their NAAC report on student support, and the pilot needed nothing from my staff except IT approval.",
+  "price_too_cheap": 30,
+  "price_cheap": 75,
+  "price_expensive": 150,
+  "price_too_expensive": 250
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I might entertain the free pilot, but I am not paying ₹9 lakh a year or handing tenant-level Microsoft 365 and ERP access to a small Hyderabad startup I have never heard of. Unless it clearly moves something NAAC or NIRF looks at, a notice feed is a nice-to-have, and Teams and our LMS already push announcements.",
+  "objection": "A tiny new startup: will it still exist next year? If they fold, I have student data on their servers, an app students depend on that goes dark, and I am the one who signed off on the M365 permissions.",
+  "would_change_my_mind": "Two or three reference universities of our size already running it for a year, plus pilot data showing a fall in missed submissions that I can put straight into our NAAC student-support evidence, with read-only scoped access and a source-code escrow or exit clause.",
+  "price_too_cheap": 50,
+  "price_cheap": 120,
+  "price_expensive": 220,
+  "price_too_expensive": 350
+}

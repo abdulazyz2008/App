@@ -1,0 +1,13 @@
+{
+  "id": "P003",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our students already get every notice on the class WhatsApp groups, and I cannot walk into a committee and ask for ₹9 lakh a year to replace something that costs us nothing. At most I would let one batch try the free pilot, but paying for it is not happening this month or this term.",
+  "objection": "I don't have proof that students actually miss deadlines because of how notices reach them, rather than just ignoring them, and a small startup getting into our Microsoft 365 and ERP is a risk our IT and trustees will question.",
+  "would_change_my_mind": "A pilot report from our own batch showing a clear drop in missed submissions, plus a reference from a similar private college that renewed after the first year.",
+  "price_too_cheap": 30,
+  "price_cheap": 80,
+  "price_expensive": 180,
+  "price_too_expensive": 300
+}

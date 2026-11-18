@@ -1,0 +1,13 @@
+{
+  "id": "P013",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Our ERP already has a student app, and I am not putting another vendor in front of students and asking IT to open up Microsoft 365 and the ERP to a small startup nobody has vouched for. The free pilot is tempting, but I would want to talk to two or three colleges already using it before I even take it to IT.",
+  "objection": "No names of other colleges using it. I cannot ask our IT team for access to student data, DPDP agreement or not, on the word of a startup I found myself, and if it is just a second app duplicating the ERP one, students will ignore both.",
+  "would_change_my_mind": "A call with the registrar of a comparable private university that has run it for at least a term and can show me their missed-exam-notice complaints actually went down.",
+  "price_too_cheap": 50,
+  "price_cheap": 120,
+  "price_expensive": 250,
+  "price_too_expensive": 400
+}

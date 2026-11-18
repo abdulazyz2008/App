@@ -1,0 +1,13 @@
+{
+  "id": "P006",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Everything I need already comes through my class WhatsApp groups, and the CR posts it before any official notice goes out. I might install it if someone shares the link, but I'd stop opening it after a week because the group already pings me.",
+  "objection": "Half our real updates, like a test moved or a class cancelled, only get said in WhatsApp or by a professor in class, so I don't trust an app pulling from official college stuff to catch everything. If it misses even one thing I'm back to the group anyway.",
+  "would_change_my_mind": "If my whole class group, including the CR, started using it and stuff showed up there first and more accurately than on WhatsApp.",
+  "price_too_cheap": 10,
+  "price_cheap": 29,
+  "price_expensive": 79,
+  "price_too_expensive": 149
+}

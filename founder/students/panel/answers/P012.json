@@ -1,0 +1,13 @@
+{
+  "id": "P012",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Honestly my friends' WhatsApp group already tells me what's due, usually the night before, and that's how I've always done it. I'd probably install it because it's free and it's just my college login, but I'd mute the alerts in a week and forget it's on my phone.",
+  "objection": "Not another app on my phone. Unless my professors actually post everything there on time, it's just one more place to check, and the group chat will still know first.",
+  "would_change_my_mind": "If it pinged me about a deadline the group chat missed, or my whole friend group started using it instead of WhatsApp.",
+  "price_too_cheap": 10,
+  "price_cheap": 30,
+  "price_expensive": 99,
+  "price_too_expensive": 199
+}

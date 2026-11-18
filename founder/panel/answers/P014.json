@@ -1,0 +1,13 @@
+{
+  "id": "P014",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our ERP vendor already gives us a student app with notices, and faculty WhatsApp groups reach students instantly at zero cost. I cannot walk into a trustee meeting asking for ₹9 lakh a year for a second feed when I can't show it fixes a problem we're actually measuring.",
+  "objection": "This duplicates what the ERP app is supposed to do, and I'd be handing Microsoft 365 and ERP access to a small startup I've never heard of. If they shut down in two years I'm left explaining a data-access approval and a dead app to the committee.",
+  "would_change_my_mind": "A pilot report showing a clear, verified drop in missed submissions versus our ERP app plus WhatsApp, with references from two or three comparable Indian private universities already paying for it.",
+  "price_too_cheap": 30,
+  "price_cheap": 75,
+  "price_expensive": 150,
+  "price_too_expensive": 250
+}

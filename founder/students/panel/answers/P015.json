@@ -1,0 +1,13 @@
+{
+  "id": "P015",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "Every notice already lands in my class WhatsApp groups, usually with someone summarising it for me. I might install it if the college pushes it, but a month later I'd still be checking WhatsApp, not another app.",
+  "objection": "I already get everything on WhatsApp groups, so this is just one more app sending me the same notices a bit later.",
+  "would_change_my_mind": "If professors and admin stopped posting in WhatsApp groups and UniDash became the only place exam notices and deadline changes showed up first.",
+  "price_too_cheap": 10,
+  "price_cheap": 20,
+  "price_expensive": 49,
+  "price_too_expensive": 99
+}

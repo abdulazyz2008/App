@@ -1,0 +1,13 @@
+{
+  "id": "P018",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Our notices already go out on WhatsApp groups and the ERP portal, and I cannot take a ₹9 lakh line item to the committee for a problem I have not shown exists. At most I might table the free pilot for discussion, but nothing gets bought this month.",
+  "objection": "Students already get every notice on WhatsApp, so I would be paying lakhs for a second channel, and on top of that a small startup wants access to our Microsoft 365 and ERP with student data, which IT and the trustees will question hard.",
+  "would_change_my_mind": "A pilot report from our own batch showing a clear, measurable drop in missed submissions and exams, plus IT sign-off on the data access and DPDP agreement.",
+  "price_too_cheap": 30,
+  "price_cheap": 75,
+  "price_expensive": 180,
+  "price_too_expensive": 300
+}

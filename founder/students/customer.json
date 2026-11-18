@@ -1,0 +1,35 @@
+{
+  "business": "UniDash (working name): a never-miss-a-deadline feed for students, paid for by the university",
+  "target": "Undergraduate students at Indian private universities and colleges",
+  "where": "India, starting in Hyderabad",
+  "currency": "₹",
+  "age": [17, 23],
+  "segments": [
+    {"name": "Student on a tight allowance (yearly pocket money)", "share": 0.40, "income": [12000, 36000]},
+    {"name": "Student with a comfortable allowance (yearly pocket money)", "share": 0.40, "income": [36000, 120000]},
+    {"name": "Well-off student (yearly pocket money)", "share": 0.20, "income": [120000, 360000]}
+  ],
+  "behaviours": [
+    {"name": "Last-minute crammer", "share": 0.20, "how": "Finds out about deadlines from friends the night before."},
+    {"name": "Lives in WhatsApp groups", "share": 0.20, "how": "Gets every notice from class groups and never opens email."},
+    {"name": "Organised planner", "share": 0.15, "how": "Already keeps deadlines in Google Calendar or Notion."},
+    {"name": "Busy with extracurriculars", "share": 0.15, "how": "Clubs, fests and sport take most evenings."},
+    {"name": "Tries every new app", "share": 0.15, "how": "Installs new apps quickly and deletes most within a week."},
+    {"name": "Privacy-minded", "share": 0.15, "how": "Wary of apps asking to sign in with their college account."}
+  ],
+  "objections": [
+    "I already get everything on WhatsApp groups",
+    "Not another app on my phone",
+    "Will it actually be accurate, or will it miss things?",
+    "I don't want an app reading my college account",
+    "It will spam me with notifications",
+    "My college portal works fine"
+  ],
+  "habits": [
+    "you check Instagram and WhatsApp first thing every morning",
+    "you have opened your college Outlook maybe twice this semester",
+    "you missed at least one assignment deadline last semester",
+    "you stay in a hostel near campus",
+    "you commute an hour to college by metro"
+  ]
+}

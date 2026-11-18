@@ -1,0 +1,13 @@
+{
+  "id": "P017",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "need",
+  "reason": "Every notice already goes out on the department WhatsApp groups and the LMS, so students who miss exams are mostly not reading what they already get. Another app won't change that, and I'm not giving a small startup access to our M365 and ERP to find out.",
+  "objection": "Students already get every notice on WhatsApp groups. ₹9 lakh a year for another feed they'll mute is hard to justify, and connecting an unknown vendor to our ERP means a security review and more work for my team.",
+  "would_change_my_mind": "A peer CIO at a comparable private university telling me it cut missed exams and submissions in a measurable way, with read-only access that my team could set up in a day.",
+  "price_too_cheap": 20,
+  "price_cheap": 60,
+  "price_expensive": 150,
+  "price_too_expensive": 300
+}

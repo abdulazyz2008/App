@@ -1,0 +1,13 @@
+{
+  "id": "P007",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "habit",
+  "reason": "We already pay our ERP vendor, and notices and deadlines are their job. With NAAC next year I'd ask them to add alerts before I bring a second student-data vendor into the college.",
+  "objection": "A tiny Hyderabad startup holding our student data and plugging into our ERP and Microsoft 365. If they shut down halfway through the accreditation cycle, I'm the one who has to explain it.",
+  "would_change_my_mind": "Our ERP vendor confirming they won't build this soon, plus two or three comparable private colleges that have used UniDash for over a year and show the missed-submission drop in a form we could put in our NAAC file.",
+  "price_too_cheap": 30,
+  "price_cheap": 75,
+  "price_expensive": 150,
+  "price_too_expensive": 250
+}

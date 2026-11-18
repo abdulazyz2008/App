@@ -1,0 +1,13 @@
+{
+  "id": "P019",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "Yeah, I missed a deadline last sem, so I get why this exists. But the first thing it asks is to sign in with my college Microsoft account, and I don't hand that to some random app the uni is paying for. I'd skip it and keep checking the portal and the class WhatsApp group.",
+  "objection": "What can it actually see once I sign in with my college account? And if the university is paying for it, whose side is it on, mine or theirs? Plus I bet it buzzes me ten times a day until I turn notifications off, and then there's no point having it.",
+  "would_change_my_mind": "A clear one-screen explanation of exactly what it can read from my account (only deadlines and notices, not my email or files), and per-course control over notifications so it only pings me about real deadlines.",
+  "price_too_cheap": 10,
+  "price_cheap": 29,
+  "price_expensive": 79,
+  "price_too_expensive": 149
+}

@@ -1,0 +1,13 @@
+{
+  "id": "P005",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "timing",
+  "reason": "There is no budget left this academic year, and ₹9 lakh is not something I can put to the trustees mid-year for a problem the faculty WhatsApp groups already roughly handle. At most I would let one batch try the free pilot, but that is not a purchase.",
+  "objection": "This is a new recurring line item from a small startup, and I would have to justify it to a committee against things that feel more urgent. Getting IT to open Microsoft 365 and our ERP to an unknown vendor is a fight of its own, and if they shut down in two years we are back to WhatsApp anyway.",
+  "would_change_my_mind": "A pilot report showing missed submissions clearly dropped in our own batch, timed so I can put it into next year's budget proposal, ideally with a lower per-student price or a cap for a college our size.",
+  "price_too_cheap": 40,
+  "price_cheap": 100,
+  "price_expensive": 200,
+  "price_too_expensive": 350
+}

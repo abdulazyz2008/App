@@ -1,0 +1,222 @@
+[
+ {
+  "id": "P001",
+  "name": "Oscar",
+  "age": 62,
+  "segment": "Dean of students or academic dean",
+  "income": 1575000,
+  "behaviour": "Happy with the current ERP vendor",
+  "behaviour_how": "Bought the college ERP years ago and expects new features to come from that vendor.",
+  "objection": "There is no budget left this academic year",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P002",
+  "name": "Nia",
+  "age": 37,
+  "segment": "Director, principal or trustee of a private college",
+  "income": 6974000,
+  "behaviour": "Rankings and accreditation chaser",
+  "behaviour_how": "Buys things that help NAAC/NIRF scores and look good to applicants.",
+  "objection": "Our ERP already has a student app",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P003",
+  "name": "Olivia",
+  "age": 36,
+  "segment": "Director, principal or trustee of a private college",
+  "income": 4158000,
+  "behaviour": "Budget guardian",
+  "behaviour_how": "Every new spend needs a committee or trustee approval and a clear reason.",
+  "objection": "Students already get every notice on WhatsApp groups",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P004",
+  "name": "Bilal",
+  "age": 52,
+  "segment": "Dean of students or academic dean",
+  "income": 1642000,
+  "behaviour": "Overloaded, ignores vendors",
+  "behaviour_how": "Gets many vendor pitches a week and answers almost none.",
+  "objection": "Our ERP already has a student app",
+  "habit": "a NAAC accreditation visit is due next year"
+ },
+ {
+  "id": "P005",
+  "name": "Felix",
+  "age": 36,
+  "segment": "Dean of students or academic dean",
+  "income": 1502000,
+  "behaviour": "Budget guardian",
+  "behaviour_how": "Every new spend needs a committee or trustee approval and a clear reason.",
+  "objection": "There is no budget left this academic year",
+  "habit": "class notices mostly go out through WhatsApp groups run by faculty"
+ },
+ {
+  "id": "P006",
+  "name": "Lena",
+  "age": 37,
+  "segment": "IT head / CIO of a private university or college",
+  "income": 1671000,
+  "behaviour": "Rankings and accreditation chaser",
+  "behaviour_how": "Buys things that help NAAC/NIRF scores and look good to applicants.",
+  "objection": "A tiny new startup: will it still exist next year?",
+  "habit": "class notices mostly go out through WhatsApp groups run by faculty"
+ },
+ {
+  "id": "P007",
+  "name": "Nora",
+  "age": 39,
+  "segment": "Director, principal or trustee of a private college",
+  "income": 4927000,
+  "behaviour": "Happy with the current ERP vendor",
+  "behaviour_how": "Bought the college ERP years ago and expects new features to come from that vendor.",
+  "objection": "A tiny new startup: will it still exist next year?",
+  "habit": "a NAAC accreditation visit is due next year"
+ },
+ {
+  "id": "P008",
+  "name": "Mason",
+  "age": 35,
+  "segment": "Dean of students or academic dean",
+  "income": 1586000,
+  "behaviour": "Happy with the current ERP vendor",
+  "behaviour_how": "Bought the college ERP years ago and expects new features to come from that vendor.",
+  "objection": "Students already get every notice on WhatsApp groups",
+  "habit": "your college uses Microsoft 365 for staff and student email"
+ },
+ {
+  "id": "P009",
+  "name": "Leila",
+  "age": 32,
+  "segment": "Dean of students or academic dean",
+  "income": 1764000,
+  "behaviour": "Wants proof first",
+  "behaviour_how": "Asks which other colleges use it and wants to speak to them.",
+  "objection": "Will my staff have to enter everything a second time?",
+  "habit": "class notices mostly go out through WhatsApp groups run by faculty"
+ },
+ {
+  "id": "P010",
+  "name": "Anya",
+  "age": 61,
+  "segment": "Registrar or head of administration",
+  "income": 2484000,
+  "behaviour": "Happy with the current ERP vendor",
+  "behaviour_how": "Bought the college ERP years ago and expects new features to come from that vendor.",
+  "objection": "Students already get every notice on WhatsApp groups",
+  "habit": "class notices mostly go out through WhatsApp groups run by faculty"
+ },
+ {
+  "id": "P011",
+  "name": "Marco",
+  "age": 61,
+  "segment": "Registrar or head of administration",
+  "income": 2875000,
+  "behaviour": "Overloaded, ignores vendors",
+  "behaviour_how": "Gets many vendor pitches a week and answers almost none.",
+  "objection": "Student data privacy and the DPDP Act",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P012",
+  "name": "Ana",
+  "age": 48,
+  "segment": "IT head / CIO of a private university or college",
+  "income": 1649000,
+  "behaviour": "Data and security cautious",
+  "behaviour_how": "Worries about student data leaks and outside apps touching Microsoft 365.",
+  "objection": "Will my staff have to enter everything a second time?",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P013",
+  "name": "Aisha",
+  "age": 40,
+  "segment": "Registrar or head of administration",
+  "income": 2185000,
+  "behaviour": "Wants proof first",
+  "behaviour_how": "Asks which other colleges use it and wants to speak to them.",
+  "objection": "Our ERP already has a student app",
+  "habit": "students complain every semester that they missed an exam notice"
+ },
+ {
+  "id": "P014",
+  "name": "Eli",
+  "age": 33,
+  "segment": "IT head / CIO of a private university or college",
+  "income": 3236000,
+  "behaviour": "Budget guardian",
+  "behaviour_how": "Every new spend needs a committee or trustee approval and a clear reason.",
+  "objection": "Our ERP already has a student app",
+  "habit": "class notices mostly go out through WhatsApp groups run by faculty"
+ },
+ {
+  "id": "P015",
+  "name": "Rohan",
+  "age": 38,
+  "segment": "IT head / CIO of a private university or college",
+  "income": 1603000,
+  "behaviour": "Data and security cautious",
+  "behaviour_how": "Worries about student data leaks and outside apps touching Microsoft 365.",
+  "objection": "A tiny new startup: will it still exist next year?",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P016",
+  "name": "Maya",
+  "age": 41,
+  "segment": "Director, principal or trustee of a private college",
+  "income": 3150000,
+  "behaviour": "Data and security cautious",
+  "behaviour_how": "Worries about student data leaks and outside apps touching Microsoft 365.",
+  "objection": "There is no budget left this academic year",
+  "habit": "class notices mostly go out through WhatsApp groups run by faculty"
+ },
+ {
+  "id": "P017",
+  "name": "Kai",
+  "age": 52,
+  "segment": "IT head / CIO of a private university or college",
+  "income": 1428000,
+  "behaviour": "Overloaded, ignores vendors",
+  "behaviour_how": "Gets many vendor pitches a week and answers almost none.",
+  "objection": "Students already get every notice on WhatsApp groups",
+  "habit": "students complain every semester that they missed an exam notice"
+ },
+ {
+  "id": "P018",
+  "name": "Elle",
+  "age": 56,
+  "segment": "Registrar or head of administration",
+  "income": 2891000,
+  "behaviour": "Budget guardian",
+  "behaviour_how": "Every new spend needs a committee or trustee approval and a clear reason.",
+  "objection": "Students already get every notice on WhatsApp groups",
+  "habit": "vendor purchases are approved after a committee meeting"
+ },
+ {
+  "id": "P019",
+  "name": "Farah",
+  "age": 36,
+  "segment": "IT head / CIO of a private university or college",
+  "income": 2324000,
+  "behaviour": "Rankings and accreditation chaser",
+  "behaviour_how": "Buys things that help NAAC/NIRF scores and look good to applicants.",
+  "objection": "A tiny new startup: will it still exist next year?",
+  "habit": "your college uses Microsoft 365 for staff and student email"
+ },
+ {
+  "id": "P020",
+  "name": "Sofia",
+  "age": 60,
+  "segment": "Dean of students or academic dean",
+  "income": 1697000,
+  "behaviour": "Wants proof first",
+  "behaviour_how": "Asks which other colleges use it and wants to speak to them.",
+  "objection": "Will my staff have to enter everything a second time?",
+  "habit": "your college uses Microsoft 365 for staff and student email"
+ }
+]

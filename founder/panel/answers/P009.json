@@ -1,0 +1,13 @@
+{
+  "id": "P009",
+  "buys": false,
+  "purchases_first_month": 0,
+  "reason_code": "trust",
+  "reason": "I might let them run the free pilot on one batch, but I would not commit the university to a paid contract with a small startup that cannot name a single college already using it. Our notices actually live in faculty WhatsApp groups, so 'reads what staff already publish' in Microsoft 365 or the ERP may miss most of what matters.",
+  "objection": "Who else uses this? Give me two colleges like ours whose dean I can call. And if most notices go out on WhatsApp, either my staff end up posting everything again in the ERP or the app shows half the picture.",
+  "would_change_my_mind": "Speaking to deans at two or three comparable Indian private or autonomous colleges already using it, plus a pilot report showing a clear drop in missed submissions without my staff entering anything twice.",
+  "price_too_cheap": 50,
+  "price_cheap": 120,
+  "price_expensive": 250,
+  "price_too_expensive": 400
+}
