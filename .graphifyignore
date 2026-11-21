@@ -1,0 +1,3 @@
+# Keep the graph on the app, not installed Claude tooling
+.claude/
+.agents/

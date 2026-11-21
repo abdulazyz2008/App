@@ -1,0 +1,284 @@
+{
+  ".github/workflows/desktop.yml": {
+    "mtime": 1795000812.1021287,
+    "seen": 1795279119.2861242,
+    "ast_hash": "601790900a0aa4b72dcf8b4ec7dd2c19",
+    "semantic_hash": ""
+  },
+  "desktop.py": {
+    "mtime": 1795000812.1021287,
+    "seen": 1795279119.286131,
+    "ast_hash": "deb4690261288a0240beda34447ea1da",
+    "semantic_hash": ""
+  },
+  "packaging/smoke_test.py": {
+    "mtime": 1795000812.1030574,
+    "seen": 1795279119.2861335,
+    "ast_hash": "3b4f9b6bacef460a329f8f37e12145bd",
+    "semantic_hash": ""
+  },
+  "render.yaml": {
+    "mtime": 1795000812.1030574,
+    "seen": 1795279119.286135,
+    "ast_hash": "19ff61593e967f4f02016aff2123ed38",
+    "semantic_hash": ""
+  },
+  "run.py": {
+    "mtime": 1795000812.1030574,
+    "seen": 1795279119.2861364,
+    "ast_hash": "4b25876f10e9f39a7d892b0e6e5505dc",
+    "semantic_hash": ""
+  },
+  "sealsend/__init__.py": {
+    "mtime": 1795000812.1032252,
+    "seen": 1795279119.2861373,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": ""
+  },
+  "sealsend/assistant.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861385,
+    "ast_hash": "dbc5f7ce7a79e43160eeee70d2873af1",
+    "semantic_hash": ""
+  },
+  "sealsend/certificate.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861397,
+    "ast_hash": "e6039b0ad7662e53c0cf519dc33ec406",
+    "semantic_hash": ""
+  },
+  "sealsend/chaos.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861407,
+    "ast_hash": "1a67b402789234f7b1c15d39173efd0d",
+    "semantic_hash": ""
+  },
+  "sealsend/clubs.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861416,
+    "ast_hash": "c2b3e37c002383a981a78d64246e81f2",
+    "semantic_hash": ""
+  },
+  "sealsend/config.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861428,
+    "ast_hash": "b8068153d74efaf01c8076695fc5d10c",
+    "semantic_hash": ""
+  },
+  "sealsend/copilot.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861443,
+    "ast_hash": "6eba206ea1bb0e68908ef376b7484cce",
+    "semantic_hash": ""
+  },
+  "sealsend/crypto.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.286145,
+    "ast_hash": "012a68d3e110bde02bd5fa44c54a2149",
+    "semantic_hash": ""
+  },
+  "sealsend/data.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861457,
+    "ast_hash": "a3838983f538c7a8040106893e31ea3b",
+    "semantic_hash": ""
+  },
+  "sealsend/db.py": {
+    "mtime": 1795000812.1032784,
+    "seen": 1795279119.2861469,
+    "ast_hash": "f033069f284dfa846c4c832478ddc6c4",
+    "semantic_hash": ""
+  },
+  "sealsend/gsheets.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861476,
+    "ast_hash": "2d9d1beb21c46d5e608ff1c2df0f98b6",
+    "semantic_hash": ""
+  },
+  "sealsend/keepawake.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861483,
+    "ast_hash": "7d85f5e814c655e67be7aa396a4b6973",
+    "semantic_hash": ""
+  },
+  "sealsend/mailer.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861493,
+    "ast_hash": "54c4493f599a177523ff1c8dcc5a858d",
+    "semantic_hash": ""
+  },
+  "sealsend/main.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861505,
+    "ast_hash": "c5869030a45bcf96c88a7a31f8fb161d",
+    "semantic_hash": ""
+  },
+  "sealsend/pipeline.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861512,
+    "ast_hash": "ba6b9dfa8f870fcc2768fa2b8865630b",
+    "semantic_hash": ""
+  },
+  "sealsend/reports.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861521,
+    "ast_hash": "7f1afa9d4f31d8902cb86293324751c9",
+    "semantic_hash": ""
+  },
+  "sealsend/settings.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.286153,
+    "ast_hash": "75fe766e1be31073b5aa1eef7eeefcab",
+    "semantic_hash": ""
+  },
+  "sealsend/sharecard.py": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.286154,
+    "ast_hash": "033512c1e66e2a308e1ab17bb82face3",
+    "semantic_hash": ""
+  },
+  "sealsend/templates_lib.py": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.2861547,
+    "ast_hash": "aa37433c56e8f5b7727c36619b2ccaf0",
+    "semantic_hash": ""
+  },
+  "sealsend/tunnel.py": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.2861557,
+    "ast_hash": "dc83684f176d79510ed5b8a57f96c754",
+    "semantic_hash": ""
+  },
+  "skills-lock.json": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.2861567,
+    "ast_hash": "3b6b6ac7ebe913d546d90c7eafe166a4",
+    "semantic_hash": ""
+  },
+  "start-linux.sh": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.2861574,
+    "ast_hash": "3d95b85958d423f4bf336b0ede21eaf2",
+    "semantic_hash": ""
+  },
+  "start-online-linux.sh": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.286158,
+    "ast_hash": "281e9364f31b6e3dfc95c807d296cf90",
+    "semantic_hash": ""
+  },
+  "tests/test_pipeline.py": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.2861588,
+    "ast_hash": "8b832bedf9c714d624a171e8c8880e41",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1795278972.9280746,
+    "seen": 1795279119.2861595,
+    "ast_hash": "dfe5fa7939121e96d61b54077cc9ab84",
+    "semantic_hash": ""
+  },
+  "EXTRA_FEATURES.md": {
+    "mtime": 1795000812.1021287,
+    "seen": 1795279119.2861607,
+    "ast_hash": "c1551530fb9a09a3dc3e7ad107cd0d92",
+    "semantic_hash": ""
+  },
+  "README.md": {
+    "mtime": 1795000812.1021287,
+    "seen": 1795279119.2861617,
+    "ast_hash": "69f749a1368a39ee483097af591581c3",
+    "semantic_hash": ""
+  },
+  "SKILLS-CATALOG.md": {
+    "mtime": 1795000812.1021287,
+    "seen": 1795279119.2861624,
+    "ast_hash": "87c16fbd0f704068b445ed1becdb896b",
+    "semantic_hash": ""
+  },
+  "USER_GUIDE.md": {
+    "mtime": 1795000812.1021287,
+    "seen": 1795279119.286163,
+    "ast_hash": "804cdc31d53fb3cc6443c210eed93a20",
+    "semantic_hash": ""
+  },
+  "obsidian-vault/AI Automation Agency/README.md": {
+    "mtime": 1795000812.1029668,
+    "seen": 1795279119.2861643,
+    "ast_hash": "89b776e3a15da4e2755c9e430c2bff8a",
+    "semantic_hash": ""
+  },
+  "obsidian-vault/AI Automation Agency/STATUS.md": {
+    "mtime": 1795000812.1029968,
+    "seen": 1795279119.286165,
+    "ast_hash": "df6056a18c5acec771a02d2dbcf8000a",
+    "semantic_hash": ""
+  },
+  "obsidian-vault/AI Automation Agency/decisions.md": {
+    "mtime": 1795000812.1029968,
+    "seen": 1795279119.2861657,
+    "ast_hash": "0351147c424e144dc64858e124175119",
+    "semantic_hash": ""
+  },
+  "obsidian-vault/AI Automation Agency/progress.md": {
+    "mtime": 1795000812.1029968,
+    "seen": 1795279119.2861667,
+    "ast_hash": "3b6732333cfe2801485a6b963462a5ca",
+    "semantic_hash": ""
+  },
+  "requirements-app.txt": {
+    "mtime": 1795000812.1030574,
+    "seen": 1795279119.2861676,
+    "ast_hash": "0418b17382a3739f1151c2e393032760",
+    "semantic_hash": ""
+  },
+  "requirements-desktop.txt": {
+    "mtime": 1795000812.1030574,
+    "seen": 1795279119.2861686,
+    "ast_hash": "971d54c0027b88d9318785ff351e26fb",
+    "semantic_hash": ""
+  },
+  "requirements.txt": {
+    "mtime": 1795000812.1030574,
+    "seen": 1795279119.2861695,
+    "ast_hash": "e1f4651e27c31c63f0aaa0b4d0f1dee6",
+    "semantic_hash": ""
+  },
+  "sealsend/fonts/DejaVu-LICENSE.txt": {
+    "mtime": 1795000812.1041026,
+    "seen": 1795279119.2861705,
+    "ast_hash": "4371aaffe3632684a8a122ed7c8ef79d",
+    "semantic_hash": ""
+  },
+  "sealsend/fonts/OFL.txt": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861712,
+    "ast_hash": "6f740092c06e713dec84c38033ce2202",
+    "semantic_hash": ""
+  },
+  "sealsend/static/index.html": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.286173,
+    "ast_hash": "34820dc62546e986175c22d72fadf16d",
+    "semantic_hash": ""
+  },
+  "sealsend/static/apple-touch-icon.png": {
+    "mtime": 1795000812.1202807,
+    "seen": 1795279119.2861743,
+    "ast_hash": "d8ddd3493b35b95390ddf5f0cd9ed532",
+    "semantic_hash": ""
+  },
+  "sealsend/static/icon-192.png": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.2861753,
+    "ast_hash": "aee7dffd810580e13992c32f4cbec3e2",
+    "semantic_hash": ""
+  },
+  "sealsend/static/icon-512.png": {
+    "mtime": 1795000812.1266234,
+    "seen": 1795279119.286176,
+    "ast_hash": "4960fa0828076bce22abb64788f9adee",
+    "semantic_hash": ""
+  }
+}

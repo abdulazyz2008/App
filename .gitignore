@@ -13,3 +13,6 @@ dist/
 
 # Lead lists with business phone numbers - keep out of the repo
 leads/
+
+# graphify build cache
+graphify-out/cache/
